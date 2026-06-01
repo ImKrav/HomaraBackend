@@ -14,5 +14,5 @@ export const registerSchema = z.object({
 
 export const loginSchema = z.object({
   email: z.string().email("Email inválido").transform((val) => val.toLowerCase().trim()),
-  password: z.string().min(1, "Contraseña es requerida"),
+  password: z.string().min(1, "Contraseña es requerida").regex(/\S/, "Contraseña no puede ser solo espacios"),
 });
