@@ -130,7 +130,7 @@ describe("Project Use Cases", () => {
         3,
         4,
         null,
-        20, // Nuevo área
+        20,
         "ceramica",
         "60x60",
         "🏠",
@@ -140,7 +140,7 @@ describe("Project Use Cases", () => {
       mockProjectRepository.update.mockResolvedValue(updatedProject);
 
       const useCase = new UpdateProjectUseCase(mockProjectRepository);
-      const result = await useCase.execute("proj-1", {
+      const result = await useCase.execute("proj-1", "user-123", {
         name: "Sala Renovada",
         area: 20
       });
@@ -164,21 +164,48 @@ describe("Project Use Cases", () => {
       const useCase = new UpdateProjectUseCase(mockProjectRepository);
 
       await expect(
-        useCase.execute("proj-999", { name: "Nuevo Nombre" })
+        useCase.execute("proj-999", "user-123", { name: "Nuevo Nombre" })
       ).rejects.toThrowError(
         new AppError("Proyecto no encontrado", 404)
+      );
+    });
+
+    it("debe lanzar AppError 403 si el usuario no es el dueño del proyecto", async () => {
+      const existingProject = new Project(
+        "proj-1",
+        "Sala",
+        "PISO",
+        "EN_PROGRESO",
+        3,
+        4,
+        null,
+        12,
+        "ceramica",
+        "60x60",
+        "🏠",
+        150000,
+        "user-123"
+      );
+      mockProjectRepository.findById.mockResolvedValue(existingProject);
+
+      const useCase = new UpdateProjectUseCase(mockProjectRepository);
+
+      await expect(
+        useCase.execute("proj-1", "other-user", { name: "Hackeado" })
+      ).rejects.toThrowError(
+        new AppError("No tienes permiso para modificar este proyecto.", 403)
       );
     });
   });
 
   describe("DeleteProjectUseCase", () => {
-    it("debe eliminar el proyecto si existe", async () => {
+    it("debe eliminar el proyecto si existe y el usuario es el dueño", async () => {
       const project = new Project("proj-1", "Sala", "PISO", "EN_PROGRESO", 3, 4, null, 12, "ceramica", "60x60", "🏠", 150000, "user-123");
       mockProjectRepository.findById.mockResolvedValue(project);
       mockProjectRepository.delete.mockResolvedValue(undefined);
 
       const useCase = new DeleteProjectUseCase(mockProjectRepository);
-      await useCase.execute("proj-1");
+      await useCase.execute("proj-1", "user-123");
 
       expect(mockProjectRepository.findById).toHaveBeenCalledWith("proj-1");
       expect(mockProjectRepository.delete).toHaveBeenCalledWith("proj-1");
@@ -189,8 +216,19 @@ describe("Project Use Cases", () => {
 
       const useCase = new DeleteProjectUseCase(mockProjectRepository);
 
-      await expect(useCase.execute("proj-999")).rejects.toThrowError(
+      await expect(useCase.execute("proj-999", "user-123")).rejects.toThrowError(
         new AppError("Proyecto no encontrado", 404)
+      );
+    });
+
+    it("debe lanzar AppError 403 si el usuario no es el dueño del proyecto", async () => {
+      const project = new Project("proj-1", "Sala", "PISO", "EN_PROGRESO", 3, 4, null, 12, "ceramica", "60x60", "🏠", 150000, "user-123");
+      mockProjectRepository.findById.mockResolvedValue(project);
+
+      const useCase = new DeleteProjectUseCase(mockProjectRepository);
+
+      await expect(useCase.execute("proj-1", "other-user")).rejects.toThrowError(
+        new AppError("No tienes permiso para eliminar este proyecto.", 403)
       );
     });
   });

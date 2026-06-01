@@ -74,6 +74,7 @@ export class UpdateProjectUseCase {
 
   async execute(
     id: string,
+    userId: string,
     data: {
       name?: string;
       type?: "PISO" | "PARED" | "TECHO" | "INTEGRAL";
@@ -92,9 +93,12 @@ export class UpdateProjectUseCase {
       throw new AppError("Proyecto no encontrado", 404);
     }
 
+    if (existing.userId !== userId) {
+      throw new AppError("No tienes permiso para modificar este proyecto.", 403);
+    }
+
     const updateData: any = { ...data };
 
-    // Si cambian las dimensiones o el tipo, recalcular materiales
     if (
       data.area !== undefined ||
       data.materialType !== undefined ||
@@ -124,11 +128,16 @@ export class UpdateProjectUseCase {
 export class DeleteProjectUseCase {
   constructor(private readonly projectRepository: IProjectRepository) {}
 
-  async execute(id: string) {
+  async execute(id: string, userId: string) {
     const existing = await this.projectRepository.findById(id);
     if (!existing) {
       throw new AppError("Proyecto no encontrado", 404);
     }
+
+    if (existing.userId !== userId) {
+      throw new AppError("No tienes permiso para eliminar este proyecto.", 403);
+    }
+
     await this.projectRepository.delete(id);
   }
 }

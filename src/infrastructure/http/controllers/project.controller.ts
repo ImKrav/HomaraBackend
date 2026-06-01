@@ -47,7 +47,8 @@ export class ProjectController {
 
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await updateProjectUseCase.execute(req.params.id as string, req.body);
+      const userId = req.user!.id;
+      const result = await updateProjectUseCase.execute(req.params.id as string, userId, req.body);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -56,7 +57,8 @@ export class ProjectController {
 
   static async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await deleteProjectUseCase.execute(req.params.id as string);
+      const userId = req.user!.id;
+      await deleteProjectUseCase.execute(req.params.id as string, userId);
       res.json({ success: true, message: "Proyecto eliminado" });
     } catch (error) {
       next(error);
