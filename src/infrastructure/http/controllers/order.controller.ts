@@ -18,7 +18,10 @@ const DEMO_USER_ID = "demo-user-001";
 export class OrderController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || (req.query.userId as string) || DEMO_USER_ID;
+      const userId = req.user?.id || (req.query.userId as string);
+      if (!userId) {
+        return res.json({ success: true, data: [] });
+      }
       const isAdmin = req.query.admin === "true";
       const result = await listOrdersUseCase.execute({ userId, admin: isAdmin });
       res.json({ success: true, data: result });
@@ -38,7 +41,7 @@ export class OrderController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || req.body.userId || DEMO_USER_ID;
+      const userId = req.user!.id;
       const result = await createOrderUseCase.execute(userId, req.body);
       res.status(201).json({ success: true, data: result });
     } catch (error) {

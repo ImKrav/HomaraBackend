@@ -14,7 +14,20 @@ const DEMO_USER_ID = "demo-user-001";
 export class CartController {
   static async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || (req.query.userId as string) || DEMO_USER_ID;
+      const userId = req.user?.id || (req.query.userId as string);
+      if (!userId) {
+        return res.json({
+          success: true,
+          data: {
+            id: "guest",
+            items: [],
+            subtotal: 0,
+            shipping: 0,
+            total: 0,
+            itemCount: 0
+          }
+        });
+      }
       const result = await getCartUseCase.execute(userId);
       res.json({ success: true, data: result });
     } catch (error) {
@@ -25,7 +38,7 @@ export class CartController {
   static async addItem(req: Request, res: Response, next: NextFunction) {
     try {
       const { productId, quantity } = req.body;
-      const userId = req.user?.id || req.body.userId || DEMO_USER_ID;
+      const userId = req.user!.id;
       const result = await addCartItemUseCase.execute(userId, productId, quantity);
       res.status(201).json({ success: true, data: result });
     } catch (error) {

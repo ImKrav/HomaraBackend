@@ -15,7 +15,10 @@ const DEMO_USER_ID = "demo-user-001";
 export class ProjectController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || (req.query.userId as string) || DEMO_USER_ID;
+      const userId = req.user?.id || (req.query.userId as string);
+      if (!userId) {
+        return res.json({ success: true, data: [] });
+      }
       const result = await listUserProjectsUseCase.execute(userId);
       res.json({ success: true, data: result });
     } catch (error) {
@@ -34,7 +37,7 @@ export class ProjectController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || req.body.userId || DEMO_USER_ID;
+      const userId = req.user!.id;
       const result = await createProjectUseCase.execute({
         ...req.body,
         userId
