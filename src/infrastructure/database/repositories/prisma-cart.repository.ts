@@ -38,7 +38,7 @@ export class PrismaCartRepository implements ICartRepository {
       cart.userId,
       cart.createdAt,
       cart.updatedAt,
-      cart.items.map((item: any) => new CartItem(
+      cart.items.map((item) => new CartItem(
         item.id,
         item.quantity,
         item.cartId,
@@ -58,7 +58,7 @@ export class PrismaCartRepository implements ICartRepository {
           item.product.categoryId,
           item.product.createdAt,
           item.product.updatedAt,
-          item.product.tags.map((t: any) => t.name)
+          item.product.tags.map((t) => t.name)
         )
       ))
     );

@@ -17,7 +17,7 @@ export class AdminController {
         },
         select: { total: true },
       });
-      const currentMonthSales = currentMonthOrders.reduce((sum: number, o: any) => sum + o.total, 0);
+      const currentMonthSales = currentMonthOrders.reduce((sum: number, o) => sum + o.total, 0);
 
       // Ventas del mes anterior
       const lastMonthOrders = await prisma.order.findMany({
@@ -27,7 +27,7 @@ export class AdminController {
         },
         select: { total: true },
       });
-      const lastMonthSales = lastMonthOrders.reduce((sum: number, o: any) => sum + o.total, 0);
+      const lastMonthSales = lastMonthOrders.reduce((sum: number, o) => sum + o.total, 0);
 
       // Pedidos activos (pendiente + procesando + enviado)
       const activeOrders = await prisma.order.count({
@@ -70,7 +70,7 @@ export class AdminController {
       });
       
       const monthlySales = Array(12).fill(0);
-      currentYearOrders.forEach((o: any) => {
+      currentYearOrders.forEach((o) => {
         monthlySales[o.createdAt.getMonth()] += o.total;
       });
       const maxMonthlySale = Math.max(...monthlySales, 1);
@@ -89,7 +89,7 @@ export class AdminController {
       });
       const categorySales: Record<string, number> = {};
       let totalCategorySales = 0;
-      orderItems.forEach((item: any) => {
+      orderItems.forEach((item) => {
         const catName = item.product.category.name;
         if (!categorySales[catName]) categorySales[catName] = 0;
         categorySales[catName] += item.total;
@@ -147,9 +147,9 @@ export class AdminController {
         orderBy: { stockQuantity: "asc" },
       });
 
-      const lowStock = products.filter((p: any) => p.stockQuantity > 0 && p.stockQuantity < 50);
-      const outOfStock = products.filter((p: any) => !p.inStock);
-      const totalUnits = products.reduce((sum: number, p: any) => sum + p.stockQuantity, 0);
+      const lowStock = products.filter((p) => p.stockQuantity > 0 && p.stockQuantity < 50);
+      const outOfStock = products.filter((p) => !p.inStock);
+      const totalUnits = products.reduce((sum: number, p) => sum + p.stockQuantity, 0);
 
       res.json({
         success: true,
@@ -160,7 +160,7 @@ export class AdminController {
             lowStockCount: lowStock.length,
             outOfStockCount: outOfStock.length,
           },
-          products: products.map((p: any) => ({
+          products: products.map((p) => ({
             id: p.id,
             name: p.name,
             category: p.category.name,

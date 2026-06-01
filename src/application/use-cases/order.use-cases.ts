@@ -6,7 +6,14 @@ import { IOrderRepository } from "../../domain/repositories/order-repository.int
 import { ICartRepository } from "../../domain/repositories/cart-repository.interface.js";
 import { IProductRepository } from "../../domain/repositories/product-repository.interface.js";
 import { Order, OrderItem } from "../../domain/entities/order.js";
+import { Product } from "../../domain/entities/product.js";
 import { AppError } from "../../shared/errors/AppError.js";
+
+type ProductWithCategory = Product & {
+  category?: {
+    name: string;
+  };
+};
 
 export class ListOrdersUseCase {
   constructor(private readonly orderRepository: IOrderRepository) {}
@@ -54,7 +61,7 @@ export class GetOrderDetailUseCase {
         id: item.id,
         productName: item.product?.name || "Producto desconocido",
         productImage: item.product?.image || "",
-        category: (item.product as any)?.category?.name || "General",
+        category: (item.product as ProductWithCategory | undefined)?.category?.name || "General",
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         total: item.total,
@@ -138,6 +145,6 @@ export class UpdateOrderStatusUseCase {
       );
     }
 
-    return await this.orderRepository.updateStatus(id, upperStatus as any);
+    return await this.orderRepository.updateStatus(id, upperStatus as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO");
   }
 }

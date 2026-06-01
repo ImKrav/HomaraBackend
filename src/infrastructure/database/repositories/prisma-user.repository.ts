@@ -17,7 +17,7 @@ export class PrismaUserRepository implements IUserRepository {
       user.city,
       user.state,
       user.zipCode,
-      user.role as any,
+      user.role as "CUSTOMER" | "ADMIN",
       user.createdAt,
       user.updatedAt
     );
@@ -37,7 +37,7 @@ export class PrismaUserRepository implements IUserRepository {
       user.city,
       user.state,
       user.zipCode,
-      user.role as any,
+      user.role as "CUSTOMER" | "ADMIN",
       user.createdAt,
       user.updatedAt
     );
@@ -74,7 +74,7 @@ export class PrismaUserRepository implements IUserRepository {
       user.city,
       user.state,
       user.zipCode,
-      user.role as any,
+      user.role as "CUSTOMER" | "ADMIN",
       user.createdAt,
       user.updatedAt
     );
@@ -108,7 +108,7 @@ export class PrismaUserRepository implements IUserRepository {
       user.city,
       user.state,
       user.zipCode,
-      user.role as any,
+      user.role as "CUSTOMER" | "ADMIN",
       user.createdAt,
       user.updatedAt
     );

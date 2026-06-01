@@ -4,6 +4,11 @@ import { Cart, CartItem } from "../../../src/domain/entities/cart.js";
 import { Product } from "../../../src/domain/entities/product.js";
 import { AppError } from "../../../src/shared/errors/AppError.js";
 
+type MutableProductRelations = {
+  category?: { name: string; slug: string };
+  tags?: string[];
+};
+
 // Mock ICartRepository
 const mockCartRepository = {
   findByUserId: vi.fn(),
@@ -35,9 +40,9 @@ describe("Cart Use Cases", () => {
       );
       
       const cartItem = new CartItem("item-1", 2, "cart-123", "prod-1", product);
-      // Simular tags y category en product como objeto para el map de la capa de aplicación
-      (cartItem.product as any).category = { name: "Pisos", slug: "pisos" };
-      (cartItem.product as any).tags = [{ name: "nuevo" }];
+      const productWithRelations = cartItem.product as unknown as MutableProductRelations;
+      productWithRelations.category = { name: "Pisos", slug: "pisos" };
+      productWithRelations.tags = ["nuevo"];
 
       const cart = new Cart("cart-123", "user-123", new Date(), new Date(), [cartItem]);
       mockCartRepository.findByUserId.mockResolvedValue(cart);
@@ -76,8 +81,9 @@ describe("Cart Use Cases", () => {
       );
       
       const cartItem = new CartItem("item-2", 2, "cart-123", "prod-2", product);
-      (cartItem.product as any).category = { name: "Baño", slug: "banio" };
-      (cartItem.product as any).tags = [{ name: "popular" }];
+      const productWithRelations = cartItem.product as unknown as MutableProductRelations;
+      productWithRelations.category = { name: "Baño", slug: "banio" };
+      productWithRelations.tags = ["popular"];
 
       const cart = new Cart("cart-123", "user-123", new Date(), new Date(), [cartItem]);
       mockCartRepository.findByUserId.mockResolvedValue(cart);

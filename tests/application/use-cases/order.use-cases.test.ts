@@ -5,6 +5,10 @@ import { Cart, CartItem } from "../../../src/domain/entities/cart.js";
 import { Product } from "../../../src/domain/entities/product.js";
 import { AppError } from "../../../src/shared/errors/AppError.js";
 
+type MutableProductCategory = {
+  category?: { name: string };
+};
+
 // Mocks
 const mockOrderRepository = {
   findAll: vi.fn(),
@@ -89,7 +93,8 @@ describe("Order Use Cases", () => {
       );
       
       const orderItem = new OrderItem("item-1", 2, 150000, 300000, "ord-123", "prod-1", product);
-      (orderItem.product as any).category = { name: "Pisos" };
+      const productWithCategory = orderItem.product as unknown as MutableProductCategory;
+      productWithCategory.category = { name: "Pisos" };
 
       const order = new Order(
         "ord-123",

@@ -5,7 +5,7 @@ import { prisma } from "../prisma-client.js";
 export class PrismaCategoryRepository implements ICategoryRepository {
   async findAll(): Promise<Category[]> {
     const categories = await prisma.category.findMany();
-    return categories.map((c: any) => new Category(c.id, c.name, c.slug, c.description, c.icon));
+    return categories.map((c) => new Category(c.id, c.name, c.slug, c.description, c.icon));
   }
 
   async findBySlug(slug: string): Promise<Category | null> {

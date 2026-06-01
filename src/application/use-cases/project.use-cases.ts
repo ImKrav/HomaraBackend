@@ -69,6 +69,8 @@ export class CreateProjectUseCase {
   }
 }
 
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+
 export class UpdateProjectUseCase {
   constructor(private readonly projectRepository: IProjectRepository) {}
 
@@ -97,7 +99,7 @@ export class UpdateProjectUseCase {
       throw new AppError("No tienes permiso para modificar este proyecto.", 403);
     }
 
-    const updateData: any = { ...data };
+    const updateData: Writeable<Parameters<IProjectRepository["update"]>[1]> = { ...data };
 
     if (
       data.area !== undefined ||

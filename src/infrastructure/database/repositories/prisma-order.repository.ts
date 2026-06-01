@@ -2,6 +2,7 @@ import { IOrderRepository } from "../../../domain/repositories/order-repository.
 import { Order, OrderItem } from "../../../domain/entities/order.js";
 import { Product } from "../../../domain/entities/product.js";
 import { prisma } from "../prisma-client.js";
+import { Prisma } from "../../../../generated/prisma/client.js";
 
 export class PrismaOrderRepository implements IOrderRepository {
   async findAll(filters?: { userId?: string; admin?: boolean }): Promise<Order[]> {
@@ -19,10 +20,10 @@ export class PrismaOrderRepository implements IOrderRepository {
       orderBy: { createdAt: "desc" }
     });
 
-    return orders.map((o: any) => new Order(
+    return orders.map((o) => new Order(
       o.id,
       o.orderNumber,
-      o.status as any,
+      o.status as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO",
       o.subtotal,
       o.shippingCost,
       o.total,
@@ -35,7 +36,7 @@ export class PrismaOrderRepository implements IOrderRepository {
       o.userId,
       o.createdAt,
       o.updatedAt,
-      o.items.map((item: any) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
+      o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
       { firstName: o.user.firstName, lastName: o.user.lastName }
     ));
   }
@@ -63,7 +64,7 @@ export class PrismaOrderRepository implements IOrderRepository {
     return new Order(
       o.id,
       o.orderNumber,
-      o.status as any,
+      o.status as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO",
       o.subtotal,
       o.shippingCost,
       o.total,
@@ -76,7 +77,7 @@ export class PrismaOrderRepository implements IOrderRepository {
       o.userId,
       o.createdAt,
       o.updatedAt,
-      o.items.map((item: any) => new OrderItem(
+      o.items.map((item) => new OrderItem(
         item.id,
         item.quantity,
         item.unitPrice,
@@ -116,7 +117,7 @@ export class PrismaOrderRepository implements IOrderRepository {
     const orderNumber = `ORD-${year}-${String(count + 1).padStart(3, "0")}`;
 
     // Ejecutar transaccionalmente el checkout completo
-    const createdOrder = await prisma.$transaction(async (tx: any) => {
+    const createdOrder = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // 1. Crear Orden
       const order = await tx.order.create({
         data: {
@@ -132,7 +133,7 @@ export class PrismaOrderRepository implements IOrderRepository {
           shippingZip: data.shippingZip,
           shippingNotes: data.shippingNotes,
           items: {
-            create: data.items.map((item: any) => ({
+            create: data.items.map((item) => ({
               productId: item.productId,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
@@ -173,7 +174,7 @@ export class PrismaOrderRepository implements IOrderRepository {
     return new Order(
       createdOrder.id,
       createdOrder.orderNumber,
-      createdOrder.status as any,
+      createdOrder.status as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO",
       createdOrder.subtotal,
       createdOrder.shippingCost,
       createdOrder.total,
@@ -186,7 +187,7 @@ export class PrismaOrderRepository implements IOrderRepository {
       createdOrder.userId,
       createdOrder.createdAt,
       createdOrder.updatedAt,
-      createdOrder.items.map((item: any) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
+      createdOrder.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
       { firstName: createdOrder.user.firstName, lastName: createdOrder.user.lastName }
     );
   }
@@ -204,7 +205,7 @@ export class PrismaOrderRepository implements IOrderRepository {
     return new Order(
       o.id,
       o.orderNumber,
-      o.status as any,
+      o.status as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO",
       o.subtotal,
       o.shippingCost,
       o.total,
@@ -217,7 +218,7 @@ export class PrismaOrderRepository implements IOrderRepository {
       o.userId,
       o.createdAt,
       o.updatedAt,
-      o.items.map((item: any) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
+      o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
       { firstName: o.user.firstName, lastName: o.user.lastName }
     );
   }

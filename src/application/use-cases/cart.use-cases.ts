@@ -3,7 +3,15 @@
 // ============================================
 
 import { ICartRepository } from "../../domain/repositories/cart-repository.interface.js";
+import { Product } from "../../domain/entities/product.js";
 import { AppError } from "../../shared/errors/AppError.js";
+
+type ProductWithRelations = Product & {
+  category?: {
+    name: string;
+    slug: string;
+  };
+};
 
 export class GetCartUseCase {
   constructor(private readonly cartRepository: ICartRepository) {}
@@ -12,26 +20,29 @@ export class GetCartUseCase {
     const cart = await this.cartRepository.findByUserId(userId);
     
     // Formatear items del carrito de la forma que espera el frontend
-    const items = (cart.items || []).map((item) => ({
-      id: item.id,
-      quantity: item.quantity,
-      product: {
-        id: item.product?.id,
-        name: item.product?.name,
-        description: item.product?.description,
-        price: item.product?.price,
-        originalPrice: item.product?.originalPrice,
-        image: item.product?.image,
-        category: (item.product as any)?.category?.name || "Sin Categoría",
-        categorySlug: (item.product as any)?.category?.slug || "sin-categoria",
-        rating: item.product?.rating,
-        reviews: item.product?.reviewCount,
-        inStock: item.product?.inStock,
-        stockQuantity: item.product?.stockQuantity,
-        unit: item.product?.unit,
-        tags: (item.product as any)?.tags?.map((t: any) => t.name) || [],
-      },
-    }));
+    const items = (cart.items || []).map((item) => {
+      const product = item.product as ProductWithRelations | undefined;
+      return {
+        id: item.id,
+        quantity: item.quantity,
+        product: {
+          id: product?.id,
+          name: product?.name,
+          description: product?.description,
+          price: product?.price,
+          originalPrice: product?.originalPrice,
+          image: product?.image,
+          category: product?.category?.name || "Sin Categoría",
+          categorySlug: product?.category?.slug || "sin-categoria",
+          rating: product?.rating,
+          reviews: product?.reviewCount,
+          inStock: product?.inStock,
+          stockQuantity: product?.stockQuantity,
+          unit: product?.unit,
+          tags: product?.tags || [],
+        },
+      };
+    });
 
     const subtotal = items.reduce(
       (sum, item) => sum + (item.product.price || 0) * item.quantity,

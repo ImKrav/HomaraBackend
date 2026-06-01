@@ -1,10 +1,11 @@
 import { IProductRepository } from "../../../domain/repositories/product-repository.interface.js";
 import { Product } from "../../../domain/entities/product.js";
 import { prisma } from "../prisma-client.js";
+import { Prisma } from "../../../../generated/prisma/client.js";
 
 export class PrismaProductRepository implements IProductRepository {
   async findAll(filters?: { categorySlug?: string; query?: string; tag?: string }): Promise<Product[]> {
-    const where: any = {};
+    const where: Prisma.ProductWhereInput = {};
 
     if (filters?.categorySlug) {
       where.category = { slug: filters.categorySlug };
@@ -29,7 +30,7 @@ export class PrismaProductRepository implements IProductRepository {
       }
     });
 
-    return products.map((p: any) => new Product(
+    return products.map((p) => new Product(
       p.id,
       p.name,
       p.description,
@@ -44,7 +45,7 @@ export class PrismaProductRepository implements IProductRepository {
       p.categoryId,
       p.createdAt,
       p.updatedAt,
-      p.tags.map((t: any) => t.name)
+      p.tags.map((t) => t.name)
     ));
   }
 
@@ -70,7 +71,7 @@ export class PrismaProductRepository implements IProductRepository {
       p.categoryId,
       p.createdAt,
       p.updatedAt,
-      p.tags.map((t: any) => t.name)
+      p.tags.map((t) => t.name)
     );
   }
 
@@ -90,7 +91,7 @@ export class PrismaProductRepository implements IProductRepository {
         unit: data.unit,
         categoryId: data.categoryId,
         tags: {
-          create: (data.tags || []).map((t: any) => ({ name: t }))
+          create: (data.tags || []).map((t) => ({ name: t }))
         }
       },
       include: { tags: true }
@@ -111,7 +112,7 @@ export class PrismaProductRepository implements IProductRepository {
       p.categoryId,
       p.createdAt,
       p.updatedAt,
-      p.tags.map((t: any) => t.name)
+      p.tags.map((t) => t.name)
     );
   }
 

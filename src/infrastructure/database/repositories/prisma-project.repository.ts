@@ -1,6 +1,7 @@
 import { IProjectRepository } from "../../../domain/repositories/project-repository.interface.js";
 import { Project, ProjectMaterial } from "../../../domain/entities/project.js";
 import { prisma } from "../prisma-client.js";
+import { Prisma } from "../../../../generated/prisma/client.js";
 
 export class PrismaProjectRepository implements IProjectRepository {
   async findAllByUserId(userId: string): Promise<Project[]> {
@@ -10,11 +11,11 @@ export class PrismaProjectRepository implements IProjectRepository {
       orderBy: { createdAt: "desc" }
     });
 
-    return projects.map((p: any) => new Project(
+    return projects.map((p) => new Project(
       p.id,
       p.name,
-      p.type as any,
-      p.status as any,
+      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
+      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
       p.length,
       p.width,
       p.height,
@@ -26,7 +27,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       p.userId,
       p.createdAt,
       p.updatedAt,
-      p.materials.map((m: any) => new ProjectMaterial(
+      p.materials.map((m) => new ProjectMaterial(
         m.id,
         m.name,
         m.quantity,
@@ -49,8 +50,8 @@ export class PrismaProjectRepository implements IProjectRepository {
     return new Project(
       p.id,
       p.name,
-      p.type as any,
-      p.status as any,
+      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
+      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
       p.length,
       p.width,
       p.height,
@@ -62,7 +63,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       p.userId,
       p.createdAt,
       p.updatedAt,
-      p.materials.map((m: any) => new ProjectMaterial(
+      p.materials.map((m) => new ProjectMaterial(
         m.id,
         m.name,
         m.quantity,
@@ -91,7 +92,7 @@ export class PrismaProjectRepository implements IProjectRepository {
         estimatedCost: data.estimatedCost,
         userId: data.userId,
         materials: {
-          create: (data.materials || []).map((m: any) => ({
+          create: (data.materials || []).map((m) => ({
             name: m.name,
             quantity: m.quantity,
             note: m.note,
@@ -107,8 +108,8 @@ export class PrismaProjectRepository implements IProjectRepository {
     return new Project(
       p.id,
       p.name,
-      p.type as any,
-      p.status as any,
+      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
+      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
       p.length,
       p.width,
       p.height,
@@ -120,12 +121,12 @@ export class PrismaProjectRepository implements IProjectRepository {
       p.userId,
       p.createdAt,
       p.updatedAt,
-      p.materials.map((m: any) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId))
+      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId))
     );
   }
 
   async update(id: string, data: Partial<Omit<Project, "id" | "createdAt" | "updatedAt" | "materials">> & { materials?: Omit<ProjectMaterial, "id" | "projectId">[] }): Promise<Project> {
-    const updatePayload: any = {
+    const updatePayload: Prisma.ProjectUpdateInput = {
       name: data.name,
       type: data.type,
       status: data.status,
@@ -142,7 +143,7 @@ export class PrismaProjectRepository implements IProjectRepository {
     if (data.materials) {
       await prisma.projectMaterial.deleteMany({ where: { projectId: id } });
       updatePayload.materials = {
-        create: data.materials.map((m: any) => ({
+        create: data.materials.map((m) => ({
           name: m.name,
           quantity: m.quantity,
           note: m.note,
@@ -162,8 +163,8 @@ export class PrismaProjectRepository implements IProjectRepository {
     return new Project(
       p.id,
       p.name,
-      p.type as any,
-      p.status as any,
+      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
+      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
       p.length,
       p.width,
       p.height,
@@ -175,7 +176,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       p.userId,
       p.createdAt,
       p.updatedAt,
-      p.materials.map((m: any) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId))
+      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId))
     );
   }
 
