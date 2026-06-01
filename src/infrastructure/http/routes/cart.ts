@@ -85,7 +85,7 @@ router.post(
 router.put(
   "/items/:itemId",
   requireAuth,
-  validateZod(updateItemQuantitySchema, "body"),
+  validateZod(updateItemQuantitySchema),
   CartController.updateItemQuantity
 );
 

@@ -20,5 +20,5 @@ export const updateProjectSchema = z.object({
   height: z.number().positive().optional(),
   materialType: z.string().max(100).optional(),
   tileFormat: z.string().max(100).optional(),
-  status: z.enum(["DRAFT", "IN_PROGRESS", "COMPLETED", "ARCHIVED"]).optional(),
+  status: z.enum(["EN_PROGRESO", "COMPLETADO", "PAUSADO"]).optional(),
 });

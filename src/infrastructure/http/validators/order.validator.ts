@@ -10,5 +10,5 @@ export const createOrderSchema = z.object({
 });
 
 export const updateOrderStatusSchema = z.object({
-  status: z.enum(["PENDING", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"], { message: "Estado debe ser PENDING, CONFIRMED, SHIPPED, DELIVERED o CANCELLED" }),
+  status: z.enum(["PENDIENTE", "PROCESANDO", "ENVIADO", "ENTREGADO", "CANCELADO"], { message: "Estado debe ser PENDIENTE, PROCESANDO, ENVIADO, ENTREGADO o CANCELADO" }),
 });
