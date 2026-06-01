@@ -20,11 +20,34 @@ declare global {
 
 const userRepository = new PrismaUserRepository();
 
+function toRequestUser(user: {
+  id: string;
+  email: string;
+  role?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+}) {
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role!,
+    firstName: user.firstName ?? undefined,
+    lastName: user.lastName ?? undefined,
+  };
+}
+
 function extractToken(authHeader: string | undefined): string {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw new AppError("Token no provisto.", 401);
   }
   return authHeader.split(" ")[1];
+}
+
+function forwardAuthError(error: unknown, next: NextFunction) {
+  if (error instanceof AppError || error instanceof TokenExpiredError || error instanceof JsonWebTokenError) {
+    return next(error);
+  }
+  next(new AppError("Error durante la autenticación.", 500));
 }
 
 async function authenticateUser(req: Request, token: string) {
@@ -35,30 +58,20 @@ async function authenticateUser(req: Request, token: string) {
     throw new AppError("Usuario no encontrado o dado de baja.", 401);
   }
 
-  req.user = {
-    id: user.id,
-    email: user.email,
-    role: user.role!,
-    firstName: user.firstName,
-    lastName: user.lastName,
-  };
+  req.user = toRequestUser(user);
 }
 
-export async function requireAuth(req: Request, res: Response, next: NextFunction) {
+export async function requireAuth(_req: Request, _res: Response, next: NextFunction) {
   try {
-    const token = extractToken(req.headers.authorization);
-    await authenticateUser(req, token);
+    const token = extractToken(_req.headers.authorization);
+    await authenticateUser(_req, token);
     next();
   } catch (error) {
-    if (error instanceof AppError || error instanceof TokenExpiredError || error instanceof JsonWebTokenError) {
-      next(error);
-      return;
-    }
-    next(new AppError("Error durante la autenticación.", 500));
+    forwardAuthError(error, next);
   }
 }
 
-export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
+export async function requireAdmin(req: Request, _res: Response, next: NextFunction) {
   try {
     const token = extractToken(req.headers.authorization);
     await authenticateUser(req, token);
@@ -69,11 +82,7 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
 
     next();
   } catch (error) {
-    if (error instanceof AppError || error instanceof TokenExpiredError || error instanceof JsonWebTokenError) {
-      next(error);
-      return;
-    }
-    next(new AppError("Error durante la autenticación.", 500));
+    forwardAuthError(error, next);
   }
 }
 
@@ -85,16 +94,12 @@ export async function optionalAuth(req: Request, _res: Response, next: NextFunct
       const decoded = verifyToken(token);
       const user = await userRepository.findById(decoded.id);
       if (user) {
-        req.user = {
-          id: user.id,
-          email: user.email,
-          role: user.role!,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        };
+        req.user = toRequestUser(user);
       }
-    } catch {
-      // Ignorar errores — autenticación opcional
+    } catch (error) {
+      if (!(error instanceof TokenExpiredError) && !(error instanceof JsonWebTokenError)) {
+        console.debug("optionalAuth: non-JWT error ignored", error);
+      }
     }
   }
   next();
