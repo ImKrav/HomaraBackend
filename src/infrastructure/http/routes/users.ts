@@ -4,7 +4,8 @@
 
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller.js";
-import { validateBody } from "../middlewares/validate.js";
+import { validateZod } from "../middlewares/validateZod.js";
+import { registerSchema, loginSchema } from "../validators/auth.validator.js";
 import { requireAuth, optionalAuth } from "../middlewares/auth.js";
 
 const router = Router();
@@ -55,7 +56,7 @@ const router = Router();
  */
 router.post(
   "/register",
-  validateBody(["email", "password", "firstName", "lastName"]),
+  validateZod(registerSchema),
   AuthController.register
 );
 
@@ -89,7 +90,7 @@ router.post(
  */
 router.post(
   "/login",
-  validateBody(["email", "password"]),
+  validateZod(loginSchema),
   AuthController.login
 );
 
@@ -151,6 +152,6 @@ router.get("/:id", optionalAuth, AuthController.getById);
  *       200:
  *         description: Usuario actualizado.
  */
-router.put("/:id", optionalAuth, AuthController.update);
+router.put("/:id", requireAuth, AuthController.update);
 
 export default router;

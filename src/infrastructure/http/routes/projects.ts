@@ -4,8 +4,9 @@
 
 import { Router } from "express";
 import { ProjectController } from "../controllers/project.controller.js";
-import { validateBody } from "../middlewares/validate.js";
-import { optionalAuth } from "../middlewares/auth.js";
+import { requireAuth, optionalAuth } from "../middlewares/auth.js";
+import { validateZod } from "../middlewares/validateZod.js";
+import { createProjectSchema, updateProjectSchema } from "../validators/project.validator.js";
 
 const router = Router();
 
@@ -94,8 +95,8 @@ router.get("/:id", ProjectController.getDetail);
  */
 router.post(
   "/",
-  optionalAuth,
-  validateBody(["name", "type", "area"]),
+  requireAuth,
+  validateZod(createProjectSchema),
   ProjectController.create
 );
 
@@ -117,7 +118,12 @@ router.post(
  *       200:
  *         description: Proyecto actualizado.
  */
-router.put("/:id", ProjectController.update);
+router.put(
+  "/:id",
+  requireAuth,
+  validateZod(updateProjectSchema),
+  ProjectController.update
+);
 
 /**
  * @openapi
@@ -137,6 +143,10 @@ router.put("/:id", ProjectController.update);
  *       200:
  *         description: Proyecto eliminado.
  */
-router.delete("/:id", ProjectController.delete);
+router.delete(
+  "/:id",
+  requireAuth,
+  ProjectController.delete
+);
 
 export default router;

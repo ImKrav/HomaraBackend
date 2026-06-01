@@ -4,8 +4,9 @@
 
 import { Router } from "express";
 import { CartController } from "../controllers/cart.controller.js";
-import { validateBody } from "../middlewares/validate.js";
-import { optionalAuth } from "../middlewares/auth.js";
+import { requireAuth, optionalAuth } from "../middlewares/auth.js";
+import { validateZod } from "../middlewares/validateZod.js";
+import { addItemSchema, updateItemQuantitySchema } from "../validators/cart.validator.js";
 
 const router = Router();
 
@@ -58,8 +59,8 @@ router.get("/", optionalAuth, CartController.get);
  */
 router.post(
   "/items",
-  optionalAuth,
-  validateBody(["productId"]),
+  requireAuth,
+  validateZod(addItemSchema),
   CartController.addItem
 );
 
@@ -81,7 +82,12 @@ router.post(
  *       200:
  *         description: Cantidad actualizada exitosamente.
  */
-router.put("/items/:itemId", CartController.updateItemQuantity);
+router.put(
+  "/items/:itemId",
+  requireAuth,
+  validateZod(updateItemQuantitySchema, "body"),
+  CartController.updateItemQuantity
+);
 
 /**
  * @openapi
@@ -101,6 +107,10 @@ router.put("/items/:itemId", CartController.updateItemQuantity);
  *       200:
  *         description: Item removido exitosamente.
  */
-router.delete("/items/:itemId", CartController.removeItem);
+router.delete(
+  "/items/:itemId",
+  requireAuth,
+  CartController.removeItem
+);
 
 export default router;

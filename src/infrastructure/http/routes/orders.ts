@@ -4,8 +4,9 @@
 
 import { Router } from "express";
 import { OrderController } from "../controllers/order.controller.js";
-import { validateBody } from "../middlewares/validate.js";
-import { optionalAuth } from "../middlewares/auth.js";
+import { requireAuth, requireAdmin, optionalAuth } from "../middlewares/auth.js";
+import { validateZod } from "../middlewares/validateZod.js";
+import { createOrderSchema, updateOrderStatusSchema } from "../validators/order.validator.js";
 
 const router = Router();
 
@@ -79,8 +80,8 @@ router.get("/:id", OrderController.getDetail);
  */
 router.post(
   "/",
-  optionalAuth,
-  validateBody(["paymentMethod"]),
+  requireAuth,
+  validateZod(createOrderSchema),
   OrderController.create
 );
 
@@ -102,6 +103,11 @@ router.post(
  *       200:
  *         description: Estado modificado y guardado transaccionalmente.
  */
-router.put("/:id/status", OrderController.updateStatus);
+router.put(
+  "/:id/status",
+  requireAdmin,
+  validateZod(updateOrderStatusSchema),
+  OrderController.updateStatus
+);
 
 export default router;
