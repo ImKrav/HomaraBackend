@@ -6,4 +6,5 @@ export interface ICartRepository {
   updateItemQuantity(itemId: string, quantity: number): Promise<CartItem>;
   removeItem(itemId: string): Promise<void>;
   clear(cartId: string): Promise<void>;
+  findItemOwner(itemId: string): Promise<string | null>;
 }

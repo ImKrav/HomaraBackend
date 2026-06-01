@@ -147,4 +147,12 @@ export class PrismaCartRepository implements ICartRepository {
   async clear(cartId: string): Promise<void> {
     await prisma.cartItem.deleteMany({ where: { cartId } });
   }
+
+  async findItemOwner(itemId: string): Promise<string | null> {
+    const item = await prisma.cartItem.findUnique({
+      where: { id: itemId },
+      include: { cart: true }
+    });
+    return item?.cart.userId ?? null;
+  }
 }

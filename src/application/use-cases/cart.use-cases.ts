@@ -63,10 +63,20 @@ export class AddCartItemUseCase {
 export class UpdateCartItemQuantityUseCase {
   constructor(private readonly cartRepository: ICartRepository) {}
 
-  async execute(itemId: string, quantity: number) {
+  async execute(itemId: string, userId: string, quantity: number) {
     if (quantity < 1) {
       throw new AppError("La cantidad debe ser al menos 1", 400);
     }
+
+    const ownerId = await this.cartRepository.findItemOwner(itemId);
+    if (!ownerId) {
+      throw new AppError("Item del carrito no encontrado", 404);
+    }
+
+    if (ownerId !== userId) {
+      throw new AppError("No tienes permiso para modificar este item del carrito.", 403);
+    }
+
     return await this.cartRepository.updateItemQuantity(itemId, quantity);
   }
 }
@@ -74,7 +84,16 @@ export class UpdateCartItemQuantityUseCase {
 export class RemoveCartItemUseCase {
   constructor(private readonly cartRepository: ICartRepository) {}
 
-  async execute(itemId: string) {
+  async execute(itemId: string, userId: string) {
+    const ownerId = await this.cartRepository.findItemOwner(itemId);
+    if (!ownerId) {
+      throw new AppError("Item del carrito no encontrado", 404);
+    }
+
+    if (ownerId !== userId) {
+      throw new AppError("No tienes permiso para eliminar este item del carrito.", 403);
+    }
+
     await this.cartRepository.removeItem(itemId);
   }
 }

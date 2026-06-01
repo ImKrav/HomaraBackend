@@ -10,7 +10,8 @@ const mockCartRepository = {
   addItem: vi.fn(),
   updateItemQuantity: vi.fn(),
   removeItem: vi.fn(),
-  clear: vi.fn()
+  clear: vi.fn(),
+  findItemOwner: vi.fn().mockResolvedValue("user-123")
 };
 
 describe("Cart Use Cases", () => {
@@ -109,13 +110,15 @@ describe("Cart Use Cases", () => {
   });
 
   describe("UpdateCartItemQuantityUseCase", () => {
-    it("debe actualizar la cantidad si es al menos 1", async () => {
+    it("debe actualizar la cantidad si es al menos 1 y el usuario es el dueño", async () => {
       const updatedItem = new CartItem("item-1", 5, "cart-123", "prod-1");
       mockCartRepository.updateItemQuantity.mockResolvedValue(updatedItem);
+      mockCartRepository.findItemOwner.mockResolvedValue("user-123");
 
       const useCase = new UpdateCartItemQuantityUseCase(mockCartRepository);
-      const result = await useCase.execute("item-1", 5);
+      const result = await useCase.execute("item-1", "user-123", 5);
 
+      expect(mockCartRepository.findItemOwner).toHaveBeenCalledWith("item-1");
       expect(mockCartRepository.updateItemQuantity).toHaveBeenCalledWith("item-1", 5);
       expect(result).toEqual(updatedItem);
     });
@@ -123,20 +126,62 @@ describe("Cart Use Cases", () => {
     it("debe lanzar AppError 400 si la cantidad es menor a 1", async () => {
       const useCase = new UpdateCartItemQuantityUseCase(mockCartRepository);
 
-      await expect(useCase.execute("item-1", 0)).rejects.toThrowError(
+      await expect(useCase.execute("item-1", "user-123", 0)).rejects.toThrowError(
         new AppError("La cantidad debe ser al menos 1", 400)
+      );
+    });
+
+    it("debe lanzar AppError 404 si el item no existe", async () => {
+      mockCartRepository.findItemOwner.mockResolvedValue(null);
+
+      const useCase = new UpdateCartItemQuantityUseCase(mockCartRepository);
+
+      await expect(useCase.execute("item-nonexistent", "user-123", 5)).rejects.toThrowError(
+        new AppError("Item del carrito no encontrado", 404)
+      );
+    });
+
+    it("debe lanzar AppError 403 si el usuario no es el dueño del item", async () => {
+      mockCartRepository.findItemOwner.mockResolvedValue("other-user");
+
+      const useCase = new UpdateCartItemQuantityUseCase(mockCartRepository);
+
+      await expect(useCase.execute("item-1", "user-123", 5)).rejects.toThrowError(
+        new AppError("No tienes permiso para modificar este item del carrito.", 403)
       );
     });
   });
 
   describe("RemoveCartItemUseCase", () => {
-    it("debe eliminar el item llamando al repositorio", async () => {
+    it("debe eliminar el item llamando al repositorio si el usuario es el dueño", async () => {
       mockCartRepository.removeItem.mockResolvedValue(undefined);
+      mockCartRepository.findItemOwner.mockResolvedValue("user-123");
 
       const useCase = new RemoveCartItemUseCase(mockCartRepository);
-      await useCase.execute("item-1");
+      await useCase.execute("item-1", "user-123");
 
+      expect(mockCartRepository.findItemOwner).toHaveBeenCalledWith("item-1");
       expect(mockCartRepository.removeItem).toHaveBeenCalledWith("item-1");
+    });
+
+    it("debe lanzar AppError 404 si el item no existe", async () => {
+      mockCartRepository.findItemOwner.mockResolvedValue(null);
+
+      const useCase = new RemoveCartItemUseCase(mockCartRepository);
+
+      await expect(useCase.execute("item-nonexistent", "user-123")).rejects.toThrowError(
+        new AppError("Item del carrito no encontrado", 404)
+      );
+    });
+
+    it("debe lanzar AppError 403 si el usuario no es el dueño del item", async () => {
+      mockCartRepository.findItemOwner.mockResolvedValue("other-user");
+
+      const useCase = new RemoveCartItemUseCase(mockCartRepository);
+
+      await expect(useCase.execute("item-1", "user-123")).rejects.toThrowError(
+        new AppError("No tienes permiso para eliminar este item del carrito.", 403)
+      );
     });
   });
 });

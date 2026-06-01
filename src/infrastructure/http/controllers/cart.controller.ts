@@ -36,7 +36,8 @@ export class CartController {
   static async updateItemQuantity(req: Request, res: Response, next: NextFunction) {
     try {
       const { quantity } = req.body;
-      const result = await updateCartItemQuantityUseCase.execute(req.params.itemId as string, quantity);
+      const userId = req.user!.id;
+      const result = await updateCartItemQuantityUseCase.execute(req.params.itemId as string, userId, quantity);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -45,7 +46,8 @@ export class CartController {
 
   static async removeItem(req: Request, res: Response, next: NextFunction) {
     try {
-      await removeCartItemUseCase.execute(req.params.itemId as string);
+      const userId = req.user!.id;
+      await removeCartItemUseCase.execute(req.params.itemId as string, userId);
       res.json({ success: true, message: "Item eliminado del carrito" });
     } catch (error) {
       next(error);
