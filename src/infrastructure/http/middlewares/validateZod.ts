@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { ZodSchema, ZodError } from "zod";
+import { ZodTypeAny, ZodError } from "zod";
 import { AppError } from "../../../shared/errors/AppError.js";
 
-export function validateZod(schema: ZodSchema, target: "body" | "query" | "params" = "body") {
+export function validateZod(schema: ZodTypeAny, target: "body" | "query" | "params" = "body") {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = schema.parse(req[target]);
@@ -17,3 +17,4 @@ export function validateZod(schema: ZodSchema, target: "body" | "query" | "param
     }
   };
 }
+

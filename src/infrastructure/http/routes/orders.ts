@@ -7,6 +7,7 @@ import { OrderController } from "../controllers/order.controller.js";
 import { requireAuth, requireAdmin, optionalAuth } from "../middlewares/auth.js";
 import { validateZod } from "../middlewares/validateZod.js";
 import { createOrderSchema, updateOrderStatusSchema } from "../validators/order.validator.js";
+import { cuidParamSchema, listOrdersQuerySchema } from "../validators/common.validator.js";
 
 const router = Router();
 
@@ -31,7 +32,7 @@ const router = Router();
  *       200:
  *         description: Lista de pedidos obtenida exitosamente.
  */
-router.get("/", optionalAuth, OrderController.list);
+router.get("/", optionalAuth, validateZod(listOrdersQuerySchema, "query"), OrderController.list);
 
 /**
  * @openapi
@@ -106,7 +107,8 @@ router.post(
 router.put(
   "/:id/status",
   requireAdmin,
-  validateZod(updateOrderStatusSchema),
+  validateZod(cuidParamSchema, "params"),
+  validateZod(updateOrderStatusSchema, "body"),
   OrderController.updateStatus
 );
 

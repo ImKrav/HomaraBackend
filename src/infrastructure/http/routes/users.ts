@@ -3,6 +3,7 @@
 // ============================================
 
 import { Router } from "express";
+import { z } from "zod";
 import { AuthController } from "../controllers/auth.controller.js";
 import { validateZod } from "../middlewares/validateZod.js";
 import { registerSchema, loginSchema } from "../validators/auth.validator.js";
@@ -132,7 +133,7 @@ router.get("/me", requireAuth, AuthController.getMe);
  *       404:
  *         description: Usuario no encontrado.
  */
-router.get("/:id", optionalAuth, AuthController.getById);
+router.get("/:id", optionalAuth, validateZod(z.object({ id: z.string().min(1, "ID es requerido") }), "params"), AuthController.getById);
 
 /**
  * @openapi
@@ -152,6 +153,6 @@ router.get("/:id", optionalAuth, AuthController.getById);
  *       200:
  *         description: Usuario actualizado.
  */
-router.put("/:id", requireAuth, AuthController.update);
+router.put("/:id", requireAuth, validateZod(z.object({ id: z.string().min(1, "ID es requerido") }), "params"), AuthController.update);
 
 export default router;

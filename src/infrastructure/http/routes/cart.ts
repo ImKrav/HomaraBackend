@@ -7,6 +7,7 @@ import { CartController } from "../controllers/cart.controller.js";
 import { requireAuth, optionalAuth } from "../middlewares/auth.js";
 import { validateZod } from "../middlewares/validateZod.js";
 import { addItemSchema, updateItemQuantitySchema } from "../validators/cart.validator.js";
+import { itemIdParamSchema } from "../validators/common.validator.js";
 
 const router = Router();
 
@@ -85,7 +86,8 @@ router.post(
 router.put(
   "/items/:itemId",
   requireAuth,
-  validateZod(updateItemQuantitySchema),
+  validateZod(itemIdParamSchema, "params"),
+  validateZod(updateItemQuantitySchema, "body"),
   CartController.updateItemQuantity
 );
 
@@ -110,6 +112,7 @@ router.put(
 router.delete(
   "/items/:itemId",
   requireAuth,
+  validateZod(itemIdParamSchema, "params"),
   CartController.removeItem
 );
 

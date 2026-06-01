@@ -7,6 +7,7 @@ import { ProjectController } from "../controllers/project.controller.js";
 import { requireAuth, optionalAuth } from "../middlewares/auth.js";
 import { validateZod } from "../middlewares/validateZod.js";
 import { createProjectSchema, updateProjectSchema } from "../validators/project.validator.js";
+import { cuidParamSchema, listProjectsQuerySchema } from "../validators/common.validator.js";
 
 const router = Router();
 
@@ -28,7 +29,7 @@ const router = Router();
  *       200:
  *         description: Lista de proyectos obtenida.
  */
-router.get("/", optionalAuth, ProjectController.list);
+router.get("/", optionalAuth, validateZod(listProjectsQuerySchema, "query"), ProjectController.list);
 
 /**
  * @openapi
@@ -50,7 +51,7 @@ router.get("/", optionalAuth, ProjectController.list);
  *       404:
  *         description: Proyecto no encontrado.
  */
-router.get("/:id", ProjectController.getDetail);
+router.get("/:id", validateZod(cuidParamSchema, "params"), ProjectController.getDetail);
 
 /**
  * @openapi
@@ -121,7 +122,8 @@ router.post(
 router.put(
   "/:id",
   requireAuth,
-  validateZod(updateProjectSchema),
+  validateZod(cuidParamSchema, "params"),
+  validateZod(updateProjectSchema, "body"),
   ProjectController.update
 );
 
@@ -146,6 +148,7 @@ router.put(
 router.delete(
   "/:id",
   requireAuth,
+  validateZod(cuidParamSchema, "params"),
   ProjectController.delete
 );
 
