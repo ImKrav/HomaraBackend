@@ -45,7 +45,9 @@ export class PrismaProductRepository implements IProductRepository {
       p.categoryId,
       p.createdAt,
       p.updatedAt,
-      p.tags.map((t) => t.name)
+      p.tags.map((t) => t.name),
+      p.category?.name,
+      p.category?.slug
     ));
   }
 
@@ -71,7 +73,9 @@ export class PrismaProductRepository implements IProductRepository {
       p.categoryId,
       p.createdAt,
       p.updatedAt,
-      p.tags.map((t) => t.name)
+      p.tags.map((t) => t.name),
+      p.category?.name,
+      p.category?.slug
     );
   }
 
@@ -112,7 +116,9 @@ export class PrismaProductRepository implements IProductRepository {
       p.categoryId,
       p.createdAt,
       p.updatedAt,
-      p.tags.map((t) => t.name)
+      p.tags.map((t) => t.name),
+      undefined,
+      undefined
     );
   }
 

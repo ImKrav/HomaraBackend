@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../../../shared/utils/authHelper.js";
 import { PrismaUserRepository } from "../../database/repositories/prisma-user.repository.js";
 import { AppError } from "../../../shared/errors/AppError.js";
-import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+
+const { TokenExpiredError, JsonWebTokenError } = jwt;
 
 declare global {
   namespace Express {

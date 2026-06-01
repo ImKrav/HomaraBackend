@@ -22,6 +22,8 @@ export class Product {
     public readonly categoryId: string,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
-    public readonly tags?: string[]
+    public readonly tags?: string[],
+    public readonly category?: string,
+    public readonly categorySlug?: string
   ) {}
 }

@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+
+const { TokenExpiredError, JsonWebTokenError } = jwt;
 import { Prisma } from "../../../../generated/prisma/client.js";
 
 export function errorHandler(err: Error & { statusCode?: number }, _req: Request, res: Response, _next: NextFunction) {
