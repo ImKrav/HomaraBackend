@@ -1,0 +1,54 @@
+import { Request, Response, NextFunction } from "express";
+import { PrismaCartRepository } from "../../database/repositories/prisma-cart.repository.js";
+import { GetCartUseCase, AddCartItemUseCase, UpdateCartItemQuantityUseCase, RemoveCartItemUseCase } from "../../../application/use-cases/cart.use-cases.js";
+
+const cartRepository = new PrismaCartRepository();
+
+const getCartUseCase = new GetCartUseCase(cartRepository);
+const addCartItemUseCase = new AddCartItemUseCase(cartRepository);
+const updateCartItemQuantityUseCase = new UpdateCartItemQuantityUseCase(cartRepository);
+const removeCartItemUseCase = new RemoveCartItemUseCase(cartRepository);
+
+const DEMO_USER_ID = "demo-user-001";
+
+export class CartController {
+  static async get(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id || (req.query.userId as string) || DEMO_USER_ID;
+      const result = await getCartUseCase.execute(userId);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async addItem(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { productId, quantity } = req.body;
+      const userId = req.user?.id || req.body.userId || DEMO_USER_ID;
+      const result = await addCartItemUseCase.execute(userId, productId, quantity);
+      res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async updateItemQuantity(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { quantity } = req.body;
+      const result = await updateCartItemQuantityUseCase.execute(req.params.itemId as string, quantity);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async removeItem(req: Request, res: Response, next: NextFunction) {
+    try {
+      await removeCartItemUseCase.execute(req.params.itemId as string);
+      res.json({ success: true, message: "Item eliminado del carrito" });
+    } catch (error) {
+      next(error);
+    }
+  }
+}

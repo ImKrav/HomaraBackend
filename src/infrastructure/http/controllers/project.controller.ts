@@ -1,0 +1,65 @@
+import { Request, Response, NextFunction } from "express";
+import { PrismaProjectRepository } from "../../database/repositories/prisma-project.repository.js";
+import { ListUserProjectsUseCase, GetProjectUseCase, CreateProjectUseCase, UpdateProjectUseCase, DeleteProjectUseCase } from "../../../application/use-cases/project.use-cases.js";
+
+const projectRepository = new PrismaProjectRepository();
+
+const listUserProjectsUseCase = new ListUserProjectsUseCase(projectRepository);
+const getProjectUseCase = new GetProjectUseCase(projectRepository);
+const createProjectUseCase = new CreateProjectUseCase(projectRepository);
+const updateProjectUseCase = new UpdateProjectUseCase(projectRepository);
+const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
+
+const DEMO_USER_ID = "demo-user-001";
+
+export class ProjectController {
+  static async list(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id || (req.query.userId as string) || DEMO_USER_ID;
+      const result = await listUserProjectsUseCase.execute(userId);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getDetail(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await getProjectUseCase.execute(req.params.id as string);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id || req.body.userId || DEMO_USER_ID;
+      const result = await createProjectUseCase.execute({
+        ...req.body,
+        userId
+      });
+      res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await updateProjectUseCase.execute(req.params.id as string, req.body);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await deleteProjectUseCase.execute(req.params.id as string);
+      res.json({ success: true, message: "Proyecto eliminado" });
+    } catch (error) {
+      next(error);
+    }
+  }
+}

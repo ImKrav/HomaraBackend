@@ -1,0 +1,238 @@
+// ============================================
+// Homara — Prisma Schema
+// ============================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Users ───────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+  cart     Cart?
+  orders   Order[]
+  reviews  Review[]
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+// ─── Categories ──────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String
+  icon        String // emoji
+  products    Product[]
+}
+
+// ─── Products ────────────────────────────────
+
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  description    String
+  price          Int // en pesos colombianos (sin decimales)
+  originalPrice  Int? // precio original antes de descuento
+  image          String
+  rating         Float    @default(0)
+  reviewCount    Int      @default(0)
+  inStock        Boolean  @default(true)
+  stockQuantity  Int      @default(0)
+  unit           String // "unidad", "m²", "galón", "kg", "bulto"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  tags             ProductTag[]
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  reviews          Review[]
+  projectMaterials ProjectMaterial[]
+
+  @@index([categoryId])
+}
+
+model ProductTag {
+  id        String @id @default(cuid())
+  name      String // "oferta", "popular", "nuevo"
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, name])
+  @@index([productId])
+}
+
+// ─── Projects ────────────────────────────────
+
+model Project {
+  id              String        @id @default(cuid())
+  name            String
+  type            ProjectType
+  status          ProjectStatus @default(EN_PROGRESO)
+  length          Float? // metros
+  width           Float? // metros
+  height          Float? // metros
+  area            Float // m² calculado
+  materialType    String? // "ceramica", "porcelanato", "madera", "vinilo"
+  tileFormat      String? // "60x60", "45x45", "30x60", "20x60"
+  thumbnail       String        @default("🏠") // emoji icon
+  estimatedCost   Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  userId    String
+  user      User              @relation(fields: [userId], references: [id])
+  materials ProjectMaterial[]
+
+  @@index([userId])
+}
+
+enum ProjectType {
+  PISO
+  PARED
+  TECHO
+  INTEGRAL
+}
+
+enum ProjectStatus {
+  EN_PROGRESO
+  COMPLETADO
+  PAUSADO
+}
+
+model ProjectMaterial {
+  id       String @id @default(cuid())
+  name     String
+  quantity String // "39 m²", "8 bultos", etc.
+  note     String? // "+10% de desperdicio", "25kg c/u"
+  icon     String // emoji
+  price    Int // precio estimado total de este material
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  productId String? // relación opcional a un producto del catálogo
+  product   Product? @relation(fields: [productId], references: [id])
+
+  @@index([projectId])
+}
+
+// ─── Cart ────────────────────────────────────
+
+model Cart {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String   @unique
+  user   User     @relation(fields: [userId], references: [id])
+  items  CartItem[]
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  quantity Int    @default(1)
+
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+}
+
+// ─── Orders ──────────────────────────────────
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique // "ORD-2026-001"
+  status          OrderStatus @default(PENDIENTE)
+  subtotal        Int
+  shippingCost    Int         @default(0)
+  total           Int
+  paymentMethod   String? // "card", "pse", "cash"
+
+  // Dirección de envío (snapshot al momento de la orden)
+  shippingAddress String?
+  shippingCity    String?
+  shippingState   String?
+  shippingZip     String?
+  shippingNotes   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User        @relation(fields: [userId], references: [id])
+  items  OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum OrderStatus {
+  PENDIENTE
+  PROCESANDO
+  ENVIADO
+  ENTREGADO
+  CANCELADO
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  quantity  Int
+  unitPrice Int // precio al momento de la compra
+  total     Int
+
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+}
+
+// ─── Reviews ─────────────────────────────────
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([productId])
+}

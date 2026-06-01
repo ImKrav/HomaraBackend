@@ -1,0 +1,115 @@
+import { Request, Response, NextFunction } from "express";
+import { PrismaUserRepository } from "../../database/repositories/prisma-user.repository.js";
+import { RegisterUserUseCase, LoginUserUseCase, GetUserProfileUseCase } from "../../../application/use-cases/auth.use-cases.js";
+import { prisma } from "../../database/prisma-client.js";
+
+const userRepository = new PrismaUserRepository();
+const registerUserUseCase = new RegisterUserUseCase(userRepository);
+const loginUserUseCase = new LoginUserUseCase(userRepository);
+const getUserProfileUseCase = new GetUserProfileUseCase(userRepository);
+
+const DEMO_USER_ID = "demo-user-001";
+
+export class AuthController {
+  static async register(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await registerUserUseCase.execute(req.body);
+      res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async login(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email, password } = req.body;
+      const result = await loginUserUseCase.execute(email, password);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getMe(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.id;
+      const user = await getUserProfileUseCase.execute(userId);
+
+      const [projectCount, orderCount] = await Promise.all([
+        prisma.project.count({ where: { userId } }),
+        prisma.order.count({ where: { userId } })
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          zipCode: user.zipCode,
+          role: user.role,
+          projectCount,
+          orderCount,
+          createdAt: user.createdAt
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      let userId = req.params.id as string;
+      if (userId === "me") {
+        userId = req.user ? req.user.id : DEMO_USER_ID;
+      }
+
+      const user = await getUserProfileUseCase.execute(userId);
+      const [projectCount, orderCount] = await Promise.all([
+        prisma.project.count({ where: { userId } }),
+        prisma.order.count({ where: { userId } })
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          zipCode: user.zipCode,
+          role: user.role,
+          projectCount,
+          orderCount,
+          createdAt: user.createdAt
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      let userId = req.params.id as string;
+      if (userId === "me") {
+        userId = req.user ? req.user.id : DEMO_USER_ID;
+      }
+
+      const updated = await userRepository.update(userId, req.body);
+      res.json({ success: true, data: updated });
+    } catch (error) {
+      next(error);
+    }
+  }
+}
