@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../../../shared/utils/authHelper.js";
 import { PrismaUserRepository } from "../../database/repositories/prisma-user.repository.js";
+import { AppError } from "../../../shared/errors/AppError.js";
 
-// Extender la interfaz de Request para incluir el usuario de sesión
 declare global {
   namespace Express {
     interface Request {
@@ -19,42 +19,40 @@ declare global {
 
 const userRepository = new PrismaUserRepository();
 
+function extractToken(authHeader: string | undefined): string {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new AppError("Acceso denegado. No autorizado. Token no provisto.", 401);
+  }
+  return authHeader.split(" ")[1];
+}
+
+async function authenticateUser(req: Request, token: string) {
+  try {
+    const decoded = verifyToken(token);
+    const user = await userRepository.findById(decoded.id);
+
+    if (!user) {
+      throw new AppError("Usuario no encontrado o dado de baja.", 401);
+    }
+
+    req.user = {
+      id: user.id,
+      email: user.email,
+      role: user.role!,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
+  } catch (err) {
+    if (err instanceof AppError) throw err;
+    throw new AppError("Token inválido, alterado o expirado.", 401);
+  }
+}
+
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        error: "Acceso denegado. No autorizado. Token no provisto.",
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
-    try {
-      const decoded = verifyToken(token);
-      const user = await userRepository.findById(decoded.id);
-
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          error: "Usuario no encontrado o dado de baja.",
-        });
-      }
-
-      req.user = {
-        id: user.id,
-        email: user.email,
-        role: user.role!,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      };
-      next();
-    } catch (err) {
-      return res.status(401).json({
-        success: false,
-        error: "Token inválido, alterado o expirado.",
-      });
-    }
+    const token = extractToken(req.headers.authorization);
+    await authenticateUser(req, token);
+    next();
   } catch (error) {
     next(error);
   }
@@ -62,47 +60,14 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        success: false,
-        error: "Acceso denegado. No autorizado. Token no provisto.",
-      });
+    const token = extractToken(req.headers.authorization);
+    await authenticateUser(req, token);
+
+    if (req.user?.role !== "ADMIN") {
+      throw new AppError("Acceso denegado. Se requieren permisos de administrador.", 403);
     }
 
-    const token = authHeader.split(" ")[1];
-    try {
-      const decoded = verifyToken(token);
-      const user = await userRepository.findById(decoded.id);
-
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          error: "Usuario no encontrado o dado de baja.",
-        });
-      }
-
-      if (user.role !== "ADMIN") {
-        return res.status(403).json({
-          success: false,
-          error: "Acceso denegado. Se requieren permisos de administrador.",
-        });
-      }
-
-      req.user = {
-        id: user.id,
-        email: user.email,
-        role: user.role!,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      };
-      next();
-    } catch (err) {
-      return res.status(401).json({
-        success: false,
-        error: "Token inválido, alterado o expirado.",
-      });
-    }
+    next();
   } catch (error) {
     next(error);
   }
