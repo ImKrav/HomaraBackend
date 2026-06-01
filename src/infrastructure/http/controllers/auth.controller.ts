@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaUserRepository } from "../../database/repositories/prisma-user.repository.js";
 import { RegisterUserUseCase, LoginUserUseCase, GetUserProfileUseCase } from "../../../application/use-cases/auth.use-cases.js";
 import { prisma } from "../../database/prisma-client.js";
+import { AppError } from "../../../shared/errors/AppError.js";
+import { hashPassword } from "../../../shared/utils/authHelper.js";
 
 const userRepository = new PrismaUserRepository();
 const registerUserUseCase = new RegisterUserUseCase(userRepository);
@@ -103,10 +105,23 @@ export class AuthController {
     try {
       let userId = req.params.id as string;
       if (userId === "me") {
-        userId = req.user ? req.user.id : DEMO_USER_ID;
+        userId = req.user!.id;
       }
 
-      const updated = await userRepository.update(userId, req.body);
+      if (userId !== req.user!.id && req.user!.role !== "ADMIN") {
+        throw new AppError("No tienes permiso para modificar este perfil.", 403);
+      }
+
+      // Whitelist de campos permitidos — previene privilege escalation
+      const { email, firstName, lastName, phone, address, city, state, zipCode, password } = req.body;
+      const updateData: Record<string, unknown> = { email, firstName, lastName, phone, address, city, state, zipCode };
+
+      // Si se envía contraseña, hashearla antes de guardar
+      if (password) {
+        updateData.password = await hashPassword(password);
+      }
+
+      const updated = await userRepository.update(userId, updateData);
       res.json({ success: true, data: updated });
     } catch (error) {
       next(error);
