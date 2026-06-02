@@ -28,6 +28,17 @@ export class Project {
     public readonly userId: string,
     public readonly createdAt?: Date,
     public readonly updatedAt?: Date,
-    public readonly materials?: ProjectMaterial[]
+    public readonly materials?: ProjectMaterial[],
+    // Nuevos campos de personalización de calculadora
+    public readonly wastePercent?: number | null,
+    public readonly layingPattern?: string | null,
+    public readonly deductDoors?: number | null,
+    public readonly deductWindows?: number | null,
+    public readonly customSubtractions?: number | null,
+    public readonly includeAdhesive?: boolean | null,
+    public readonly includeGrout?: boolean | null,
+    public readonly includeSpacers?: boolean | null,
+    public readonly includeTools?: boolean | null,
+    public readonly selectedProductId?: string | null
   ) {}
 }

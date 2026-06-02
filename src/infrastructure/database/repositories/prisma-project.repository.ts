@@ -36,7 +36,18 @@ export class PrismaProjectRepository implements IProjectRepository {
         m.price,
         m.projectId,
         m.productId
-      ))
+      )),
+      // Nuevos campos mapeados
+      p.wastePercent,
+      p.layingPattern,
+      p.deductDoors,
+      p.deductWindows,
+      p.customSubtractions,
+      p.includeAdhesive,
+      p.includeGrout,
+      p.includeSpacers,
+      p.includeTools,
+      p.selectedProductId
     ));
   }
 
@@ -72,7 +83,18 @@ export class PrismaProjectRepository implements IProjectRepository {
         m.price,
         m.projectId,
         m.productId
-      ))
+      )),
+      // Nuevos campos mapeados
+      p.wastePercent,
+      p.layingPattern,
+      p.deductDoors,
+      p.deductWindows,
+      p.customSubtractions,
+      p.includeAdhesive,
+      p.includeGrout,
+      p.includeSpacers,
+      p.includeTools,
+      p.selectedProductId
     );
   }
 
@@ -91,6 +113,17 @@ export class PrismaProjectRepository implements IProjectRepository {
         thumbnail: data.thumbnail,
         estimatedCost: data.estimatedCost,
         userId: data.userId,
+        // Guardar nuevos campos
+        wastePercent: data.wastePercent,
+        layingPattern: data.layingPattern,
+        deductDoors: data.deductDoors,
+        deductWindows: data.deductWindows,
+        customSubtractions: data.customSubtractions,
+        includeAdhesive: data.includeAdhesive,
+        includeGrout: data.includeGrout,
+        includeSpacers: data.includeSpacers,
+        includeTools: data.includeTools,
+        selectedProductId: data.selectedProductId,
         materials: {
           create: (data.materials || []).map((m) => ({
             name: m.name,
@@ -121,7 +154,17 @@ export class PrismaProjectRepository implements IProjectRepository {
       p.userId,
       p.createdAt,
       p.updatedAt,
-      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId))
+      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId)),
+      p.wastePercent,
+      p.layingPattern,
+      p.deductDoors,
+      p.deductWindows,
+      p.customSubtractions,
+      p.includeAdhesive,
+      p.includeGrout,
+      p.includeSpacers,
+      p.includeTools,
+      p.selectedProductId
     );
   }
 
@@ -137,7 +180,18 @@ export class PrismaProjectRepository implements IProjectRepository {
       materialType: data.materialType,
       tileFormat: data.tileFormat,
       thumbnail: data.thumbnail,
-      estimatedCost: data.estimatedCost
+      estimatedCost: data.estimatedCost,
+      // Actualizar nuevos campos
+      wastePercent: data.wastePercent,
+      layingPattern: data.layingPattern,
+      deductDoors: data.deductDoors,
+      deductWindows: data.deductWindows,
+      customSubtractions: data.customSubtractions,
+      includeAdhesive: data.includeAdhesive,
+      includeGrout: data.includeGrout,
+      includeSpacers: data.includeSpacers,
+      includeTools: data.includeTools,
+      selectedProductId: data.selectedProductId
     };
 
     if (data.materials) {
@@ -176,7 +230,17 @@ export class PrismaProjectRepository implements IProjectRepository {
       p.userId,
       p.createdAt,
       p.updatedAt,
-      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId))
+      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId)),
+      p.wastePercent,
+      p.layingPattern,
+      p.deductDoors,
+      p.deductWindows,
+      p.customSubtractions,
+      p.includeAdhesive,
+      p.includeGrout,
+      p.includeSpacers,
+      p.includeTools,
+      p.selectedProductId
     );
   }
 

@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaProjectRepository } from "../../database/repositories/prisma-project.repository.js";
+import { PrismaProductRepository } from "../../database/repositories/prisma-product.repository.js";
 import { ListUserProjectsUseCase, GetProjectUseCase, CreateProjectUseCase, UpdateProjectUseCase, DeleteProjectUseCase } from "../../../application/use-cases/project.use-cases.js";
 
 const projectRepository = new PrismaProjectRepository();
+const productRepository = new PrismaProductRepository();
 
 const listUserProjectsUseCase = new ListUserProjectsUseCase(projectRepository);
 const getProjectUseCase = new GetProjectUseCase(projectRepository);
-const createProjectUseCase = new CreateProjectUseCase(projectRepository);
-const updateProjectUseCase = new UpdateProjectUseCase(projectRepository);
+const createProjectUseCase = new CreateProjectUseCase(projectRepository, productRepository);
+const updateProjectUseCase = new UpdateProjectUseCase(projectRepository, productRepository);
 const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
 
 const DEMO_USER_ID = "demo-user-001";

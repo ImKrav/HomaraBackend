@@ -247,8 +247,109 @@ async function main() {
       name: "Rodillo de Pintura Antigoteo 23cm",
       description: "Rodillo profesional con sistema antigoteo y mango ergonómico extensible. Felpa de microfibra para acabado perfecto. Incluye bandeja.",
       price: 34500, originalPrice: null, image: "/products/rodillo.jpg",
-      categorySlug: "pinturas", rating: 4.2, reviewCount: 256,
+      categorySlug: "herramientas", rating: 4.2, reviewCount: 256,
       inStock: true, stockQuantity: 678, unit: "unidad", tags: [],
+    },
+    
+    // --- NUEVAS CERÁMICAS ---
+    {
+      name: "Cerámica Rústica Terracota 45x45",
+      description: "Cerámica rústica de alta resistencia para exteriores, balcones y terrazas. Hermoso acabado terracota natural antideslizante.",
+      price: 32000, originalPrice: 36000, image: "/products/rustico.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.5, reviewCount: 88,
+      inStock: true, stockQuantity: 550, unit: "m²", tags: ["oferta"],
+    },
+    {
+      name: "Cerámica Hidráulica Decorativa Flor 30x30",
+      description: "Baldosas de cerámica hidráulica decorativa con patrón floral vintage. Perfectas para acentos decorativos en baños y cocinas.",
+      price: 29000, originalPrice: null, image: "/products/hidraulica.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.6, reviewCount: 64,
+      inStock: true, stockQuantity: 320, unit: "m²", tags: ["nuevo"],
+    },
+    {
+      name: "Cerámica Subterráneo Blanco Metro 10x20",
+      description: "Clásica baldosa de cerámica tipo Subway o Metro en formato rectangular. Acabado brillante ideal para salpicaderos de cocina y paredes de baño.",
+      price: 31000, originalPrice: null, image: "/products/metro.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.9, reviewCount: 198,
+      inStock: true, stockQuantity: 1200, unit: "m²", tags: ["popular"],
+    },
+    
+    // --- NUEVOS PORCELANATOS ---
+    {
+      name: "Porcelanato Pulido Rectificado Beige 80x80",
+      description: "Porcelanato pulido rectificado de gran formato en tono beige neutro. Aporta amplitud, elegancia y un brillo tipo espejo a tu sala o comedor.",
+      price: 54000, originalPrice: 62000, image: "/products/porcelanato-beige.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.7, reviewCount: 112,
+      inStock: true, stockQuantity: 750, unit: "m²", tags: ["popular"],
+    },
+    {
+      name: "Porcelanato Súper Formato Gris Oxford 100x100",
+      description: "Porcelanato de súper gran formato rectificado con acabado mate texturizado tipo piedra. Máxima sofisticación para interiores residenciales.",
+      price: 65000, originalPrice: null, image: "/products/porcelanato-gris.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.8, reviewCount: 57,
+      inStock: true, stockQuantity: 400, unit: "m²", tags: ["nuevo"],
+    },
+    {
+      name: "Porcelanato Negro Absoluto Satinado 60x60",
+      description: "Porcelanato con acabado negro satinado de alta elegancia. Apto para tráfico medio-alto en interiores y salpicaderos de lujo.",
+      price: 45900, originalPrice: null, image: "/products/porcelanato-negro.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.4, reviewCount: 42,
+      inStock: true, stockQuantity: 180, unit: "m²", tags: [],
+    },
+    
+    // --- NUEVAS MADERAS LAMINADAS ---
+    {
+      name: "Piso Laminado Madera Nogal Alemán 15x90",
+      description: "Piso de madera laminada alemana de alta densidad. Aspecto nogal natural con vetas marcadas. Aporta calidez extrema a dormitorios y estudios.",
+      price: 51000, originalPrice: 58000, image: "/products/madera-nogal.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.8, reviewCount: 146,
+      inStock: true, stockQuantity: 620, unit: "m²", tags: ["popular"],
+    },
+    {
+      name: "Piso Laminado Teka Resistente al Agua 15x90",
+      description: "Piso laminado con tecnología hidrófuga avanzada para resistir derrames superficiales. Textura táctil de madera de teca real.",
+      price: 53500, originalPrice: null, image: "/products/madera-teka.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.6, reviewCount: 78,
+      inStock: true, stockQuantity: 450, unit: "m²", tags: ["nuevo"],
+    },
+    {
+      name: "Piso Laminado Haya Clic Acústico 20x60",
+      description: "Piso laminado de madera clara de Haya con sistema Clic fácil de instalar. Incluye base de aislamiento acústico integrada.",
+      price: 49000, originalPrice: null, image: "/products/madera-haya.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.5, reviewCount: 39,
+      inStock: true, stockQuantity: 280, unit: "m²", tags: [],
+    },
+    
+    // --- NUEVOS VINILOS (PISO PVC) ---
+    {
+      name: "Piso Vinílico SPC Clic Roble Miel 15x90",
+      description: "Piso de vinilo SPC rígido de alta gama. 100% impermeable al agua, ideal para cocinas y áreas húmedas. Sistema clic de instalación flotante.",
+      price: 28000, originalPrice: 32000, image: "/products/vinilo-roble.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.7, reviewCount: 95,
+      inStock: true, stockQuantity: 880, unit: "m²", tags: ["popular"],
+    },
+    {
+      name: "Piso Vinílico Autoadhesivo Gris Cenizo 20x60",
+      description: "Lamas de vinilo autoadhesivo de fácil instalación para renovación rápida de ambientes residenciales. Acabado gris cenizo texturizado.",
+      price: 26000, originalPrice: null, image: "/products/vinilo-gris.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.3, reviewCount: 110,
+      inStock: true, stockQuantity: 950, unit: "m²", tags: ["oferta"],
+    },
+    
+    // --- NUEVAS PINTURAS ---
+    {
+      name: "Pintura Exterior Ultra Resistente Gris Fósil 5L",
+      description: "Pintura para exteriores de máxima durabilidad y resistencia al sol y lluvia. Tecnología antihumedad y antihongos en hermoso tono Gris Fósil.",
+      price: 135000, originalPrice: null, image: "/products/pintura-gris.jpg",
+      categorySlug: "pinturas", rating: 4.7, reviewCount: 75,
+      inStock: true, stockQuantity: 180, unit: "galón", tags: [],
+    },
+    {
+      name: "Pintura Acrílica Satinada Lavable Beige Arena 5L",
+      description: "Pintura de interior satinada con excelente lavabilidad. Remueve manchas comunes con un paño húmedo. Acabado elegante tono Beige Arena.",
+      price: 128000, originalPrice: 145000, image: "/products/pintura-beige.jpg",
+      categorySlug: "pinturas", rating: 4.5, reviewCount: 92,
+      inStock: true, stockQuantity: 240, unit: "galón", tags: ["oferta"],
     },
   ];
 

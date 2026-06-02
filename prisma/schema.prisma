@@ -75,6 +75,7 @@ model Product {
   orderItems       OrderItem[]
   reviews          Review[]
   projectMaterials ProjectMaterial[]
+  selectedInProjects Project[]
 
   @@index([categoryId])
 }
@@ -107,9 +108,22 @@ model Project {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  userId    String
-  user      User              @relation(fields: [userId], references: [id])
-  materials ProjectMaterial[]
+  userId             String
+  user               User              @relation(fields: [userId], references: [id])
+  materials          ProjectMaterial[]
+  
+  // Nuevos campos de personalización de calculadora
+  wastePercent       Float?            @default(10.0)
+  layingPattern      String?           @default("directo")
+  deductDoors        Int?              @default(0)
+  deductWindows      Int?              @default(0)
+  customSubtractions Float?            @default(0.0)
+  includeAdhesive    Boolean?          @default(true)
+  includeGrout       Boolean?          @default(true)
+  includeSpacers     Boolean?          @default(true)
+  includeTools       Boolean?          @default(true)
+  selectedProductId  String?
+  selectedProduct    Product?          @relation(fields: [selectedProductId], references: [id])
 
   @@index([userId])
 }
