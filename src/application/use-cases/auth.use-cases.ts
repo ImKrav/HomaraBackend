@@ -44,6 +44,11 @@ export class RegisterUserUseCase {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        phone: user.phone,
+        address: user.address,
+        city: user.city,
+        state: user.state,
+        zipCode: user.zipCode,
         role: user.role,
       },
     };
@@ -79,6 +84,11 @@ export class LoginUserUseCase {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        phone: user.phone,
+        address: user.address,
+        city: user.city,
+        state: user.state,
+        zipCode: user.zipCode,
         role: user.role,
       },
     };

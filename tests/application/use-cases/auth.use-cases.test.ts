@@ -51,6 +51,70 @@ describe("Auth Use Cases", () => {
         email: "test@homara.com",
         firstName: "Alejo",
         lastName: "Kravs",
+        phone: null,
+        address: null,
+        city: null,
+        state: null,
+        zipCode: null,
+        role: "CUSTOMER"
+      });
+    });
+
+    it("debe registrar exitosamente un nuevo usuario con todos los campos opcionales del perfil", async () => {
+      mockUserRepository.findByEmail.mockResolvedValue(null);
+      
+      const createdUser = new User(
+        "user-123",
+        "test@homara.com",
+        "hashed-password",
+        "Alejo",
+        "Kravs",
+        "300 999 8888",
+        "Calle Falsa 123",
+        "Medellin",
+        "Antioquia",
+        "050001",
+        "CUSTOMER",
+        new Date(),
+        new Date()
+      );
+      mockUserRepository.create.mockResolvedValue(createdUser);
+
+      const useCase = new RegisterUserUseCase(mockUserRepository);
+      const result = await useCase.execute({
+        email: "test@homara.com",
+        password: "secretpassword",
+        firstName: "Alejo",
+        lastName: "Kravs",
+        phone: "300 999 8888",
+        address: "Calle Falsa 123",
+        city: "Medellin",
+        state: "Antioquia",
+        zipCode: "050001"
+      });
+
+      expect(mockUserRepository.create).toHaveBeenCalledWith({
+        email: "test@homara.com",
+        password: expect.any(String),
+        firstName: "Alejo",
+        lastName: "Kravs",
+        phone: "300 999 8888",
+        address: "Calle Falsa 123",
+        city: "Medellin",
+        state: "Antioquia",
+        zipCode: "050001",
+        role: "CUSTOMER"
+      });
+      expect(result.user).toEqual({
+        id: "user-123",
+        email: "test@homara.com",
+        firstName: "Alejo",
+        lastName: "Kravs",
+        phone: "300 999 8888",
+        address: "Calle Falsa 123",
+        city: "Medellin",
+        state: "Antioquia",
+        zipCode: "050001",
         role: "CUSTOMER"
       });
     });
@@ -104,6 +168,11 @@ describe("Auth Use Cases", () => {
         email: "test@homara.com",
         firstName: "Alejo",
         lastName: "Kravs",
+        phone: null,
+        address: null,
+        city: null,
+        state: null,
+        zipCode: null,
         role: "CUSTOMER"
       });
     });
