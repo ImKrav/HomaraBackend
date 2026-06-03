@@ -62,6 +62,10 @@ export class CreateProjectUseCase {
     if (data.selectedProductId && this.productRepository) {
       const prod = await this.productRepository.findById(data.selectedProductId);
       if (prod) {
+        const allowedCategories = ["pisos-ceramicas", "pinturas", "materiales-construccion"];
+        if (prod.categorySlug && !allowedCategories.includes(prod.categorySlug)) {
+          throw new AppError("Solo se pueden usar materiales de revestimiento (pisos, cerámicas o pinturas) o de construcción en un proyecto.", 400);
+        }
         selectedProduct = {
           id: prod.id,
           name: prod.name,
@@ -201,6 +205,10 @@ export class UpdateProjectUseCase {
       if (calcSelectedProdId && this.productRepository) {
         const prod = await this.productRepository.findById(calcSelectedProdId);
         if (prod) {
+          const allowedCategories = ["pisos-ceramicas", "pinturas", "materiales-construccion"];
+          if (prod.categorySlug && !allowedCategories.includes(prod.categorySlug)) {
+            throw new AppError("Solo se pueden usar materiales de revestimiento (pisos, cerámicas o pinturas) o de construcción en un proyecto.", 400);
+          }
           selectedProduct = {
             id: prod.id,
             name: prod.name,

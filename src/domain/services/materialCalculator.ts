@@ -175,8 +175,30 @@ export function calculateMaterials({
   const totalArea = Math.ceil(netArea * wasteMultiplier);
 
   // 3. Inclusión del material de revestimiento principal
-  if (selectedProduct) {
-    // Si el usuario eligió un producto real del catálogo, calculamos con base en él
+  const nameLower = selectedProduct ? selectedProduct.name.toLowerCase() : "";
+  const isConstructionMaterial = selectedProduct && (
+    nameLower.includes("pegante") ||
+    nameLower.includes("cemento") ||
+    nameLower.includes("adhesivo") ||
+    nameLower.includes("mortero") ||
+    nameLower.includes("yeso") ||
+    nameLower.includes("cal") ||
+    nameLower.includes("boquilla")
+  );
+
+  const isPeganteProduct = selectedProduct && (
+    nameLower.includes("pegante") ||
+    nameLower.includes("cemento") ||
+    nameLower.includes("adhesivo") ||
+    nameLower.includes("mortero") ||
+    nameLower.includes("yeso") ||
+    nameLower.includes("cal")
+  );
+  
+  const isBoquillaProduct = selectedProduct && nameLower.includes("boquilla");
+
+  if (selectedProduct && !isConstructionMaterial) {
+    // Si el usuario eligió un producto real del catálogo de revestimiento principal, calculamos con base en él
     const qtyUnit = selectedProduct.unit || "m²";
     const isPaintProduct = qtyUnit === "galón" || qtyUnit === "galones" || materialType === "pintura";
 
@@ -192,7 +214,7 @@ export function calculateMaterials({
         productId: selectedProduct.id,
       });
     } else {
-      // Para recubrimientos sólidos en m²
+      // Para recubrimientos sólidos en m² (Pisos, cerámicas, maderas, vinilos)
       materials.push({
         name: selectedProduct.name,
         quantity: `${totalArea} ${qtyUnit}`,
@@ -203,7 +225,7 @@ export function calculateMaterials({
       });
     }
   } else if (materialType === "pintura") {
-    // Si eligió pintura genérica, calculamos con base en el rendimiento de un galón
+    // Si eligió pintura genérica o tiene un producto de construcción vinculado, calculamos pintura genérica
     const galones = Math.ceil(totalArea / COVERAGE.pintura);
     materials.push({
       name: "Pintura Premium de Interior/Exterior",
@@ -214,7 +236,7 @@ export function calculateMaterials({
       productId: null,
     });
   } else {
-    // Cálculo genérico de baldosas/madera/vinilo si no hay producto específico
+    // Cálculo genérico de baldosas/madera/vinilo si no hay producto específico de revestimiento
     const matName = MATERIAL_NAMES[materialType] || "Cerámica";
     const formatLabel = FORMAT_LABELS[tileFormat] || tileFormat;
     const pricePerM2 = TILE_PRICES[materialType]?.[tileFormat] || TILE_PRICES.ceramica["60x60"];
@@ -232,31 +254,53 @@ export function calculateMaterials({
   // 4. Insumos para baldosas (cerámica y porcelanato)
   const isTile = materialType === "ceramica" || materialType === "porcelanato";
   
-  if (isTile && !selectedProduct || (selectedProduct && (selectedProduct.name.toLowerCase().includes("ceramica") || selectedProduct.name.toLowerCase().includes("porcelanato") || selectedProduct.name.toLowerCase().includes("baldosa")))) {
+  if (isTile) {
     // Pegante
     if (includeAdhesive) {
       const bultos = Math.ceil(netArea / COVERAGE.pegante);
-      materials.push({
-        name: "Pegante cerámico flexible 25kg",
-        quantity: `${bultos} bultos`,
-        note: "25kg c/u (Rendimiento: 4m²/bulto)",
-        icon: "🧱",
-        price: PRICES.pegante * bultos,
-        productId: null,
-      });
+      if (isPeganteProduct) {
+        materials.push({
+          name: selectedProduct.name,
+          quantity: `${bultos} ${selectedProduct.unit || "bultos"}`,
+          note: `Pegante real vinculado: 1 bulto por cada 4m²`,
+          icon: "🧱",
+          price: selectedProduct.price * bultos,
+          productId: selectedProduct.id,
+        });
+      } else {
+        materials.push({
+          name: "Pegante cerámico flexible 25kg",
+          quantity: `${bultos} bultos`,
+          note: "25kg c/u (Rendimiento: 4m²/bulto)",
+          icon: "🧱",
+          price: PRICES.pegante * bultos,
+          productId: null,
+        });
+      }
     }
 
     // Boquilla
     if (includeGrout) {
       const kgBoquilla = Math.ceil(netArea / COVERAGE.boquilla);
-      materials.push({
-        name: "Boquilla",
-        quantity: `${kgBoquilla} kg`,
-        note: "Rendimiento: 8m²/kg",
-        icon: "🪣",
-        price: PRICES.boquilla * kgBoquilla,
-        productId: null,
-      });
+      if (isBoquillaProduct) {
+        materials.push({
+          name: selectedProduct.name,
+          quantity: `${kgBoquilla} ${selectedProduct.unit || "kg"}`,
+          note: `Boquilla real vinculada: 1 kg por cada 8m²`,
+          icon: "🪣",
+          price: selectedProduct.price * kgBoquilla,
+          productId: selectedProduct.id,
+        });
+      } else {
+        materials.push({
+          name: "Boquilla",
+          quantity: `${kgBoquilla} kg`,
+          note: "Rendimiento: 8m²/kg",
+          icon: "🪣",
+          price: PRICES.boquilla * kgBoquilla,
+          productId: null,
+        });
+      }
     }
 
     // Crucetas
