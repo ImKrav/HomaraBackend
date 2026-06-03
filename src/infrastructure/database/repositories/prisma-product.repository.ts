@@ -257,5 +257,61 @@ export class PrismaProductRepository implements IProductRepository {
       }
     });
   }
+
+  async update(id: string, data: Partial<Omit<Product, "id" | "createdAt" | "updatedAt">> & { tags?: string[] }): Promise<Product> {
+    const { tags, ...productData } = data;
+
+    const updated = await prisma.$transaction(async (tx) => {
+      if (tags !== undefined) {
+        await tx.productTag.deleteMany({ where: { productId: id } });
+        if (tags.length > 0) {
+          await tx.productTag.createMany({
+            data: tags.map((t) => ({ productId: id, name: t })),
+          });
+        }
+      }
+
+      const updateFields: Prisma.ProductUpdateInput = {};
+      if (productData.name !== undefined) updateFields.name = productData.name;
+      if (productData.description !== undefined) updateFields.description = productData.description;
+      if (productData.price !== undefined) updateFields.price = productData.price;
+      if (productData.originalPrice !== undefined) updateFields.originalPrice = productData.originalPrice;
+      if (productData.image !== undefined) updateFields.image = productData.image;
+      if (productData.stockQuantity !== undefined) {
+        updateFields.stockQuantity = productData.stockQuantity;
+        updateFields.inStock = productData.stockQuantity > 0;
+      }
+      if (productData.unit !== undefined) updateFields.unit = productData.unit;
+      if (productData.categoryId !== undefined) {
+        updateFields.category = { connect: { id: productData.categoryId } };
+      }
+
+      return await tx.product.update({
+        where: { id },
+        data: updateFields,
+        include: { tags: true, category: true },
+      });
+    });
+
+    return this.mapToEntity(updated as Prisma.ProductGetPayload<{ include: { tags: true; category: true } }>);
+  }
+
+  async delete(id: string): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      // 1. Eliminar ítems de carrito
+      await tx.cartItem.deleteMany({ where: { productId: id } });
+      
+      // 2. Desvincular de materiales del proyecto (set null)
+      await tx.projectMaterial.updateMany({
+        where: { productId: id },
+        data: { productId: null },
+      });
+
+      // 3. Eliminar el producto (cascada automática a tags y reviews en PostgreSQL)
+      await tx.product.delete({
+        where: { id },
+      });
+    });
+  }
 }
 

@@ -9,5 +9,7 @@ export interface IProductRepository {
   findStorefrontOffers(): Promise<Product[]>;
   findStorefrontBestSellers(): Promise<Product[]>;
   updateProductRating(id: string, rating: number, reviewCount: number): Promise<void>;
+  update(id: string, product: Partial<Omit<Product, "id" | "createdAt" | "updatedAt">> & { tags?: string[] }): Promise<Product>;
+  delete(id: string): Promise<void>;
 }
 
