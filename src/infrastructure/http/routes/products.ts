@@ -4,8 +4,12 @@
 
 import { Router } from "express";
 import { CatalogController } from "../controllers/catalog.controller.js";
+import { requireAuth } from "../middlewares/auth.js";
+import { validateZod } from "../middlewares/validateZod.js";
+import { createReviewSchema } from "../validators/catalog.validator.js";
 
 const router = Router();
+
 
 /**
  * @openapi
@@ -32,6 +36,7 @@ const router = Router();
  *       200:
  *         description: Lista de productos filtrada obtenida con éxito.
  */
+router.get("/storefront", CatalogController.getStorefrontProducts);
 router.get("/", CatalogController.listProducts);
 
 /**
@@ -56,4 +61,8 @@ router.get("/", CatalogController.listProducts);
  */
 router.get("/:id", CatalogController.getProductDetail);
 
+router.get("/:id/reviews", CatalogController.getProductReviews);
+router.post("/:id/reviews", requireAuth, validateZod(createReviewSchema), CatalogController.createReview);
+
 export default router;
+

@@ -5,4 +5,9 @@ export interface IProductRepository {
   findById(id: string): Promise<Product | null>;
   create(product: Omit<Product, "id" | "createdAt" | "updatedAt" | "tags"> & { id?: string; tags?: string[] }): Promise<Product>;
   updateStock(id: string, quantityChange: number): Promise<void>;
+  findStorefrontRecommended(): Promise<Product[]>;
+  findStorefrontOffers(): Promise<Product[]>;
+  findStorefrontBestSellers(): Promise<Product[]>;
+  updateProductRating(id: string, rating: number, reviewCount: number): Promise<void>;
 }
+

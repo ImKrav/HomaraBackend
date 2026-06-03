@@ -122,6 +122,28 @@ export class PrismaProductRepository implements IProductRepository {
     );
   }
 
+  private mapToEntity(p: any): Product {
+    return new Product(
+      p.id,
+      p.name,
+      p.description,
+      p.price,
+      p.originalPrice,
+      p.image,
+      p.rating,
+      p.reviewCount,
+      p.inStock,
+      p.stockQuantity,
+      p.unit,
+      p.categoryId,
+      p.createdAt,
+      p.updatedAt,
+      p.tags ? p.tags.map((t: any) => typeof t === "string" ? t : t.name) : [],
+      p.category?.name,
+      p.category?.slug
+    );
+  }
+
   async updateStock(id: string, quantityChange: number): Promise<void> {
     const p = await prisma.product.findUnique({ where: { id } });
     if (!p) return;
@@ -135,4 +157,105 @@ export class PrismaProductRepository implements IProductRepository {
       }
     });
   }
+
+  async findStorefrontRecommended(): Promise<Product[]> {
+    const products = await prisma.product.findMany({
+      where: {
+        OR: [
+          { tags: { some: { name: "nuevo" } } },
+          { rating: { gte: 4.5 } }
+        ]
+      },
+      include: { tags: true, category: true },
+      orderBy: [
+        { rating: "desc" },
+        { reviewCount: "desc" },
+        { createdAt: "desc" }
+      ],
+      take: 4
+    });
+    return products.map((p) => this.mapToEntity(p));
+  }
+
+  async findStorefrontOffers(): Promise<Product[]> {
+    const products = await prisma.product.findMany({
+      where: {
+        originalPrice: { not: null }
+      },
+      include: { tags: true, category: true }
+    });
+
+    return products
+      .filter((p) => p.originalPrice !== null && p.originalPrice > p.price)
+      .sort((a, b) => {
+        const discountA = (a.originalPrice! - a.price) / a.originalPrice!;
+        const discountB = (b.originalPrice! - b.price) / b.originalPrice!;
+        return discountB - discountA;
+      })
+      .slice(0, 4)
+      .map((p) => this.mapToEntity(p));
+  }
+
+  async findStorefrontBestSellers(): Promise<Product[]> {
+    const orderAggregates = await prisma.orderItem.groupBy({
+      by: ["productId"],
+      where: {
+        order: {
+          status: {
+            in: ["PROCESANDO", "ENVIADO", "ENTREGADO"]
+          }
+        }
+      },
+      _sum: {
+        quantity: true
+      },
+      orderBy: {
+        _sum: {
+          quantity: "desc"
+        }
+      },
+      take: 4
+    });
+
+    const bestSellerIds = orderAggregates.map((a) => a.productId);
+    let bestSellers: any[] = [];
+    if (bestSellerIds.length > 0) {
+      bestSellers = await prisma.product.findMany({
+        where: {
+          id: { in: bestSellerIds }
+        },
+        include: { tags: true, category: true }
+      });
+      bestSellers.sort((a, b) => bestSellerIds.indexOf(a.id) - bestSellerIds.indexOf(b.id));
+    }
+
+    if (bestSellers.length < 4) {
+      const needed = 4 - bestSellers.length;
+      const fallbacks = await prisma.product.findMany({
+        where: {
+          id: { notIn: bestSellerIds }
+        },
+        include: { tags: true, category: true },
+        orderBy: [
+          { reviewCount: "desc" },
+          { rating: "desc" }
+        ],
+        take: needed
+      });
+      bestSellers = [...bestSellers, ...fallbacks];
+    }
+
+    return bestSellers.map((p) => this.mapToEntity(p));
+  }
+
+  async updateProductRating(id: string, rating: number, reviewCount: number): Promise<void> {
+    await prisma.product.update({
+      where: { id },
+      data: {
+        rating,
+        reviewCount
+      }
+    });
+  }
 }
+

@@ -19,11 +19,11 @@ async function main() {
   console.log("🌱 Seeding Homara database (TS)...\n");
 
   // ─── Check if already seeded ──────────────
-  const existingUsers = await prisma.user.count();
-  if (existingUsers > 0) {
-    console.log("✅ Database already contains data. Skipping seed to prevent data loss.");
-    return;
-  }
+  // const existingUsers = await prisma.user.count();
+  // if (existingUsers > 0) {
+  //   console.log("✅ Database already contains data. Skipping seed to prevent data loss.");
+  //   return;
+  // }
 
   // ─── Clean existing data ────────────────────
   console.log("🧹 Cleaning existing data...");
@@ -351,6 +351,187 @@ async function main() {
       categorySlug: "pinturas", rating: 4.5, reviewCount: 92,
       inStock: true, stockQuantity: 240, unit: "galón", tags: ["oferta"],
     },
+    // --- MÁS PISOS Y PORCELANATOS ---
+    {
+      name: "Porcelanato Líquido Epóxico Cristalino 1 Galón",
+      description: "Recubrimiento epóxico de dos componentes con acabado autonivelante ultra brillante. Ideal para encapsulados y pisos de diseño industrial.",
+      price: 185000, originalPrice: 210000, image: "/products/epoxico.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.8, reviewCount: 42,
+      inStock: true, stockQuantity: 95, unit: "unidad", tags: ["oferta"],
+    },
+    {
+      name: "Cerámica Fachaleta Piedra Gris 30x60",
+      description: "Revestimiento cerámico con textura estructurada tipo fachaleta de piedra natural. Perfecta para muros exteriores y chimeneas.",
+      price: 34900, originalPrice: null, image: "/products/fachaleta.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.5, reviewCount: 29,
+      inStock: true, stockQuantity: 480, unit: "m²", tags: ["nuevo"],
+    },
+    {
+      name: "Zócalo Poliestireno Blanco 7cm x 2.4m",
+      description: "Guardaescobas o zócalo de poliestireno expandido de alta resistencia. 100% resistente al agua y a las plagas. Fácil de instalar y pintar.",
+      price: 29900, originalPrice: null, image: "/products/zocalo.html",
+      categorySlug: "pisos-ceramicas", rating: 4.6, reviewCount: 68,
+      inStock: true, stockQuantity: 340, unit: "unidad", tags: [],
+    },
+    {
+      name: "Piso Laminado Roble Gris Oscuro 8mm",
+      description: "Madera laminada de 8mm de espesor con bisel perimetral. Acabado roble gris con alta resistencia al tráfico doméstico.",
+      price: 48900, originalPrice: 54000, image: "/products/laminado-gris.jpg",
+      categorySlug: "pisos-ceramicas", rating: 4.4, reviewCount: 51,
+      inStock: true, stockQuantity: 390, unit: "m²", tags: ["oferta"],
+    },
+    // --- MÁS HERRAMIENTAS ---
+    {
+      name: "Taladro Percutor DeWalt 1/2' 800W Con Cable",
+      description: "Taladro percutor Dewalt profesional con cable. Motor de alto rendimiento de 800W, mandril de 1/2 pulgada y velocidad variable reversible.",
+      price: 425000, originalPrice: 489000, image: "/products/taladro-dewalt.jpg",
+      categorySlug: "herramientas", rating: 4.9, reviewCount: 178,
+      inStock: true, stockQuantity: 45, unit: "unidad", tags: ["oferta", "popular"],
+    },
+    {
+      name: "Cortadora de Baldosa Profesional Rubí 60cm",
+      description: "Cortadora manual profesional para baldosas cerámicas y azulejos. Guías de acero macizo y rodel de carburo de tungsteno.",
+      price: 179000, originalPrice: null, image: "/products/cortadora.jpg",
+      categorySlug: "herramientas", rating: 4.7, reviewCount: 38,
+      inStock: true, stockQuantity: 28, unit: "unidad", tags: [],
+    },
+    {
+      name: "Nivel Láser Autonivelante 3 Líneas Verdes",
+      description: "Nivel láser profesional de líneas cruzadas verdes de alta visibilidad. Rango de hasta 30 metros, autonivelación automática y soporte magnético.",
+      price: 345000, originalPrice: 399000, image: "/products/nivel-laser.jpg",
+      categorySlug: "herramientas", rating: 4.8, reviewCount: 46,
+      inStock: true, stockQuantity: 22, unit: "unidad", tags: ["oferta", "nuevo"],
+    },
+    {
+      name: "Juego de Destornilladores Tramontina 6 Piezas",
+      description: "Kit de destornilladores en acero cromo vanadio. Incluye 3 puntas planas y 3 de estrella con mangos ergonómicos antideslizantes.",
+      price: 24900, originalPrice: null, image: "/products/destornilladores.jpg",
+      categorySlug: "herramientas", rating: 4.3, reviewCount: 104,
+      inStock: true, stockQuantity: 150, unit: "unidad", tags: [],
+    },
+    {
+      name: "Llana Metálica Dentada 10x10mm",
+      description: "Llana dentada cuadrada de 10x10mm ideal para aplicar pegante cerámico flexible en porcelanatos de formato medio. Mango plástico resistente.",
+      price: 14500, originalPrice: null, image: "/products/llana.jpg",
+      categorySlug: "herramientas", rating: 4.5, reviewCount: 112,
+      inStock: true, stockQuantity: 300, unit: "unidad", tags: ["popular"],
+    },
+    {
+      name: "Mazo de Goma Blanca 16oz Para Enchapes",
+      description: "Martillo de goma blanca que no mancha las superficies cerámicas al nivelar. Ideal para la instalación de baldosas y porcelanatos.",
+      price: 18900, originalPrice: null, image: "/products/mazo.jpg",
+      categorySlug: "herramientas", rating: 4.6, reviewCount: 84,
+      inStock: true, stockQuantity: 120, unit: "unidad", tags: [],
+    },
+    // --- MÁS PINTURAS ---
+    {
+      name: "Pintura Exterior Koraza Premium Caneca 5 Galones",
+      description: "Pintura premium marca Pintuco especial para exteriores en presentación de caneca grande. Alta impermeabilidad y protección contra algas.",
+      price: 549000, originalPrice: 629000, image: "/products/koraza-caneca.jpg",
+      categorySlug: "pinturas", rating: 4.9, reviewCount: 135,
+      inStock: true, stockQuantity: 65, unit: "unidad", tags: ["oferta", "popular"],
+    },
+    {
+      name: "Esmalte Sintético Corona Blanco Brillante 1 Galón",
+      description: "Pintura esmalte alquídico de alta resistencia para proteger y decorar superficies de metal y madera. Secado rápido y alto brillo.",
+      price: 56900, originalPrice: null, image: "/products/esmalte.jpg",
+      categorySlug: "pinturas", rating: 4.4, reviewCount: 47,
+      inStock: true, stockQuantity: 140, unit: "galón", tags: [],
+    },
+    {
+      name: "Imprimante Acrílico Sellador de Muros 1 Galón",
+      description: "Sellador acrílico base agua para muros nuevos de concreto o yeso. Disminuye la absorción y optimiza el rendimiento de la pintura final.",
+      price: 45000, originalPrice: null, image: "/products/imprimante.jpg",
+      categorySlug: "pinturas", rating: 4.5, reviewCount: 32,
+      inStock: true, stockQuantity: 90, unit: "galón", tags: ["nuevo"],
+    },
+    {
+      name: "Pintura de Tablero Negro Tiza 1 Galón",
+      description: "Pintura especial que convierte cualquier pared en un tablero para escribir con tiza. Lavable y altamente resistente al rayado.",
+      price: 62000, originalPrice: null, image: "/products/pintura-tablero.jpg",
+      categorySlug: "pinturas", rating: 4.6, reviewCount: 19,
+      inStock: true, stockQuantity: 40, unit: "galón", tags: [],
+    },
+    // --- MÁS MUEBLES ---
+    {
+      name: "Gabinete Espejo de Baño Corona Blanco",
+      description: "Organizador de baño flotante con espejo frontal y repisas interiores. Estructura plástica inmune a la humedad y el vapor del baño.",
+      price: 159000, originalPrice: 189000, image: "/products/gabinete-espejo.jpg",
+      categorySlug: "muebles", rating: 4.7, reviewCount: 88,
+      inStock: true, stockQuantity: 34, unit: "unidad", tags: ["oferta"],
+    },
+    {
+      name: "Mesa Auxiliar de Baño Con Cajón Madera Blanca",
+      description: "Gabinete auxiliar vertical de madera blanca para baño. Cuenta con un cajón y repisas inferiores para toallas y cosméticos.",
+      price: 189000, originalPrice: null, image: "/products/mesa-auxiliar.jpg",
+      categorySlug: "muebles", rating: 4.3, reviewCount: 22,
+      inStock: true, stockQuantity: 15, unit: "unidad", tags: ["nuevo"],
+    },
+    {
+      name: "Organizador Modular de Herramientas Plástico",
+      description: "Caja organizadora modular de herramientas y tornillería con gavetas plásticas transparentes. Apilable y colgable.",
+      price: 89000, originalPrice: null, image: "/products/organizador.jpg",
+      categorySlug: "muebles", rating: 4.4, reviewCount: 54,
+      inStock: true, stockQuantity: 75, unit: "unidad", tags: [],
+    },
+    // --- MÁS ILUMINACIÓN ---
+    {
+      name: "Bombillo LED Inteligente RGB E27 9W",
+      description: "Bombillo LED con conexión Wi-Fi, control por voz compatible con Alexa y Google Home. Millones de colores y luz blanca regulable.",
+      price: 39900, originalPrice: null, image: "/products/bombillo-rgb.jpg",
+      categorySlug: "iluminacion", rating: 4.8, reviewCount: 120,
+      inStock: true, stockQuantity: 310, unit: "unidad", tags: ["popular"],
+    },
+    {
+      name: "Reflector LED Exterior 50W Negro IP65",
+      description: "Reflector de luz fría de alta potencia para exteriores. Hermético contra lluvia y polvo (IP65) con soporte metálico direccionable.",
+      price: 58900, originalPrice: 69900, image: "/products/reflector.jpg",
+      categorySlug: "iluminacion", rating: 4.6, reviewCount: 85,
+      inStock: true, stockQuantity: 190, unit: "unidad", tags: ["oferta"],
+    },
+    {
+      name: "Cinta LED Adhesiva RGB 5 Metros",
+      description: "Cinta LED flexible RGB de 5 metros con control remoto. Incluye transformador y cinta adhesiva 3M para fácil instalación en cielo rasos y muebles.",
+      price: 49900, originalPrice: null, image: "/products/cinta-led.jpg",
+      categorySlug: "iluminacion", rating: 4.5, reviewCount: 165,
+      inStock: true, stockQuantity: 250, unit: "unidad", tags: ["nuevo"],
+    },
+    // --- MÁS MATERIALES DE CONSTRUCCIÓN ---
+    {
+      name: "Cemento Blanco Argos Uso General 40kg",
+      description: "Cemento portland blanco especial para acabados, fraguados estéticos, pegado de mármoles y baldosas de colores claros.",
+      price: 49900, originalPrice: null, image: "/products/cemento-blanco.jpg",
+      categorySlug: "materiales-construccion", rating: 4.7, reviewCount: 220,
+      inStock: true, stockQuantity: 650, unit: "bulto", tags: ["popular"],
+    },
+    {
+      name: "Boquilla Con Látex Impermeable Gris 2kg",
+      description: "Boquilla cementicia impermeable modificada con látex para rellenar juntas de 1 a 6mm. Previene la filtración de agua y formación de hongos.",
+      price: 15500, originalPrice: null, image: "/products/boquilla.jpg",
+      categorySlug: "materiales-construccion", rating: 4.5, reviewCount: 310,
+      inStock: true, stockQuantity: 1400, unit: "unidad", tags: ["popular"],
+    },
+    {
+      name: "Bolsa de Crucetas Niveladoras 2mm 100 Und",
+      description: "Crucetas de nivelación plásticas de 2mm para garantizar un espaciado perfecto y uniforme entre las baldosas durante la obra.",
+      price: 9900, originalPrice: null, image: "/products/crucetas.jpg",
+      categorySlug: "materiales-construccion", rating: 4.6, reviewCount: 420,
+      inStock: true, stockQuantity: 2800, unit: "unidad", tags: [],
+    },
+    {
+      name: "Rollo Alambre de Amarre Calibre 18 (1 kg)",
+      description: "Alambre de acero recocido negro calibre 18 para amarre de armaduras de concreto y estribos de refuerzo.",
+      price: 12500, originalPrice: null, image: "/products/alambre.jpg",
+      categorySlug: "materiales-construccion", rating: 4.2, reviewCount: 145,
+      inStock: true, stockQuantity: 800, unit: "unidad", tags: [],
+    },
+    {
+      name: "Yeso de Construcción Fraguado Rápido 10kg",
+      description: "Yeso hemihidratado de fraguado rápido para revoques interiores, resanes y reparaciones de grietas en muros secos.",
+      price: 14900, originalPrice: null, image: "/products/yeso.jpg",
+      categorySlug: "materiales-construccion", rating: 4.3, reviewCount: 98,
+      inStock: true, stockQuantity: 340, unit: "unidad", tags: [],
+    }
   ];
 
   const products: Record<string, any> = {};
@@ -534,11 +715,85 @@ async function main() {
     });
   }
 
+  // ─── Product Reviews ─────────────────────────
+  console.log("⭐ Creating product reviews...");
+
+  const comments = [
+    "Excelente calidad, superó mis expectativas.",
+    "El producto es bueno, pero el empaque llegó un poco maltratado.",
+    "Muy resistente y duradero. Lo recomiendo al 100%.",
+    "Fácil de instalar y con muy buenos acabados.",
+    "Relación calidad-precio inmejorable. Volvería a comprar.",
+    "Cumple con su función perfectamente para el proyecto de obra.",
+    "El material se siente premium y resistente.",
+    "El color es exactamente igual al de la foto. Muy conforme.",
+    "Herramienta muy potente, indispensable para mi trabajo.",
+    "Un poco costoso pero vale totalmente la pena.",
+    "Rendimiento excepcional en superficies difíciles.",
+    "Muy satisfecho con la compra, envío rápido.",
+    "La boquilla y fraguado son excelentes.",
+    "El cemento fraguó rápido y con muy buena dureza."
+  ];
+
+  const reviewerIds = ["demo-user-001", "user-carlos", "user-maria", "user-juan-r", "user-ana", "user-pedro", "user-lucia"];
+  let reviewCountSeeded = 0;
+
+  for (const product of productList) {
+    // 75% de probabilidad de que el producto sea calificado
+    if (Math.random() > 0.25) {
+      // Entre 1 y 5 calificaciones
+      const numReviews = Math.floor(Math.random() * 5) + 1;
+      const shuffledReviewers = [...reviewerIds].sort(() => Math.random() - 0.5);
+      const selectedReviewers = shuffledReviewers.slice(0, numReviews);
+
+      const ratings: number[] = [];
+
+      for (const userId of selectedReviewers) {
+        // Calificación aleatoria entre 3 y 5 estrellas (para que sea realista)
+        // Ocasionalmente una calificación de 1 o 2 estrellas para variedad
+        const rand = Math.random();
+        const rating = rand < 0.05 ? 1 : rand < 0.1 ? 2 : rand < 0.3 ? 3 : rand < 0.6 ? 4 : 5;
+        ratings.push(rating);
+
+        // 60% de probabilidad de tener comentario
+        const comment = Math.random() > 0.4 ? comments[Math.floor(Math.random() * comments.length)] : null;
+
+        await prisma.review.create({
+          data: {
+            userId,
+            productId: product.id,
+            rating,
+            comment
+          }
+        });
+        reviewCountSeeded++;
+      }
+
+      const avgRating = ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
+      await prisma.product.update({
+        where: { id: product.id },
+        data: {
+          rating: parseFloat(avgRating.toFixed(1)),
+          reviewCount: ratings.length
+        }
+      });
+    } else {
+      await prisma.product.update({
+        where: { id: product.id },
+        data: {
+          rating: 0,
+          reviewCount: 0
+        }
+      });
+    }
+  }
+
   // ─── Summary ────────────────────────────────
   console.log("\n✅ Seed completed successfully!");
   console.log(`   👤 ${8} users created`);
   console.log(`   📂 ${categoriesData.length} categories created`);
   console.log(`   🏷️ ${productsData.length} products created`);
+  console.log(`   ⭐ ${reviewCountSeeded} reviews seeded`);
   console.log(`   📐 ${projectsData.length} projects created`);
   console.log(`   🛒 1 cart with 3 items created`);
   console.log(`   📦 ${ordersData.length} orders created`);

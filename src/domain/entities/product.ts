@@ -7,6 +7,8 @@ export class ProductTag {
 }
 
 export class Product {
+  public readonly reviews?: number;
+
   constructor(
     public readonly id: string,
     public readonly name: string,
@@ -25,5 +27,8 @@ export class Product {
     public readonly tags?: string[],
     public readonly category?: string,
     public readonly categorySlug?: string
-  ) {}
+  ) {
+    this.reviews = reviewCount;
+  }
 }
+
