@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/projects:
+ * /projects:
  *   get:
  *     tags:
  *       - Projects
@@ -33,7 +33,7 @@ router.get("/", optionalAuth, validateZod(listProjectsQuerySchema, "query"), Pro
 
 /**
  * @openapi
- * /api/projects/{id}:
+ * /projects/{id}:
  *   get:
  *     tags:
  *       - Projects
@@ -55,7 +55,7 @@ router.get("/:id", validateZod(cuidParamSchema, "params"), ProjectController.get
 
 /**
  * @openapi
- * /api/projects:
+ * /projects:
  *   post:
  *     tags:
  *       - Projects
@@ -103,7 +103,7 @@ router.post(
 
 /**
  * @openapi
- * /api/projects/{id}:
+ * /projects/{id}:
  *   put:
  *     tags:
  *       - Projects
@@ -129,7 +129,7 @@ router.put(
 
 /**
  * @openapi
- * /api/projects/{id}:
+ * /projects/{id}:
  *   delete:
  *     tags:
  *       - Projects

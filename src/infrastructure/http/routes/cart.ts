@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/cart:
+ * /cart:
  *   get:
  *     tags:
  *       - Cart
@@ -33,7 +33,7 @@ router.get("/", optionalAuth, CartController.get);
 
 /**
  * @openapi
- * /api/cart/items:
+ * /cart/items:
  *   post:
  *     tags:
  *       - Cart
@@ -67,7 +67,7 @@ router.post(
 
 /**
  * @openapi
- * /api/cart/items/{itemId}:
+ * /cart/items/{itemId}:
  *   put:
  *     tags:
  *       - Cart
@@ -93,7 +93,7 @@ router.put(
 
 /**
  * @openapi
- * /api/cart/items/{itemId}:
+ * /cart/items/{itemId}:
  *   delete:
  *     tags:
  *       - Cart

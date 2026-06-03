@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/users/register:
+ * /users/register:
  *   post:
  *     tags:
  *       - Authentication
@@ -63,7 +63,7 @@ router.post(
 
 /**
  * @openapi
- * /api/users/login:
+ * /users/login:
  *   post:
  *     tags:
  *       - Authentication
@@ -97,7 +97,7 @@ router.post(
 
 /**
  * @openapi
- * /api/users/me:
+ * /users/me:
  *   get:
  *     tags:
  *       - Users
@@ -115,7 +115,7 @@ router.get("/me", requireAuth, AuthController.getMe);
 
 /**
  * @openapi
- * /api/users/{id}:
+ * /users/{id}:
  *   get:
  *     tags:
  *       - Users
@@ -137,7 +137,7 @@ router.get("/:id", optionalAuth, validateZod(z.object({ id: z.string().min(1, "I
 
 /**
  * @openapi
- * /api/users/{id}:
+ * /users/{id}:
  *   put:
  *     tags:
  *       - Users

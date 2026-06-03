@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/products:
+ * /products:
  *   get:
  *     tags:
  *       - Products
@@ -41,7 +41,7 @@ router.get("/", CatalogController.listProducts);
 
 /**
  * @openapi
- * /api/products/{id}:
+ * /products/{id}:
  *   get:
  *     tags:
  *       - Products

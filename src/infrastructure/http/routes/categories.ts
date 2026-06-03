@@ -9,7 +9,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/categories:
+ * /categories:
  *   get:
  *     tags:
  *       - Categories

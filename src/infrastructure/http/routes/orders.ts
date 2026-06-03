@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/orders:
+ * /orders:
  *   get:
  *     tags:
  *       - Orders
@@ -36,7 +36,7 @@ router.get("/", optionalAuth, validateZod(listOrdersQuerySchema, "query"), Order
 
 /**
  * @openapi
- * /api/orders/{id}:
+ * /orders/{id}:
  *   get:
  *     tags:
  *       - Orders
@@ -58,7 +58,7 @@ router.get("/:id", OrderController.getDetail);
 
 /**
  * @openapi
- * /api/orders:
+ * /orders:
  *   post:
  *     tags:
  *       - Orders
@@ -88,7 +88,7 @@ router.post(
 
 /**
  * @openapi
- * /api/orders/{id}/status:
+ * /orders/{id}/status:
  *   put:
  *     tags:
  *       - Orders

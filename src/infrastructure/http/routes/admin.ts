@@ -10,7 +10,7 @@ const router = Router();
 
 /**
  * @openapi
- * /api/admin/metrics:
+ * /admin/metrics:
  *   get:
  *     tags:
  *       - Admin
@@ -30,7 +30,7 @@ router.get("/metrics", requireAdmin, AdminController.getMetrics);
 
 /**
  * @openapi
- * /api/admin/inventory:
+ * /admin/inventory:
  *   get:
  *     tags:
  *       - Admin

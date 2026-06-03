@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 // Endpoint base informativo
 app.get("/", (req, res) => {
   res.json({
-    message: "🏠 Homara API — Backend activo (Hexagonal + TS)",
+    message: "Homara API — Backend",
     version: "1.0.0",
     endpoints: {
       categories: "/api/v1/categories",
