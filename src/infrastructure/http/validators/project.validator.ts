@@ -45,4 +45,14 @@ export const updateProjectSchema = z.object({
   includeSpacers: z.boolean().optional().nullable(),
   includeTools: z.boolean().optional().nullable(),
   selectedProductId: z.string().optional().nullable(),
+  materials: z.array(
+    z.object({
+      name: z.string().min(1, "Nombre de material requerido"),
+      quantity: z.string().min(1, "Cantidad requerida"),
+      note: z.string().optional().nullable(),
+      icon: z.string().min(1, "Icono/Emoji requerido"),
+      price: z.number().int().nonnegative("Precio debe ser entero no negativo"),
+      productId: z.string().optional().nullable(),
+    })
+  ).optional(),
 });

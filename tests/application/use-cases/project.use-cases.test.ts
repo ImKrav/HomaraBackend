@@ -196,6 +196,64 @@ describe("Project Use Cases", () => {
         new AppError("No tienes permiso para modificar este proyecto.", 403)
       );
     });
+
+    it("debe actualizar los materiales del proyecto manualmente sin recalcular si no cambian dimensiones", async () => {
+      const existingProject = new Project(
+        "proj-1",
+        "Sala",
+        "PISO",
+        "EN_PROGRESO",
+        3,
+        4,
+        null,
+        12,
+        "ceramica",
+        "60x60",
+        "🏠",
+        150000,
+        "user-123"
+      );
+      mockProjectRepository.findById.mockResolvedValue(existingProject);
+
+      const customMaterials = [
+        { name: "Material manual", quantity: "10 unidades", note: "Test note", icon: "🛠️", price: 50000, productId: null }
+      ];
+
+      const updatedProject = new Project(
+        "proj-1",
+        "Sala",
+        "PISO",
+        "EN_PROGRESO",
+        3,
+        4,
+        null,
+        12,
+        "ceramica",
+        "60x60",
+        "🏠",
+        50000,
+        "user-123",
+        new Date(),
+        new Date(),
+        customMaterials as any
+      );
+      mockProjectRepository.update.mockResolvedValue(updatedProject);
+
+      const useCase = new UpdateProjectUseCase(mockProjectRepository);
+      const result = await useCase.execute("proj-1", "user-123", {
+        materials: customMaterials
+      });
+
+      expect(mockProjectRepository.findById).toHaveBeenCalledWith("proj-1");
+      expect(mockProjectRepository.update).toHaveBeenCalledWith(
+        "proj-1",
+        expect.objectContaining({
+          materials: customMaterials,
+          estimatedCost: 50000
+        })
+      );
+      expect(result).toEqual(updatedProject);
+    });
   });
 
   describe("DeleteProjectUseCase", () => {

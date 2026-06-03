@@ -158,6 +158,14 @@ export class UpdateProjectUseCase {
       includeSpacers?: boolean;
       includeTools?: boolean;
       selectedProductId?: string;
+      materials?: {
+        name: string;
+        quantity: string;
+        note?: string | null;
+        icon: string;
+        price: number;
+        productId?: string | null;
+      }[];
     }
   ) {
     const existing = await this.projectRepository.findById(id);
@@ -169,7 +177,8 @@ export class UpdateProjectUseCase {
       throw new AppError("No tienes permiso para modificar este proyecto.", 403);
     }
 
-    const updateData: Writeable<Parameters<IProjectRepository["update"]>[1]> = { ...data };
+    const { materials: dataMaterials, ...restData } = data;
+    const updateData: Writeable<Parameters<IProjectRepository["update"]>[1]> = { ...restData };
 
     // Si cambia algo relevante para el cálculo, recalculamos
     const calculationTriggerFields = [
@@ -237,6 +246,16 @@ export class UpdateProjectUseCase {
 
       updateData.estimatedCost = materials.reduce((sum, m) => sum + m.price, 0);
       updateData.materials = materials;
+    } else if (dataMaterials !== undefined) {
+      updateData.materials = dataMaterials.map((m) => ({
+        name: m.name,
+        quantity: m.quantity,
+        note: m.note ?? null,
+        icon: m.icon,
+        price: m.price,
+        productId: m.productId ?? null,
+      }));
+      updateData.estimatedCost = updateData.materials.reduce((sum, m) => sum + m.price, 0);
     }
 
     return await this.projectRepository.update(id, updateData);
