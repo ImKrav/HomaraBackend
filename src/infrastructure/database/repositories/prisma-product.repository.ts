@@ -122,7 +122,7 @@ export class PrismaProductRepository implements IProductRepository {
     );
   }
 
-  private mapToEntity(p: any): Product {
+  private mapToEntity(p: Prisma.ProductGetPayload<{ include: { tags: true; category: true } }>): Product {
     return new Product(
       p.id,
       p.name,
@@ -138,7 +138,7 @@ export class PrismaProductRepository implements IProductRepository {
       p.categoryId,
       p.createdAt,
       p.updatedAt,
-      p.tags ? p.tags.map((t: any) => typeof t === "string" ? t : t.name) : [],
+      p.tags ? p.tags.map((t: { name: string } | string) => typeof t === "string" ? t : t.name) : [],
       p.category?.name,
       p.category?.slug
     );
@@ -218,7 +218,7 @@ export class PrismaProductRepository implements IProductRepository {
     });
 
     const bestSellerIds = orderAggregates.map((a) => a.productId);
-    let bestSellers: any[] = [];
+    let bestSellers: Prisma.ProductGetPayload<{ include: { tags: true; category: true } }>[] = [];
     if (bestSellerIds.length > 0) {
       bestSellers = await prisma.product.findMany({
         where: {

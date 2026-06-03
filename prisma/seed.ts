@@ -3,7 +3,7 @@
 // ============================================
 
 import "dotenv/config";
-import { PrismaClient } from "../generated/prisma/client.js";
+import { PrismaClient, ProjectType, ProjectStatus, OrderStatus, Category, Product } from "../generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import bcrypt from "bcryptjs";
@@ -157,7 +157,7 @@ async function main() {
     { name: "Materiales de Construcción", slug: "materiales-construccion", description: "Cemento, bloques, arena y todo material de obra", icon: "🧱" },
   ];
 
-  const categories: Record<string, any> = {};
+  const categories: Record<string, Category> = {};
   for (const cat of categoriesData) {
     categories[cat.slug] = await prisma.category.create({ data: cat });
   }
@@ -534,7 +534,7 @@ async function main() {
     }
   ];
 
-  const products: Record<string, any> = {};
+  const products: Record<string, Product> = {};
   for (const pData of productsData) {
     const { tags, categorySlug, ...productFields } = pData;
     const product = await prisma.product.create({
@@ -610,8 +610,8 @@ async function main() {
     await prisma.project.create({
       data: {
         name: proj.name,
-        type: proj.type as any,
-        status: proj.status as any,
+        type: proj.type as ProjectType,
+        status: proj.status as ProjectStatus,
         area: proj.area,
         createdAt: proj.createdAt,
         thumbnail: proj.thumbnail,
@@ -707,7 +707,7 @@ async function main() {
     await prisma.order.create({
       data: {
         ...orderFields,
-        status: orderFields.status as any,
+        status: orderFields.status as OrderStatus,
         items: {
           create: items,
         },

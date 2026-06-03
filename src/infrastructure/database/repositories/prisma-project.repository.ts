@@ -169,7 +169,7 @@ export class PrismaProjectRepository implements IProjectRepository {
   }
 
   async update(id: string, data: Partial<Omit<Project, "id" | "createdAt" | "updatedAt" | "materials">> & { materials?: Omit<ProjectMaterial, "id" | "projectId">[] }): Promise<Project> {
-    const updatePayload: any = {
+    const updatePayload: Prisma.ProjectUncheckedUpdateInput = {
       name: data.name,
       type: data.type,
       status: data.status,

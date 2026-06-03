@@ -189,7 +189,7 @@ export class UpdateProjectUseCase {
     ];
 
     const needsRecalculation = calculationTriggerFields.some(
-      (field) => (data as any)[field] !== undefined
+      (field) => (data as Record<string, unknown>)[field] !== undefined
     );
 
     if (needsRecalculation) {

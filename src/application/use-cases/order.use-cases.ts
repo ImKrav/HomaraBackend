@@ -61,7 +61,7 @@ export class GetOrderDetailUseCase {
         id: item.id,
         productName: item.product?.name || "Producto desconocido",
         productImage: item.product?.image || "",
-        category: typeof item.product?.category === "object" ? (item.product.category as any)?.name : (item.product?.category || "General"),
+        category: typeof item.product?.category === "object" ? (item.product.category as unknown as { name: string })?.name : (item.product?.category || "General"),
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         total: item.total,

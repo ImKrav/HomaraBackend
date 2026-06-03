@@ -215,8 +215,21 @@ describe("Project Use Cases", () => {
       );
       mockProjectRepository.findById.mockResolvedValue(existingProject);
 
-      const customMaterials = [
+      const customMaterialsInput = [
         { name: "Material manual", quantity: "10 unidades", note: "Test note", icon: "🛠️", price: 50000, productId: null }
+      ];
+
+      const customMaterialsEntities = [
+        new ProjectMaterial(
+          "mat-1",
+          "Material manual",
+          "10 unidades",
+          "Test note",
+          "🛠️",
+          50000,
+          "proj-1",
+          null
+        )
       ];
 
       const updatedProject = new Project(
@@ -235,20 +248,20 @@ describe("Project Use Cases", () => {
         "user-123",
         new Date(),
         new Date(),
-        customMaterials as any
+        customMaterialsEntities
       );
       mockProjectRepository.update.mockResolvedValue(updatedProject);
 
       const useCase = new UpdateProjectUseCase(mockProjectRepository);
       const result = await useCase.execute("proj-1", "user-123", {
-        materials: customMaterials
+        materials: customMaterialsInput
       });
 
       expect(mockProjectRepository.findById).toHaveBeenCalledWith("proj-1");
       expect(mockProjectRepository.update).toHaveBeenCalledWith(
         "proj-1",
         expect.objectContaining({
-          materials: customMaterials,
+          materials: customMaterialsInput,
           estimatedCost: 50000
         })
       );
