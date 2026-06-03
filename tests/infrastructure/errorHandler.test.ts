@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { Request, Response, NextFunction } from "express";
 import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
-import { Prisma } from "../../generated/prisma/client.js";
+import { Prisma } from "../../src/generated/prisma/client.js";
 import { errorHandler } from "../../src/infrastructure/http/middlewares/errorHandler.js";
 import { AppError } from "../../src/shared/errors/AppError.js";
 

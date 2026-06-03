@@ -1,7 +1,7 @@
 import { IProjectRepository } from "../../../domain/repositories/project-repository.interface.js";
 import { Project, ProjectMaterial } from "../../../domain/entities/project.js";
 import { prisma } from "../prisma-client.js";
-import { Prisma } from "../../../../generated/prisma/client.js";
+import { Prisma } from "../../../generated/prisma/client.js";
 
 export class PrismaProjectRepository implements IProjectRepository {
   async findAllByUserId(userId: string): Promise<Project[]> {

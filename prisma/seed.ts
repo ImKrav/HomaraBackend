@@ -3,7 +3,7 @@
 // ============================================
 
 import "dotenv/config";
-import { PrismaClient, ProjectType, ProjectStatus, OrderStatus, Category, Product } from "../generated/prisma/client.js";
+import { PrismaClient, ProjectType, ProjectStatus, OrderStatus, Category, Product } from "../src/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 import bcrypt from "bcryptjs";

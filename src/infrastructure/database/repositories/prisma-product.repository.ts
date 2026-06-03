@@ -1,7 +1,7 @@
 import { IProductRepository } from "../../../domain/repositories/product-repository.interface.js";
 import { Product } from "../../../domain/entities/product.js";
 import { prisma } from "../prisma-client.js";
-import { Prisma } from "../../../../generated/prisma/client.js";
+import { Prisma } from "../../../generated/prisma/client.js";
 
 export class PrismaProductRepository implements IProductRepository {
   async findAll(filters?: { categorySlug?: string; query?: string; tag?: string }): Promise<Product[]> {

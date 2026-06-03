@@ -2,7 +2,7 @@ import { IOrderRepository } from "../../../domain/repositories/order-repository.
 import { Order, OrderItem } from "../../../domain/entities/order.js";
 import { Product } from "../../../domain/entities/product.js";
 import { prisma } from "../prisma-client.js";
-import { Prisma } from "../../../../generated/prisma/client.js";
+import { Prisma } from "../../../generated/prisma/client.js";
 
 export class PrismaOrderRepository implements IOrderRepository {
   async findAll(filters?: { userId?: string; admin?: boolean }): Promise<Order[]> {
