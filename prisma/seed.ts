@@ -19,27 +19,11 @@ async function main() {
   console.log("🌱 Seeding Homara database (TS)...\n");
 
   // ─── Check if already seeded ──────────────
-  // const existingUsers = await prisma.user.count();
-  // if (existingUsers > 0) {
-  //   console.log("✅ Database already contains data. Skipping seed to prevent data loss.");
-  //   return;
-  // }
-
-  // ─── Clean existing data ────────────────────
-  console.log("🧹 Cleaning existing data...");
-  await prisma.$transaction([
-    prisma.review.deleteMany(),
-    prisma.orderItem.deleteMany(),
-    prisma.order.deleteMany(),
-    prisma.cartItem.deleteMany(),
-    prisma.cart.deleteMany(),
-    prisma.projectMaterial.deleteMany(),
-    prisma.project.deleteMany(),
-    prisma.productTag.deleteMany(),
-    prisma.product.deleteMany(),
-    prisma.category.deleteMany(),
-    prisma.user.deleteMany(),
-  ]);
+  const existingUsers = await prisma.user.count();
+  if (existingUsers > 0) {
+    console.log("✅ Database already contains data. Skipping seed to prevent data loss.");
+    return;
+  }
 
   // ─── Users ──────────────────────────────────
   console.log("👤 Creating users...");
