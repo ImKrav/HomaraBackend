@@ -27,17 +27,19 @@ async function main() {
 
   // ─── Clean existing data ────────────────────
   console.log("🧹 Cleaning existing data...");
-  await prisma.review.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.cartItem.deleteMany();
-  await prisma.cart.deleteMany();
-  await prisma.projectMaterial.deleteMany();
-  await prisma.project.deleteMany();
-  await prisma.productTag.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.$transaction([
+    prisma.review.deleteMany(),
+    prisma.orderItem.deleteMany(),
+    prisma.order.deleteMany(),
+    prisma.cartItem.deleteMany(),
+    prisma.cart.deleteMany(),
+    prisma.projectMaterial.deleteMany(),
+    prisma.project.deleteMany(),
+    prisma.productTag.deleteMany(),
+    prisma.product.deleteMany(),
+    prisma.category.deleteMany(),
+    prisma.user.deleteMany(),
+  ]);
 
   // ─── Users ──────────────────────────────────
   console.log("👤 Creating users...");
