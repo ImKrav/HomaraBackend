@@ -98,7 +98,10 @@ export class PrismaOrderRepository implements IOrderRepository {
           item.product.unit,
           item.product.categoryId,
           item.product.createdAt,
-          item.product.updatedAt
+          item.product.updatedAt,
+          undefined,
+          item.product.category.name,
+          item.product.category.slug
         )
       )),
       { firstName: o.user.firstName, lastName: o.user.lastName, email: o.user.email }
