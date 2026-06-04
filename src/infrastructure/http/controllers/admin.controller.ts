@@ -13,7 +13,7 @@ export class AdminController {
       const currentMonthOrders = await prisma.order.findMany({
         where: {
           createdAt: { gte: startOfMonth },
-          status: { not: "CANCELADO" },
+          status: "ENTREGADO",
         },
         select: { total: true },
       });
@@ -22,8 +22,8 @@ export class AdminController {
       // Ventas del mes anterior
       const lastMonthOrders = await prisma.order.findMany({
         where: {
-          createdAt: { gte: startOfLastMonth, lte: endOfLastMonth },
-          status: { not: "CANCELADO" },
+          createdAt: { gte: startOfLastMonth, lt: startOfMonth },
+          status: "ENTREGADO",
         },
         select: { total: true },
       });
@@ -64,7 +64,7 @@ export class AdminController {
       const currentYearOrders = await prisma.order.findMany({
         where: {
           createdAt: { gte: new Date(currentYear, 0, 1) },
-          status: { not: "CANCELADO" },
+          status: "ENTREGADO",
         },
         select: { createdAt: true, total: true },
       });
@@ -73,13 +73,12 @@ export class AdminController {
       currentYearOrders.forEach((o) => {
         monthlySales[o.createdAt.getMonth()] += o.total;
       });
-      const maxMonthlySale = Math.max(...monthlySales, 1);
-      const salesByMonth = monthlySales.map(val => Math.round((val / maxMonthlySale) * 100));
+      const salesByMonth = monthlySales;
 
       // Chart Data: Categorías más vendidas
       const orderItems = await prisma.orderItem.findMany({
         where: {
-          order: { status: { not: "CANCELADO" } }
+          order: { status: "ENTREGADO" }
         },
         include: {
           product: {
