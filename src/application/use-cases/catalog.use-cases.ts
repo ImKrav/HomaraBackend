@@ -101,7 +101,7 @@ export class CreateProductUseCase {
     description: string;
     price: number;
     originalPrice?: number | null;
-    image: string;
+    image?: string;
     stockQuantity: number;
     unit: string;
     categoryId: string;
