@@ -22,6 +22,7 @@ export class ListOrdersUseCase {
     const orders = await this.orderRepository.findAll(filters);
     return orders.map((o) => ({
       id: o.orderNumber,
+      dbId: o.id,
       date: o.createdAt?.toISOString().split("T")[0],
       status: o.status.toLowerCase(),
       items: o.items?.length || 0,
@@ -42,6 +43,7 @@ export class GetOrderDetailUseCase {
 
     return {
       id: order.orderNumber,
+      dbId: order.id,
       status: order.status.toLowerCase(),
       subtotal: order.subtotal,
       shippingCost: order.shippingCost,

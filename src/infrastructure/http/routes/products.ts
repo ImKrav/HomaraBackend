@@ -4,9 +4,9 @@
 
 import { Router } from "express";
 import { CatalogController } from "../controllers/catalog.controller.js";
-import { requireAuth } from "../middlewares/auth.js";
+import { requireAuth, requireAdmin } from "../middlewares/auth.js";
 import { validateZod } from "../middlewares/validateZod.js";
-import { createReviewSchema } from "../validators/catalog.validator.js";
+import { createReviewSchema, createProductSchema, updateProductSchema } from "../validators/catalog.validator.js";
 
 const router = Router();
 
@@ -63,6 +63,11 @@ router.get("/:id", CatalogController.getProductDetail);
 
 router.get("/:id/reviews", CatalogController.getProductReviews);
 router.post("/:id/reviews", requireAuth, validateZod(createReviewSchema), CatalogController.createReview);
+
+// Rutas de administración de catálogo
+router.post("/", requireAdmin, validateZod(createProductSchema), CatalogController.createProduct);
+router.put("/:id", requireAdmin, validateZod(updateProductSchema), CatalogController.updateProduct);
+router.delete("/:id", requireAdmin, CatalogController.deleteProduct);
 
 export default router;
 

@@ -66,6 +66,7 @@ describe("Order Use Cases", () => {
       expect(result.length).toBe(1);
       expect(result[0]).toEqual({
         id: "HOM-2026-0001",
+        dbId: "ord-123",
         date: "2026-05-23",
         status: "procesando",
         items: 1,

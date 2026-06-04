@@ -12,3 +12,27 @@ export const createReviewSchema = z.object({
     .optional()
     .nullable(),
 });
+
+export const createProductSchema = z.object({
+  name: z.string().min(1, "El nombre es obligatorio y no puede estar vacío."),
+  description: z.string().min(1, "La descripción es obligatoria y no puede estar vacía."),
+  price: z.number().int().nonnegative("El precio no puede ser negativo."),
+  originalPrice: z.number().int().nonnegative().nullable().optional(),
+  image: z.string().optional(),
+  stockQuantity: z.number().int().nonnegative("El stock no puede ser negativo."),
+  unit: z.string().min(1, "La unidad es obligatoria."),
+  categoryId: z.string().min(1, "La categoría es obligatoria."),
+  tags: z.array(z.string()).optional(),
+});
+
+export const updateProductSchema = z.object({
+  name: z.string().min(1).optional(),
+  description: z.string().min(1).optional(),
+  price: z.number().int().nonnegative().optional(),
+  originalPrice: z.number().int().nonnegative().nullable().optional(),
+  image: z.string().optional(),
+  stockQuantity: z.number().int().nonnegative().optional(),
+  unit: z.string().min(1).optional(),
+  categoryId: z.string().min(1).optional(),
+  tags: z.array(z.string()).optional(),
+});

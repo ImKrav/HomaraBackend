@@ -93,3 +93,73 @@ export class GetStorefrontProductsUseCase {
   }
 }
 
+export class CreateProductUseCase {
+  constructor(private readonly productRepository: IProductRepository) {}
+
+  async execute(data: {
+    name: string;
+    description: string;
+    price: number;
+    originalPrice?: number | null;
+    image?: string;
+    stockQuantity: number;
+    unit: string;
+    categoryId: string;
+    tags?: string[];
+  }) {
+    return await this.productRepository.create({
+      name: data.name,
+      description: data.description,
+      price: data.price,
+      originalPrice: data.originalPrice ?? null,
+      image: data.image || "/products/placeholder.jpg",
+      rating: 0,
+      reviewCount: 0,
+      inStock: data.stockQuantity > 0,
+      stockQuantity: data.stockQuantity,
+      unit: data.unit,
+      categoryId: data.categoryId,
+      tags: data.tags || [],
+    });
+  }
+}
+
+export class UpdateProductUseCase {
+  constructor(private readonly productRepository: IProductRepository) {}
+
+  async execute(
+    id: string,
+    data: {
+      name?: string;
+      description?: string;
+      price?: number;
+      originalPrice?: number | null;
+      image?: string;
+      stockQuantity?: number;
+      unit?: string;
+      categoryId?: string;
+      tags?: string[];
+    }
+  ) {
+    const existing = await this.productRepository.findById(id);
+    if (!existing) {
+      throw new AppError("Producto no encontrado", 404);
+    }
+
+    return await this.productRepository.update(id, data);
+  }
+}
+
+export class DeleteProductUseCase {
+  constructor(private readonly productRepository: IProductRepository) {}
+
+  async execute(id: string) {
+    const existing = await this.productRepository.findById(id);
+    if (!existing) {
+      throw new AppError("Producto no encontrado", 404);
+    }
+
+    await this.productRepository.delete(id);
+  }
+}
+
