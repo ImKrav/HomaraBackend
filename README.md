@@ -42,9 +42,9 @@ src/
 
 ---
 
-## 🛠️ Instalación y Configuración Local
+## 🛠️ Instalación y Configuración Local (sin Docker)
 
-Sigue los siguientes pasos para levantar y ejecutar el backend localmente en tu máquina.
+Sigue los siguientes pasos para levantar y ejecutar el backend localmente con Node.
 
 ### Requisitos Previos
 
@@ -54,17 +54,15 @@ Sigue los siguientes pasos para levantar y ejecutar el backend localmente en tu 
 ### Pasos de Configuración
 
 1. **Instalar Dependencias:**
-   Navega a la carpeta raíz del backend e instala todos los paquetes necesarios:
    ```bash
    npm install
    ```
 
 2. **Configurar el Entorno:**
-   Copia el archivo de plantilla `.env.example` y nómbralo como `.env`:
    ```bash
    cp .env.example .env
    ```
-   Abre `.env` y configura tus variables de entorno, principalmente la URL de tu base de datos:
+   Edita `.env` con tus variables, principalmente `DATABASE_URL`:
    ```env
    PORT=5000
    DATABASE_URL="postgresql://postgres:postgres@localhost:51214/homara?schema=public"
@@ -72,25 +70,21 @@ Sigue los siguientes pasos para levantar y ejecutar el backend localmente en tu 
    ```
 
 3. **Sincronizar la Base de Datos:**
-   Utiliza Prisma para crear las tablas en tu base de datos basándose en el esquema:
    ```bash
    npx prisma db push
    ```
 
 4. **Poblar la Base de Datos (Semillas):**
-   Ejecuta el script de semilla para insertar categorías, productos de muestra y un usuario demo (`CUSTOMER` y `ADMIN`):
    ```bash
    npm run seed
    ```
 
 5. **Validar la Conexión de Base de Datos:**
-   Ejecuta el script de validación integrado para comprobar que la conexión y el conteo de tablas sean óptimos:
    ```bash
    npm run validate
    ```
 
 6. **Iniciar el Servidor en Desarrollo:**
-   Arranca el backend con monitoreo en caliente (`tsx watch`):
    ```bash
    npm run dev
    ```
@@ -100,65 +94,136 @@ Sigue los siguientes pasos para levantar y ejecutar el backend localmente en tu 
 
 ## 🐳 Despliegue con Docker
 
-Este repositorio incluye un `Dockerfile` optimizado para entornos de producción.
+Este repositorio incluye un `Dockerfile` multi-stage y un `docker-compose.yml` listo para orquestar la API junto a PostgreSQL.
 
-### Opción 1: Construcción y Ejecución Manual del Contenedor
+### Requisitos Previos
 
-1. **Construir la Imagen:**
-   ```bash
-   docker build -t homara-backend .
-   ```
+- [Docker](https://www.docker.com/) 20.10+
+- [Docker Compose](https://docs.docker.com/compose/) v2 (incluido en Docker Desktop)
 
-2. **Ejecutar el Contenedor:**
-   Asegúrate de pasarle la variable de entorno `DATABASE_URL` correspondiente para que se conecte a tu base de datos PostgreSQL:
-   ```bash
-   docker run -d -p 5000:5000 --name homara-backend-instance -e DATABASE_URL="postgresql://usuario:password@host_postgres:5432/homara?schema=public" homara-backend
-   ```
+### Opción 1: Docker Compose (Recomendado)
 
-### Opción 2: Docker Compose Independiente (Recomendado para Dev)
+Levanta PostgreSQL + la API con un solo comando. Todo está preconfigurado con los puertos y credenciales definidos en `AGENTS.md`.
 
-Si deseas levantar rápidamente el Backend junto a una base de datos PostgreSQL dedicada en Docker, puedes crear un archivo `docker-compose.yml` en la raíz del proyecto backend con el siguiente contenido:
-
-```yaml
-services:
-  postgres:
-    image: postgres:17-alpine
-    container_name: homara_postgres_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: super_password
-      POSTGRES_DB: homara
-    ports:
-      - "51214:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d homara"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  backend:
-    build: .
-    container_name: homara_backend_app
-    ports:
-      - "5000:5000"
-    environment:
-      - PORT=5000
-      - DATABASE_URL=postgresql://postgres:super_password@postgres:5432/homara?schema=public
-      - JWT_SECRET=jwt_token_secreto_desarrollo
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-volumes:
-  postgres_data:
-```
-
-Luego, simplemente ejecuta:
 ```bash
-docker compose up --build -d
+# Levantar DB + Backend en segundo plano
+docker compose up -d
+
+# Reconstruir las imágenes después de cambios
+docker compose up -d --build
+
+# Ver logs en tiempo real
+docker compose logs -f backend
+
+# Detener todo (conserva el volumen pgdata con los datos de la BD)
+docker compose down
+
+# Detener y BORRAR el volumen de la BD (reset completo)
+docker compose down -v
 ```
+
+Una vez arriba:
+
+- **API:** `http://localhost:5000` (Swagger en `/api-docs`)
+- **PostgreSQL:** `localhost:51214`
+
+Para incluir **Prisma Studio** (UI web para la BD en `http://localhost:5555`):
+
+```bash
+docker compose --profile tools up -d
+```
+
+#### Variables de entorno
+
+El `docker-compose.yml` define valores por defecto para todas las variables. Puedes sobreescribirlas creando un archivo `.env` en esta misma carpeta:
+
+```env
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=homara
+POSTGRES_PORT=51214
+BACKEND_PORT=5000
+PRISMA_STUDIO_PORT=5555
+JWT_SECRET=homara_jwt_secret_key_2026_secure
+```
+
+### Opción 2: Construcción y Ejecución Manual
+
+Si prefieres controlar cada paso a mano:
+
+```bash
+# 1. Construir la imagen
+docker build -t homara-backend .
+
+# 2. Ejecutar el contenedor (asume que ya tienes un PostgreSQL accesible)
+docker run -d -p 5000:5000 --name homara-backend \
+  -e DATABASE_URL="postgresql://usuario:password@host_postgres:5432/homara?schema=public" \
+  -e PORT=5000 \
+  -e JWT_SECRET="homara_jwt_secret_key_2026_secure" \
+  homara-backend
+```
+
+---
+
+## ☸️ Despliegue Local con Minikube (driver Docker)
+
+Los manifiestos de Kubernetes viven en `k8s/` (Namespace, PostgreSQL con PVC, Backend como `NodePort`). Están pensados para un cluster local de [Minikube](https://minikube.sigs.k8s.io/) usando el driver de Docker.
+
+### Requisitos Previos
+
+- [Docker](https://www.docker.com/)
+- [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+
+### Paso a paso
+
+```bash
+# 1. Inicia el cluster (driver Docker)
+minikube start --driver=docker
+
+# 2. Apunta tu shell al daemon de Docker de Minikube para que `docker build`
+#    deposite la imagen dentro del cluster y k8s la encuentre.
+eval $(minikube docker-env)
+
+# 3. Construye la imagen en el daemon de Minikube
+docker build -t homara-backend:latest .
+
+# 4. Aplica los manifiestos (Namespace + PVC + Postgres + Backend)
+kubectl apply -f k8s/
+
+# 5. Espera a que los pods arranquen
+kubectl -n homara wait --for=condition=ready pod -l app=homara-db --timeout=180s
+kubectl -n homara wait --for=condition=ready pod -l app=homara-backend --timeout=180s
+
+# 6. Abre la API en tu navegador. Devuelve algo como http://127.0.0.1:30500
+minikube service homara-backend --url -n homara
+```
+
+### Inspección y logs
+
+```bash
+# Estado de los recursos
+kubectl -n homara get pods,svc,pvc
+
+# Logs en tiempo real
+kubectl -n homara logs -f deployment/homara-backend
+kubectl -n homara logs -f deployment/homara-db
+
+# Acceder al contenedor del backend
+kubectl -n homara exec -it deploy/homara-backend -- sh
+```
+
+### Limpieza
+
+```bash
+# Borrar todos los recursos del stack
+kubectl delete -f k8s/
+
+# Apagar el cluster
+minikube stop
+```
+
+> **Nota sobre Prisma Studio:** los manifiestos solo incluyen la API y la base de datos. Si necesitas Prisma Studio dentro del cluster, puedes añadir un Deployment + Service extra; o exponer el PostgreSQL del cluster a tu máquina local con `kubectl port-forward -n homara svc/homara-db 51214:5432` y correr `npx prisma studio` desde aquí.
 
 ---
 
@@ -171,6 +236,7 @@ npm run test
 ```
 
 Para generar reportes de cobertura:
+
 ```bash
 npm run test -- --coverage
 ```
@@ -179,19 +245,19 @@ npm run test -- --coverage
 
 ## 🌐 Accesos Útiles y Endpoints
 
-Una vez que el servidor esté corriendo:
+Una vez que el servidor esté corriendo (en cualquier modalidad):
 
-- **Base URL:** `http://localhost:5000/api`
+- **Base URL:** `http://localhost:5000/api/v1`
 - **Documentación Swagger:** [http://localhost:5000/api-docs](http://localhost:5000/api-docs) (Consulta interactiva de endpoints y esquemas).
-- **Prisma Studio (Administrador Local de BD):** Levántalo con `npx prisma studio` y accede en `http://localhost:5555`.
+- **Prisma Studio (Administrador Local de BD):** Levántalo con `docker compose --profile tools up -d` y accede en `http://localhost:5555`.
 
 ### Principales Rutas de la API:
-- `POST /api/auth/register` - Registro de nuevos usuarios.
-- `POST /api/auth/login` - Inicio de sesión y entrega de JWT token.
-- `GET /api/products` - Catálogo completo de productos con filtros y paginación.
-- `GET /api/categories` - Listado de categorías disponibles.
-- `POST /api/projects` - Creación y estimación de materiales para un proyecto.
-- `GET /api/projects/user` - Listado de proyectos del usuario autenticado.
-- `GET /api/cart` - Carrito de compras actual del usuario.
-- `POST /api/cart/items` - Añadir productos al carrito.
-- `POST /api/orders` - Creación de órdenes (compra en un clic).
+- `POST /api/v1/auth/register` - Registro de nuevos usuarios.
+- `POST /api/v1/auth/login` - Inicio de sesión y entrega de JWT token.
+- `GET /api/v1/products` - Catálogo completo de productos con filtros y paginación.
+- `GET /api/v1/categories` - Listado de categorías disponibles.
+- `POST /api/v1/projects` - Creación y estimación de materiales para un proyecto.
+- `GET /api/v1/projects/user` - Listado de proyectos del usuario autenticado.
+- `GET /api/v1/cart` - Carrito de compras actual del usuario.
+- `POST /api/v1/cart/items` - Añadir productos al carrito.
+- `POST /api/v1/orders` - Creación de órdenes (compra en un clic).

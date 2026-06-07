@@ -1,0 +1,117 @@
+# ============================================
+# Homara Backend — Docker Compose
+# ============================================
+# Standalone stack for the Homara Backend repository.
+# Includes: PostgreSQL 17, the Backend API, and (opt-in) Prisma Studio.
+#
+# Usage:
+#   docker compose up -d                 # Start DB + Backend
+#   docker compose down                  # Stop all services (keeps the DB volume)
+#   docker compose down -v               # Stop and DELETE the DB volume
+#   docker compose logs -f backend       # Follow backend logs
+#   docker compose up -d --build         # Rebuild and start
+#   docker compose --profile tools up -d # Also start Prisma Studio (port 5555)
+#
+# Environment variables (override in `.env` or your shell):
+#   POSTGRES_USER      (default: postgres)
+#   POSTGRES_PASSWORD  (default: postgres)
+#   POSTGRES_DB        (default: homara)
+#   POSTGRES_PORT      (default: 51214)  — host port mapped to the DB container
+#   BACKEND_PORT       (default: 5000)   — host port mapped to the API container
+#   PRISMA_STUDIO_PORT (default: 5555)   — host port mapped to Prisma Studio
+#   JWT_SECRET         (default: homara_jwt_secret_key_2026_secure)
+# ============================================
+
+name: homara-backend
+
+services:
+  # ── PostgreSQL Database ──
+  db:
+    image: postgres:17-alpine
+    container_name: homara-backend-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-homara}
+    ports:
+      - "${POSTGRES_PORT:-51214}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-homara}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - homara-net
+
+  # ── Backend API (Express 5 + Prisma 7) ──
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: homara-backend:latest
+    container_name: homara-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-homara}?schema=public
+      PORT: 5000
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET:-homara_jwt_secret_key_2026_secure}
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - homara-net
+
+  # ── Prisma Studio (Database Admin UI) — opt-in via --profile tools ──
+  prisma-studio:
+    image: node:22-alpine
+    container_name: homara-backend-prisma-studio
+    restart: unless-stopped
+    profiles: ["tools"]
+    depends_on:
+      db:
+        condition: service_healthy
+    working_dir: /app
+    command:
+      - sh
+      - -c
+      - |
+        npm install --no-save --no-audit --no-fund \
+          prisma@7 @prisma/client@7 @prisma/adapter-pg@7 \
+        && npx prisma generate \
+        && npx prisma db push --accept-data-loss --skip-generate \
+        && npx prisma studio --port 5555 --hostname 0.0.0.0
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-homara}?schema=public
+    # Bind-mount the project so Prisma can read the schema and generate the client.
+    # An anonymous volume at /app/node_modules keeps the container's install
+    # isolated from the host's node_modules.
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "${PRISMA_STUDIO_PORT:-5555}:5555"
+    networks:
+      - homara-net
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  homara-net:
+    driver: bridge

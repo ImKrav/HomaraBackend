@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homara-db-pvc
+  namespace: homara
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homara-db
+  namespace: homara
+  labels:
+    app: homara-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homara-db
+  template:
+    metadata:
+      labels:
+        app: homara-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_DB
+              value: homara
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-d", "homara"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres", "-d", "homara"]
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: homara-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homara-db
+  namespace: homara
+spec:
+  type: ClusterIP
+  selector:
+    app: homara-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP

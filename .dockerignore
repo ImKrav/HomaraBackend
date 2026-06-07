@@ -1,5 +1,24 @@
+# Dependencies
 node_modules
-generated
-npm-debug.log
+
+# Prisma generated client (regenerated at build time)
+src/generated
+
+# Build artifacts
+dist
+
+# Tests (not needed at runtime)
+tests
+
+# VCS / IDE / agents
+.git
+.agents
+.claude
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env files (only the example is allowed in the build context)
 .env*
 !.env.example
