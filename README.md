@@ -92,6 +92,29 @@ Sigue los siguientes pasos para levantar y ejecutar el backend localmente con No
 
 ---
 
+## 📦 Imagen Pública en Docker Hub
+
+La imagen oficial del backend se publica y actualiza automáticamente en DockerHub en cada push a `main` mediante GitHub Actions:
+
+- **Repositorio:** [**imkrav/homara-backend**](https://hub.docker.com/r/imkrav/homara-backend)
+- **Pull de la última versión:**
+  ```bash
+  docker pull imkrav/homara-backend:latest
+  ```
+- **Tags disponibles:** `latest` y `<short-sha>` por cada commit en `main`.
+
+Para usarla directamente sin clonar este repo (asume un PostgreSQL accesible):
+
+```bash
+docker run -d -p 5000:5000 --name homara-backend \
+  -e DATABASE_URL="postgresql://usuario:password@host_postgres:5432/homara?schema=public" \
+  -e PORT=5000 \
+  -e JWT_SECRET="homara_jwt_secret_key_2026_secure" \
+  imkrav/homara-backend:latest
+```
+
+---
+
 ## 🐳 Despliegue con Docker
 
 Este repositorio incluye un `Dockerfile` multi-stage y un `docker-compose.yml` listo para orquestar la API junto a PostgreSQL.

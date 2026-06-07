@@ -54,7 +54,7 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy application source (includes the generated Prisma client) + prisma schema
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
-COPY package*.json tsconfig.json ./
+COPY package*.json tsconfig.json prisma.config.ts ./
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
