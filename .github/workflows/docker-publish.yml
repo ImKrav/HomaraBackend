@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  IMAGE_NAME: homara-backend
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/homara-backend
 
 jobs:
   build-and-push:
