@@ -1,0 +1,17 @@
+# Includes the Namespace so this repo's k8s/ folder is self-contained
+# (kubectl apply -f k8s works without depending on the frontend repo).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homara
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homara-backend-config
+  namespace: homara
+data:
+  POSTGRES_USER: "postgres"
+  POSTGRES_DB: "homara"
+  PORT: "5000"
+  NODE_ENV: "production"

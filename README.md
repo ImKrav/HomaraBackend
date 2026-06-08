@@ -190,63 +190,33 @@ docker run -d -p 5000:5000 --name homara-backend \
 
 ## ☸️ Despliegue Local con Minikube (driver Docker)
 
-Los manifiestos de Kubernetes viven en `k8s/` (Namespace, PostgreSQL con PVC, Backend como `NodePort`). Están pensados para un cluster local de [Minikube](https://minikube.sigs.k8s.io/) usando el driver de Docker.
-
-### Requisitos Previos
-
-- [Docker](https://www.docker.com/)
-- [Minikube](https://minikube.sigs.k8s.io/docs/start/)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
-
-### Paso a paso
+Manifiestos en `k8s/`. Se despliegan en el **mismo cluster y mismo namespace `homara`** que [HomaraFrontend](https://github.com/ImKrav/HomaraFrontend), que se aplica en segundo lugar desde su propio repo.
 
 ```bash
-# 1. Inicia el cluster (driver Docker)
 minikube start --driver=docker
-
-# 2. Apunta tu shell al daemon de Docker de Minikube para que `docker build`
-#    deposite la imagen dentro del cluster y k8s la encuentre.
 eval $(minikube docker-env)
-
-# 3. Construye la imagen en el daemon de Minikube
 docker build -t homara-backend:latest .
-
-# 4. Aplica los manifiestos (Namespace + PVC + Postgres + Backend)
-kubectl apply -f k8s/
-
-# 5. Espera a que los pods arranquen
+kubectl apply -f k8s
 kubectl -n homara wait --for=condition=ready pod -l app=homara-db --timeout=180s
 kubectl -n homara wait --for=condition=ready pod -l app=homara-backend --timeout=180s
-
-# 6. Abre la API en tu navegador. Devuelve algo como http://127.0.0.1:30500
 minikube service homara-backend --url -n homara
 ```
 
-### Inspección y logs
-
 ```bash
-# Estado de los recursos
+# Inspección
 kubectl -n homara get pods,svc,pvc
-
-# Logs en tiempo real
 kubectl -n homara logs -f deployment/homara-backend
 kubectl -n homara logs -f deployment/homara-db
-
-# Acceder al contenedor del backend
 kubectl -n homara exec -it deploy/homara-backend -- sh
 ```
 
-### Limpieza
-
 ```bash
-# Borrar todos los recursos del stack
-kubectl delete -f k8s/
-
-# Apagar el cluster
-minikube stop
+# Limpieza
+kubectl delete -f k8s
+kubectl -n homara delete pvc homara-db-pvc   # solo si quieres resetear la BD
 ```
 
-> **Nota sobre Prisma Studio:** los manifiestos solo incluyen la API y la base de datos. Si necesitas Prisma Studio dentro del cluster, puedes añadir un Deployment + Service extra; o exponer el PostgreSQL del cluster a tu máquina local con `kubectl port-forward -n homara svc/homara-db 51214:5432` y correr `npx prisma studio` desde aquí.
+> **Prisma Studio:** no está incluido. Exponer el Postgres del cluster a tu host con `kubectl port-forward -n homara svc/homara-db 51214:5432` y correr `npx prisma studio` desde este repo.
 
 ---
 
