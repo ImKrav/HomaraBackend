@@ -58,21 +58,63 @@ export class CreateProjectUseCase {
     includeTools?: boolean;
     selectedProductId?: string;
   }) {
+    const allowedMaterialTypes = ["ceramica", "porcelanato", "madera", "vinilo", "pintura"];
+    if (data.materialType && !allowedMaterialTypes.includes(data.materialType.toLowerCase())) {
+      throw new AppError("Tipo de material no soportado.", 400);
+    }
+
     let selectedProduct = undefined;
     if (data.selectedProductId && this.productRepository) {
       const prod = await this.productRepository.findById(data.selectedProductId);
-      if (prod) {
-        const allowedCategories = ["pisos-ceramicas", "pinturas", "materiales-construccion"];
-        if (prod.categorySlug && !allowedCategories.includes(prod.categorySlug)) {
-          throw new AppError("Solo se pueden usar materiales de revestimiento (pisos, cerámicas o pinturas) o de construcción en un proyecto.", 400);
-        }
-        selectedProduct = {
-          id: prod.id,
-          name: prod.name,
-          price: prod.price,
-          unit: prod.unit,
-        };
+      if (!prod) {
+        throw new AppError("El producto seleccionado no existe.", 404);
       }
+      if (!prod.categorySlug) {
+        throw new AppError("El producto seleccionado no tiene una categoría válida.", 400);
+      }
+
+      const allowedCategories = ["pisos-ceramicas", "pinturas", "materiales-construccion"];
+      if (!allowedCategories.includes(prod.categorySlug)) {
+        throw new AppError("Solo se pueden usar materiales de revestimiento (pisos, cerámicas o pinturas) o de construcción en un proyecto.", 400);
+      }
+
+      const currentMatType = (data.materialType ?? "ceramica").toLowerCase();
+      const nameLower = prod.name.toLowerCase();
+      const isConstructionMaterial =
+        prod.categorySlug === "materiales-construccion" ||
+        nameLower.includes("pegante") ||
+        nameLower.includes("cemento") ||
+        nameLower.includes("adhesivo") ||
+        nameLower.includes("mortero") ||
+        nameLower.includes("yeso") ||
+        nameLower.includes("cal") ||
+        nameLower.includes("boquilla");
+
+      if (isConstructionMaterial) {
+        if (prod.categorySlug !== "materiales-construccion") {
+          throw new AppError("El material de construcción seleccionado no pertenece a la categoría correcta.", 400);
+        }
+        if (currentMatType !== "ceramica" && currentMatType !== "porcelanato") {
+          throw new AppError("Los materiales de construcción (pegante/boquilla) solo son compatibles con proyectos de cerámica o porcelanato.", 400);
+        }
+      } else {
+        if (currentMatType === "pintura") {
+          if (prod.categorySlug !== "pinturas") {
+            throw new AppError("Para proyectos de pintura, el producto seleccionado debe ser de la categoría de pinturas.", 400);
+          }
+        } else {
+          if (prod.categorySlug !== "pisos-ceramicas") {
+            throw new AppError("Para proyectos de revestimiento físico, el producto seleccionado debe ser de la categoría de pisos y cerámicas.", 400);
+          }
+        }
+      }
+
+      selectedProduct = {
+        id: prod.id,
+        name: prod.name,
+        price: prod.price,
+        unit: prod.unit,
+      };
     }
 
     const materials = calculateMaterials({
@@ -168,6 +210,11 @@ export class UpdateProjectUseCase {
       }[];
     }
   ) {
+    const allowedMaterialTypes = ["ceramica", "porcelanato", "madera", "vinilo", "pintura"];
+    if (data.materialType && !allowedMaterialTypes.includes(data.materialType.toLowerCase())) {
+      throw new AppError("Tipo de material no soportado.", 400);
+    }
+
     const existing = await this.projectRepository.findById(id);
     if (!existing) {
       throw new AppError("Proyecto no encontrado", 404);
@@ -213,18 +260,55 @@ export class UpdateProjectUseCase {
       let selectedProduct = undefined;
       if (calcSelectedProdId && this.productRepository) {
         const prod = await this.productRepository.findById(calcSelectedProdId);
-        if (prod) {
-          const allowedCategories = ["pisos-ceramicas", "pinturas", "materiales-construccion"];
-          if (prod.categorySlug && !allowedCategories.includes(prod.categorySlug)) {
-            throw new AppError("Solo se pueden usar materiales de revestimiento (pisos, cerámicas o pinturas) o de construcción en un proyecto.", 400);
-          }
-          selectedProduct = {
-            id: prod.id,
-            name: prod.name,
-            price: prod.price,
-            unit: prod.unit,
-          };
+        if (!prod) {
+          throw new AppError("El producto seleccionado no existe.", 404);
         }
+        if (!prod.categorySlug) {
+          throw new AppError("El producto seleccionado no tiene una categoría válida.", 400);
+        }
+
+        const allowedCategories = ["pisos-ceramicas", "pinturas", "materiales-construccion"];
+        if (!allowedCategories.includes(prod.categorySlug)) {
+          throw new AppError("Solo se pueden usar materiales de revestimiento (pisos, cerámicas o pinturas) o de construcción en un proyecto.", 400);
+        }
+
+        const currentMatType = calcType.toLowerCase();
+        const nameLower = prod.name.toLowerCase();
+        const isConstructionMaterial =
+          prod.categorySlug === "materiales-construccion" ||
+          nameLower.includes("pegante") ||
+          nameLower.includes("cemento") ||
+          nameLower.includes("adhesivo") ||
+          nameLower.includes("mortero") ||
+          nameLower.includes("yeso") ||
+          nameLower.includes("cal") ||
+          nameLower.includes("boquilla");
+
+        if (isConstructionMaterial) {
+          if (prod.categorySlug !== "materiales-construccion") {
+            throw new AppError("El material de construcción seleccionado no pertenece a la categoría correcta.", 400);
+          }
+          if (currentMatType !== "ceramica" && currentMatType !== "porcelanato") {
+            throw new AppError("Los materiales de construcción (pegante/boquilla) solo son compatibles con proyectos de cerámica o porcelanato.", 400);
+          }
+        } else {
+          if (currentMatType === "pintura") {
+            if (prod.categorySlug !== "pinturas") {
+              throw new AppError("Para proyectos de pintura, el producto seleccionado debe ser de la categoría de pinturas.", 400);
+            }
+          } else {
+            if (prod.categorySlug !== "pisos-ceramicas") {
+              throw new AppError("Para proyectos de revestimiento físico, el producto seleccionado debe ser de la categoría de pisos y cerámicas.", 400);
+            }
+          }
+        }
+
+        selectedProduct = {
+          id: prod.id,
+          name: prod.name,
+          price: prod.price,
+          unit: prod.unit,
+        };
       }
 
       const materials = calculateMaterials({

@@ -6,6 +6,17 @@ Homara es un E-Commerce especializado en productos para el hogar y ferretería, 
 
 ---
 
+## 🎯 Casos de Uso Críticos de la Arquitectura
+
+Basado en la visión del negocio, los siguientes flujos representan el núcleo transaccional y la propuesta de valor de **Homara**. Deben ser monitoreados constantemente y mantener una cobertura de pruebas exhaustiva:
+
+1. **`CreateOrderUseCase` (Checkout):** Embudo final de conversión. Genera los ingresos y depende fuertemente de la consistencia y bloqueos de base de datos (`FOR UPDATE`) para manejar concurrencia y quiebres de stock.
+2. **`GetCartUseCase` (Soft Allocation):** No es un simple GET; calcula en tiempo real la reserva de inventario temporal (15 min) y los límites de *Backordering* basándose en otros carritos activos.
+3. **`CreateProjectUseCase` (Motor Físico):** Orquesta la lógica del `calculateMaterials`. Un fallo matemático aquí romperá la promesa de "eliminar errores de cálculo", generando compras erróneas.
+4. **Auth UseCases (Gatekeeper):** Gestión de la identidad, validación de hashes y emisión de JWTs.
+
+---
+
 ## 📐 Arquitectura del Proyecto
 
 El backend se estructura de forma estricta en capas desacopladas dentro de `src/`:
@@ -220,18 +231,47 @@ kubectl -n homara delete pvc homara-db-pvc   # solo si quieres resetear la BD
 
 ---
 
-## 🧪 Pruebas Unitarias
+## 🧪 Pruebas Unitarias, de Integración y Concurrencia
 
-El backend implementa pruebas con **Vitest** enfocado en los servicios de dominio y casos de uso. Para ejecutarlas:
+El backend implementa pruebas con **Vitest** enfocado en los servicios de dominio, casos de uso e integración directa con la base de datos PostgreSQL.
+
+Para ejecutar todas las pruebas:
 
 ```bash
 npm run test
 ```
 
+### 🔬 Casos de Prueba Extremos Documentados
+
+#### A. Concurrencia y Soft Allocation (Integración)
+Validamos escenarios de carrera (*Race Conditions*) en el Checkout:
+
+#### 1. Reserva Temporal de Inventario (Soft Allocation)
+* **Caso**: Un usuario añade un producto a su carrito y otro usuario consulta el catálogo.
+* **Validación**:
+  * El stock disponible dinámicamente visible para otros usuarios disminuye en tiempo real.
+  * El usuario que realizó la reserva lógica sigue viendo su stock completo (permitiéndole comprar lo que reservó).
+  * Al transcurrir los 15 minutos de la reserva lógica (simulado en base de datos), el stock se restaura automáticamente para el resto de clientes si el primero no concretó la compra.
+
+#### 2. Concurrencia Extrema de Compras (Race Conditions)
+* **Caso**: Dos usuarios intentan comprar simultáneamente el mismo producto a través de checkouts paralelos mediante `Promise.all`, con stock disponible limitado.
+* **Validación**:
+  * Implementación de **Row-Level Locking (`FOR UPDATE`)** y generación de `orderNumber` seguro dentro del bloque de transacción de Prisma.
+  * Garantiza que ambas compras se serialicen correctamente en la base de datos sin colisionar en números de órdenes duplicados.
+  * Decrementa el stock hasta números negativos (ej. `-2`), indicando un quiebre de stock exitosamente procesado bajo la modalidad de **Envío Diferido (Backorder)**.
+  * Comprueba que la primera orden procesada tome los artículos en existencia regular, mientras que la segunda transacción procese y marque las unidades faltantes como backorder de manera exacta.
+
+#### B. Motor de Cálculo Físico de Materiales (Dominio)
+Estresamos la matemática de la propuesta de valor:
+* **Deducciones Mayores al Área:** Asegura que si se restan muchas puertas/ventanas, el sistema aplique una salvaguarda de no permitir áreas calculadas menores a `0.1 m²` para evitar errores fatales o facturaciones en cero.
+* **Comportamiento Asimétrico (Pintura vs. Enchapes):** Comprueba que la pintura utiliza rendimiento por galón (+5% desperdicio constante) ignorando patrones de colocación, mientras que la cerámica respeta incrementos porcentuales altos (15% en diagonal).
+* **Sobreescritura de Proyectos Integrales:** Verifica que al calcular un proyecto "Integral" y vincularlo a un producto real, las paredes generadas (60% del área neta) extraigan correctamente el precio y métricas asociadas al ítem del catálogo.
+* **Resistencia a Extremos Numéricos:** Manejo de porcentajes en cero, sustracciones exageradas y áreas grandes sin truncamientos ni inestabilidad.
+
 Para generar reportes de cobertura:
 
 ```bash
-npm run test -- --coverage
+npm run test --coverage
 ```
 
 ---

@@ -124,6 +124,23 @@ const FORMAT_LABELS: Record<string, string> = {
   "10x20": "10x20 cm",
 };
 
+function parseWeightFromProductName(name: string): number | null {
+  const regexKg = /\b(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilogramos)\b/i;
+  const regexG = /\b(\d+(?:\.\d+)?)\s*(?:g|gramos)\b/i;
+  
+  const matchKg = name.match(regexKg);
+  if (matchKg) {
+    return parseFloat(matchKg[1]);
+  }
+  
+  const matchG = name.match(regexG);
+  if (matchG) {
+    return parseFloat(matchG[1]) / 1000;
+  }
+  
+  return null;
+}
+
 export function calculateMaterials({
   type,
   area,
@@ -172,7 +189,7 @@ export function calculateMaterials({
   }
 
   const wasteMultiplier = 1 + (actualWastePercent / 100);
-  const totalArea = Math.ceil(netArea * wasteMultiplier);
+  const totalArea = Math.ceil(Number((netArea * wasteMultiplier).toFixed(4)));
 
   // 3. Inclusión del material de revestimiento principal
   const nameLower = selectedProduct ? selectedProduct.name.toLowerCase() : "";
@@ -257,17 +274,24 @@ export function calculateMaterials({
   if (isTile) {
     // Pegante
     if (includeAdhesive) {
-      const bultos = Math.ceil(netArea / COVERAGE.pegante);
       if (isPeganteProduct) {
+        const parsedWeight = parseWeightFromProductName(selectedProduct.name);
+        const weight = parsedWeight !== null ? parsedWeight : 25;
+        const coverage = weight * 0.16; // 25kg rinde 4m² -> 1kg rinde 0.16m²
+        const bultos = Math.ceil(netArea / coverage);
+        const formattedCoverage = Number(coverage.toFixed(2));
         materials.push({
           name: selectedProduct.name,
           quantity: `${bultos} ${selectedProduct.unit || "bultos"}`,
-          note: `Pegante real vinculado: 1 bulto por cada 4m²`,
+          note: parsedWeight !== null 
+            ? `Pegante real vinculado: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
+            : `Pegante real vinculado: 1 bulto por cada 4m²`,
           icon: "🧱",
           price: selectedProduct.price * bultos,
           productId: selectedProduct.id,
         });
       } else {
+        const bultos = Math.ceil(netArea / COVERAGE.pegante);
         materials.push({
           name: "Pegante cerámico flexible 25kg",
           quantity: `${bultos} bultos`,
@@ -281,17 +305,24 @@ export function calculateMaterials({
 
     // Boquilla
     if (includeGrout) {
-      const kgBoquilla = Math.ceil(netArea / COVERAGE.boquilla);
       if (isBoquillaProduct) {
+        const parsedWeight = parseWeightFromProductName(selectedProduct.name);
+        const weight = parsedWeight !== null ? parsedWeight : 1;
+        const coverage = weight * 8; // 1kg rinde 8m²
+        const units = Math.ceil(netArea / coverage);
+        const formattedCoverage = Number(coverage.toFixed(2));
         materials.push({
           name: selectedProduct.name,
-          quantity: `${kgBoquilla} ${selectedProduct.unit || "kg"}`,
-          note: `Boquilla real vinculada: 1 kg por cada 8m²`,
+          quantity: `${units} ${selectedProduct.unit || "unidades"}`,
+          note: parsedWeight !== null
+            ? `Boquilla real vinculada: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
+            : `Boquilla real vinculada: 1 kg por cada 8m²`,
           icon: "🪣",
-          price: selectedProduct.price * kgBoquilla,
+          price: selectedProduct.price * units,
           productId: selectedProduct.id,
         });
       } else {
+        const kgBoquilla = Math.ceil(netArea / COVERAGE.boquilla);
         materials.push({
           name: "Boquilla",
           quantity: `${kgBoquilla} kg`,
@@ -409,8 +440,8 @@ export function calculateMaterials({
 
   // Estimación de paredes si es de tipo integral y no es pintura pura
   if (type.toLowerCase() === "integral" && materialType !== "pintura") {
-    const wallArea = Math.ceil(netArea * 0.6);
-    const wallTotal = Math.ceil(wallArea * wasteMultiplier);
+    const wallArea = Math.ceil(Number((netArea * 0.6).toFixed(4)));
+    const wallTotal = Math.ceil(Number((wallArea * wasteMultiplier).toFixed(4)));
     const matName = selectedProduct ? selectedProduct.name : (MATERIAL_NAMES[materialType] || "Cerámica");
     const formatLabel = selectedProduct ? "" : (FORMAT_LABELS[tileFormat] || tileFormat);
     const pricePerM2 = selectedProduct ? selectedProduct.price : (TILE_PRICES[materialType]?.[tileFormat] || TILE_PRICES.ceramica["60x60"]);

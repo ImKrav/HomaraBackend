@@ -111,16 +111,6 @@ export class PrismaOrderRepository implements IOrderRepository {
   }
 
   async create(data: Omit<Order, "id" | "createdAt" | "updatedAt" | "items" | "orderNumber" | "user"> & { items: Omit<OrderItem, "id" | "orderId" | "product">[] }): Promise<Order> {
-    const year = new Date().getFullYear();
-    const count = await prisma.order.count({
-      where: {
-        createdAt: {
-          gte: new Date(`${year}-01-01`)
-        }
-      }
-    });
-    const orderNumber = `ORD-${year}-${String(count + 1).padStart(3, "0")}`;
-
     // Ejecutar transaccionalmente el checkout completo
     const createdOrder = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // A. Load cart to get excludeCartId
@@ -129,6 +119,23 @@ export class PrismaOrderRepository implements IOrderRepository {
 
       // B. Load products and active reservations by other users
       const productIds = data.items.map(item => item.productId);
+      if (productIds.length > 0) {
+        await tx.$executeRawUnsafe(
+          `SELECT id FROM "Product" WHERE id IN (${productIds.map((_, i) => `$${i + 1}`).join(", ")}) FOR UPDATE`,
+          ...productIds
+        );
+      }
+
+      // Generar número de orden dentro de la transacción y después del bloqueo para evitar colisiones concurrentes
+      const year = new Date().getFullYear();
+      const count = await tx.order.count({
+        where: {
+          createdAt: {
+            gte: new Date(`${year}-01-01`)
+          }
+        }
+      });
+      const orderNumber = `ORD-${year}-${String(count + 1).padStart(3, "0")}`;
       const productsList = await tx.product.findMany({
         where: { id: { in: productIds } }
       });
