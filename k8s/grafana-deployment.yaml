@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homara-grafana-pvc
+  namespace: homara
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homara-grafana
+  namespace: homara
+  labels:
+    app: homara-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homara-grafana
+  template:
+    metadata:
+      labels:
+        app: homara-grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:10.4.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "admin"
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "false"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: homara-backend-secrets
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: /var/lib/grafana
+            - name: datasource-config
+              mountPath: /etc/grafana/provisioning/datasources/datasource.yaml
+              subPath: datasource.yaml
+            - name: provider-config
+              mountPath: /etc/grafana/provisioning/dashboards/dashboard-provider.yaml
+              subPath: dashboard-provider.yaml
+            - name: dashboard-json
+              mountPath: /var/lib/grafana/dashboards/homara-dashboard.json
+              subPath: homara-dashboard.json
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+      volumes:
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: homara-grafana-pvc
+        - name: datasource-config
+          configMap:
+            name: grafana-datasource-config
+        - name: provider-config
+          configMap:
+            name: grafana-dashboard-provider-config
+        - name: dashboard-json
+          configMap:
+            name: grafana-dashboard-json-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homara-grafana
+  namespace: homara
+spec:
+  type: NodePort
+  selector:
+    app: homara-grafana
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+      nodePort: 30600
+      protocol: TCP

@@ -135,7 +135,7 @@ Este repositorio incluye un `Dockerfile` multi-stage y un `docker-compose.yml` l
 - [Docker](https://www.docker.com/) 20.10+
 - [Docker Compose](https://docs.docker.com/compose/) v2 (incluido en Docker Desktop)
 
-### Opción 1: Docker Compose (Recomendado)
+### Docker Compose
 
 Levanta PostgreSQL + la API con un solo comando. Todo está preconfigurado con los puertos y credenciales definidos en `AGENTS.md`.
 
@@ -181,53 +181,38 @@ PRISMA_STUDIO_PORT=5555
 JWT_SECRET=homara_jwt_secret_key_2026_secure
 ```
 
-### Opción 2: Construcción y Ejecución Manual
-
-Si prefieres controlar cada paso a mano:
-
-```bash
-# 1. Construir la imagen
-docker build -t homara-backend .
-
-# 2. Ejecutar el contenedor (asume que ya tienes un PostgreSQL accesible)
-docker run -d -p 5000:5000 --name homara-backend \
-  -e DATABASE_URL="postgresql://usuario:password@host_postgres:5432/homara?schema=public" \
-  -e PORT=5000 \
-  -e JWT_SECRET="homara_jwt_secret_key_2026_secure" \
-  homara-backend
-```
-
 ---
 
 ## ☸️ Despliegue Local con Minikube (driver Docker)
 
-Manifiestos en `k8s/`. Se despliegan en el **mismo cluster y mismo namespace `homara`** que [HomaraFrontend](https://github.com/ImKrav/HomaraFrontend), que se aplica en segundo lugar desde su propio repo.
+Manifiestos en `k8s/`. Hemos simplificado el despliegue a comandos directos en `package.json` para evitar configuraciones manuales complejas:
 
 ```bash
+# 1. Iniciar Minikube
 minikube start --driver=docker
-eval $(minikube docker-env)
-docker build -t homara-backend:latest .
-kubectl apply -f k8s
-kubectl -n homara wait --for=condition=ready pod -l app=homara-db --timeout=180s
-kubectl -n homara wait --for=condition=ready pod -l app=homara-backend --timeout=180s
-minikube service homara-backend --url -n homara
+
+# 2. Compilar la imagen y desplegar todo (BD, Backend, Secrets y Grafana)
+npm run k8s:deploy
+
+# 3. Monitorear el estado de los pods y servicios
+npm run k8s:status
+
+# 4. Abrir los servicios en tu navegador (túneles de Minikube)
+npm run k8s:backend   # Para la API Backend
+npm run k8s:grafana   # Para la consola de Grafana (admin/admin)
 ```
 
+### Comandos de Inspección y Limpieza Adicionales
 ```bash
-# Inspección
-kubectl -n homara get pods,svc,pvc
+# Ver logs en tiempo real
 kubectl -n homara logs -f deployment/homara-backend
-kubectl -n homara logs -f deployment/homara-db
-kubectl -n homara exec -it deploy/homara-backend -- sh
+kubectl -n homara logs -f deployment/homara-grafana
+
+# Limpiar todo el despliegue
+kubectl delete -f k8s/
 ```
 
-```bash
-# Limpieza
-kubectl delete -f k8s
-kubectl -n homara delete pvc homara-db-pvc   # solo si quieres resetear la BD
-```
-
-> **Prisma Studio:** no está incluido. Exponer el Postgres del cluster a tu host con `kubectl port-forward -n homara svc/homara-db 51214:5432` y correr `npx prisma studio` desde este repo.
+> **Prisma Studio:** Exponer el Postgres del cluster a tu host con `kubectl port-forward -n homara svc/homara-db 51214:5432` y correr `npx prisma studio` desde este repo.
 
 ---
 
