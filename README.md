@@ -200,6 +200,7 @@ npm run k8s:status
 # 4. Abrir los servicios en tu navegador (túneles de Minikube)
 npm run k8s:backend   # Para la API Backend
 npm run k8s:grafana   # Para la consola de Grafana (admin/admin)
+npm run k8s:argo      # Para el panel de control de ArgoCD (admin/admin)
 ```
 
 ### Comandos de Inspección y Limpieza Adicionales
