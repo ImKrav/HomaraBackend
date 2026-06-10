@@ -7,4 +7,5 @@ export interface ICartRepository {
   removeItem(itemId: string): Promise<void>;
   clear(cartId: string): Promise<void>;
   findItemOwner(itemId: string): Promise<string | null>;
+  getReservedQuantities(excludeCartId: string, productIds: string[]): Promise<Record<string, number>>;
 }

@@ -147,7 +147,8 @@ export class AdminController {
       });
 
       const lowStock = products.filter((p) => p.stockQuantity > 0 && p.stockQuantity < 50);
-      const outOfStock = products.filter((p) => !p.inStock);
+      const outOfStock = products.filter((p) => p.stockQuantity === 0);
+      const negativeStock = products.filter((p) => p.stockQuantity < 0);
       const totalUnits = products.reduce((sum: number, p) => sum + p.stockQuantity, 0);
 
       res.json({
@@ -158,6 +159,7 @@ export class AdminController {
             totalUnits,
             lowStockCount: lowStock.length,
             outOfStockCount: outOfStock.length,
+            negativeStockCount: negativeStock.length,
           },
           products: products.map((p) => ({
             id: p.id,
@@ -169,7 +171,9 @@ export class AdminController {
             stockValue: p.price * p.stockQuantity,
             inStock: p.inStock,
             stockStatus:
-              p.stockQuantity === 0
+              p.stockQuantity < 0
+                ? "stock_negativo"
+                : p.stockQuantity === 0
                 ? "sin_stock"
                 : p.stockQuantity < 50
                 ? "stock_bajo"

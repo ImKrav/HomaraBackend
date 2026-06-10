@@ -8,7 +8,9 @@ export class OrderItem {
     public readonly total: number,
     public readonly orderId: string,
     public readonly productId: string,
-    public readonly product?: Product
+    public readonly product?: Product,
+    public readonly isBackorder?: boolean,
+    public readonly backorderQuantity?: number
   ) {}
 }
 

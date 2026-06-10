@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import {
   ListCategoriesUseCase,
+  ListProductsUseCase,
   GetProductDetailUseCase,
   CreateProductReviewUseCase,
   GetProductReviewsUseCase,
@@ -38,6 +39,12 @@ const mockReviewRepository = {
   getAverageRatingAndCount: vi.fn()
 };
 
+// Mock para ICartRepository
+const mockCartRepository = {
+  findByUserId: vi.fn(),
+  getReservedQuantities: vi.fn()
+};
+
 
 describe("Catalog Use Cases", () => {
   it("ListCategoriesUseCase debe retornar todas las categorías del repositorio", async () => {
@@ -73,18 +80,19 @@ describe("Catalog Use Cases", () => {
       ["nuevo"]
     );
     mockProductRepository.findById.mockResolvedValue(product);
+    mockCartRepository.getReservedQuantities.mockResolvedValue({ "1": 5 });
 
-    const useCase = new GetProductDetailUseCase(mockProductRepository);
+    const useCase = new GetProductDetailUseCase(mockProductRepository, mockCartRepository);
     const result = await useCase.execute("1");
 
-    expect(result).toEqual(product);
+    expect(result.stockQuantity).toEqual(95);
     expect(mockProductRepository.findById).toHaveBeenCalledWith("1");
   });
 
   it("GetProductDetailUseCase debe lanzar AppError 404 si el producto no existe", async () => {
     mockProductRepository.findById.mockResolvedValue(null);
 
-    const useCase = new GetProductDetailUseCase(mockProductRepository);
+    const useCase = new GetProductDetailUseCase(mockProductRepository, mockCartRepository);
 
     await expect(useCase.execute("999")).rejects.toThrowError(
       new AppError("Producto no encontrado", 404)
@@ -156,6 +164,23 @@ describe("Catalog Use Cases", () => {
     expect(mockProductRepository.findStorefrontRecommended).toHaveBeenCalled();
     expect(mockProductRepository.findStorefrontOffers).toHaveBeenCalled();
     expect(mockProductRepository.findStorefrontBestSellers).toHaveBeenCalled();
+  });
+
+  it("ListProductsUseCase debe retornar productos con stock deducido segun reservas activas de otros usuarios", async () => {
+    const products = [
+      new Product("p1", "Prod1", "Desc", 100, null, "img.jpg", 5, 1, true, 10, "unidad", "cat1"),
+      new Product("p2", "Prod2", "Desc", 80, null, "img.jpg", 4.5, 2, true, 20, "unidad", "cat1")
+    ];
+    mockProductRepository.findAll.mockResolvedValue(products);
+    mockCartRepository.findByUserId.mockResolvedValue({ id: "user-cart-id" });
+    mockCartRepository.getReservedQuantities.mockResolvedValue({ "p1": 3, "p2": 5 });
+
+    const useCase = new ListProductsUseCase(mockProductRepository, mockCartRepository);
+    const result = await useCase.execute({}, "user-123");
+
+    expect(result[0].stockQuantity).toBe(7); // 10 - 3 = 7
+    expect(result[1].stockQuantity).toBe(15); // 20 - 5 = 15
+    expect(mockCartRepository.getReservedQuantities).toHaveBeenCalledWith("user-cart-id", ["p1", "p2"]);
   });
 });
 

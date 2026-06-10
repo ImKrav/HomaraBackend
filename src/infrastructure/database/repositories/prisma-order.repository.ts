@@ -36,7 +36,7 @@ export class PrismaOrderRepository implements IOrderRepository {
       o.userId,
       o.createdAt,
       o.updatedAt,
-      o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
+      o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId, undefined, item.isBackorder, item.backorderQuantity)),
       { firstName: o.user.firstName, lastName: o.user.lastName }
     ));
   }
@@ -102,7 +102,9 @@ export class PrismaOrderRepository implements IOrderRepository {
           undefined,
           item.product.category.name,
           item.product.category.slug
-        )
+        ),
+        item.isBackorder,
+        item.backorderQuantity
       )),
       { firstName: o.user.firstName, lastName: o.user.lastName, email: o.user.email }
     );
@@ -121,7 +123,56 @@ export class PrismaOrderRepository implements IOrderRepository {
 
     // Ejecutar transaccionalmente el checkout completo
     const createdOrder = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // 1. Crear Orden
+      // A. Load cart to get excludeCartId
+      const cart = await tx.cart.findUnique({ where: { userId: data.userId } });
+      const excludeCartId = cart?.id || "";
+
+      // B. Load products and active reservations by other users
+      const productIds = data.items.map(item => item.productId);
+      const productsList = await tx.product.findMany({
+        where: { id: { in: productIds } }
+      });
+      const prodMap = new Map(productsList.map(p => [p.id, p]));
+
+      const timeLimit = new Date(Date.now() - 15 * 60 * 1000);
+      const reservations = await tx.cartItem.findMany({
+        where: {
+          productId: { in: productIds },
+          cartId: excludeCartId ? { not: excludeCartId } : undefined,
+          updatedAt: { gte: timeLimit }
+        },
+        select: {
+          productId: true,
+          quantity: true
+        }
+      });
+
+      const reservedQtyMap: Record<string, number> = {};
+      for (const resItem of reservations) {
+        reservedQtyMap[resItem.productId] = (reservedQtyMap[resItem.productId] || 0) + resItem.quantity;
+      }
+
+      // C. Process each item to calculate backorder state
+      const processedItems = data.items.map((item) => {
+        const prod = prodMap.get(item.productId);
+        const physicalStock = prod ? prod.stockQuantity : 0;
+        const reservedQty = reservedQtyMap[item.productId] || 0;
+        const availableStock = Math.max(0, physicalStock - reservedQty);
+        
+        const isBackorder = item.quantity > availableStock;
+        const backorderQuantity = isBackorder ? item.quantity - availableStock : 0;
+
+        return {
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          total: item.total,
+          isBackorder,
+          backorderQuantity
+        };
+      });
+
+      // D. Crear Orden
       const order = await tx.order.create({
         data: {
           orderNumber,
@@ -136,11 +187,13 @@ export class PrismaOrderRepository implements IOrderRepository {
           shippingZip: data.shippingZip,
           shippingNotes: data.shippingNotes,
           items: {
-            create: data.items.map((item) => ({
+            create: processedItems.map((item) => ({
               productId: item.productId,
               quantity: item.quantity,
               unitPrice: item.unitPrice,
-              total: item.total
+              total: item.total,
+              isBackorder: item.isBackorder,
+              backorderQuantity: item.backorderQuantity
             }))
           }
         },
@@ -150,11 +203,11 @@ export class PrismaOrderRepository implements IOrderRepository {
         }
       });
 
-      // 2. Decrementar stock e inStock de productos
-      for (const item of data.items) {
-        const prod = await tx.product.findUnique({ where: { id: item.productId } });
+      // E. Decrementar stock e inStock de productos (allowing to go negative)
+      for (const item of processedItems) {
+        const prod = prodMap.get(item.productId);
         if (prod) {
-          const newQty = Math.max(0, prod.stockQuantity - item.quantity);
+          const newQty = prod.stockQuantity - item.quantity;
           await tx.product.update({
             where: { id: item.productId },
             data: {
@@ -165,8 +218,7 @@ export class PrismaOrderRepository implements IOrderRepository {
         }
       }
 
-      // 3. Vaciar carrito del usuario
-      const cart = await tx.cart.findUnique({ where: { userId: data.userId } });
+      // F. Vaciar carrito del usuario
       if (cart) {
         await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
       }
@@ -190,7 +242,7 @@ export class PrismaOrderRepository implements IOrderRepository {
       createdOrder.userId,
       createdOrder.createdAt,
       createdOrder.updatedAt,
-      createdOrder.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
+      createdOrder.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId, undefined, item.isBackorder, item.backorderQuantity)),
       { firstName: createdOrder.user.firstName, lastName: createdOrder.user.lastName }
     );
   }
@@ -221,7 +273,7 @@ export class PrismaOrderRepository implements IOrderRepository {
       o.userId,
       o.createdAt,
       o.updatedAt,
-      o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId)),
+      o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId, undefined, item.isBackorder, item.backorderQuantity)),
       { firstName: o.user.firstName, lastName: o.user.lastName }
     );
   }

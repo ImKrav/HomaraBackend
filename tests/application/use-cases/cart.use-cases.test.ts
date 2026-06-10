@@ -16,7 +16,8 @@ const mockCartRepository = {
   updateItemQuantity: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
-  findItemOwner: vi.fn().mockResolvedValue("user-123")
+  findItemOwner: vi.fn().mockResolvedValue("user-123"),
+  getReservedQuantities: vi.fn()
 };
 
 describe("Cart Use Cases", () => {
@@ -46,6 +47,7 @@ describe("Cart Use Cases", () => {
 
       const cart = new Cart("cart-123", "user-123", new Date(), new Date(), [cartItem]);
       mockCartRepository.findByUserId.mockResolvedValue(cart);
+      mockCartRepository.getReservedQuantities.mockResolvedValue({ "prod-1": 0 });
 
       const useCase = new GetCartUseCase(mockCartRepository);
       const result = await useCase.execute("user-123");
@@ -87,6 +89,7 @@ describe("Cart Use Cases", () => {
 
       const cart = new Cart("cart-123", "user-123", new Date(), new Date(), [cartItem]);
       mockCartRepository.findByUserId.mockResolvedValue(cart);
+      mockCartRepository.getReservedQuantities.mockResolvedValue({ "prod-2": 0 });
 
       const useCase = new GetCartUseCase(mockCartRepository);
       const result = await useCase.execute("user-123");

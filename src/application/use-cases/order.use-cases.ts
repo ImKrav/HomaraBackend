@@ -67,6 +67,8 @@ export class GetOrderDetailUseCase {
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         total: item.total,
+        isBackorder: item.isBackorder,
+        backorderQuantity: item.backorderQuantity,
       })),
     };
   }

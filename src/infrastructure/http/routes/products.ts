@@ -4,7 +4,7 @@
 
 import { Router } from "express";
 import { CatalogController } from "../controllers/catalog.controller.js";
-import { requireAuth, requireAdmin } from "../middlewares/auth.js";
+import { requireAuth, requireAdmin, optionalAuth } from "../middlewares/auth.js";
 import { validateZod } from "../middlewares/validateZod.js";
 import { createReviewSchema, createProductSchema, updateProductSchema } from "../validators/catalog.validator.js";
 
@@ -37,7 +37,7 @@ const router = Router();
  *         description: Lista de productos filtrada obtenida con éxito.
  */
 router.get("/storefront", CatalogController.getStorefrontProducts);
-router.get("/", CatalogController.listProducts);
+router.get("/", optionalAuth, CatalogController.listProducts);
 
 /**
  * @openapi
@@ -59,7 +59,7 @@ router.get("/", CatalogController.listProducts);
  *       404:
  *         description: Producto no encontrado.
  */
-router.get("/:id", CatalogController.getProductDetail);
+router.get("/:id", optionalAuth, CatalogController.getProductDetail);
 
 router.get("/:id/reviews", CatalogController.getProductReviews);
 router.post("/:id/reviews", requireAuth, validateZod(createReviewSchema), CatalogController.createReview);

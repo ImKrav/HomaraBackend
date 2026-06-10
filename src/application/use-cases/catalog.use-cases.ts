@@ -5,6 +5,8 @@
 import { ICategoryRepository } from "../../domain/repositories/category-repository.interface.js";
 import { IProductRepository } from "../../domain/repositories/product-repository.interface.js";
 import { IReviewRepository } from "../../domain/repositories/review-repository.interface.js";
+import { ICartRepository } from "../../domain/repositories/cart-repository.interface.js";
+import { Product } from "../../domain/entities/product.js";
 import { AppError } from "../../shared/errors/AppError.js";
 
 
@@ -17,22 +19,91 @@ export class ListCategoriesUseCase {
 }
 
 export class ListProductsUseCase {
-  constructor(private readonly productRepository: IProductRepository) {}
+  constructor(
+    private readonly productRepository: IProductRepository,
+    private readonly cartRepository: ICartRepository
+  ) {}
 
-  async execute(filters?: { categorySlug?: string; query?: string; tag?: string }) {
-    return await this.productRepository.findAll(filters);
+  async execute(filters?: { categorySlug?: string; query?: string; tag?: string }, userId?: string) {
+    const products = await this.productRepository.findAll(filters);
+    const productIds = products.map((p) => p.id);
+    if (productIds.length === 0) return products;
+
+    let excludeCartId = "";
+    if (userId) {
+      const cart = await this.cartRepository.findByUserId(userId);
+      excludeCartId = cart.id;
+    }
+
+    const reservedQuantities = await this.cartRepository.getReservedQuantities(excludeCartId, productIds);
+
+    return products.map((p) => {
+      const reservedQty = reservedQuantities[p.id] || 0;
+      const dynamicStock = Math.max(0, p.stockQuantity - reservedQty);
+      return new Product(
+        p.id,
+        p.name,
+        p.description,
+        p.price,
+        p.originalPrice,
+        p.image,
+        p.rating,
+        p.reviewCount,
+        dynamicStock > 0,
+        dynamicStock,
+        p.unit,
+        p.categoryId,
+        p.createdAt,
+        p.updatedAt,
+        p.tags,
+        p.category,
+        p.categorySlug
+      );
+    });
   }
 }
 
 export class GetProductDetailUseCase {
-  constructor(private readonly productRepository: IProductRepository) {}
+  constructor(
+    private readonly productRepository: IProductRepository,
+    private readonly cartRepository: ICartRepository
+  ) {}
 
-  async execute(id: string) {
+  async execute(id: string, userId?: string) {
     const product = await this.productRepository.findById(id);
     if (!product) {
       throw new AppError("Producto no encontrado", 404);
     }
-    return product;
+
+    let excludeCartId = "";
+    if (userId) {
+      const cart = await this.cartRepository.findByUserId(userId);
+      excludeCartId = cart.id;
+    }
+
+    const reservedQuantities = await this.cartRepository.getReservedQuantities(excludeCartId, [id]);
+    const reservedQty = reservedQuantities[id] || 0;
+    const dynamicStock = Math.max(0, product.stockQuantity - reservedQty);
+
+    return new Product(
+      product.id,
+      product.name,
+      product.description,
+      product.price,
+      product.originalPrice,
+      product.image,
+      product.rating,
+      product.reviewCount,
+      dynamicStock > 0,
+      dynamicStock,
+      product.unit,
+      product.categoryId,
+      product.createdAt,
+      product.updatedAt,
+      product.tags,
+      product.category,
+      product.categorySlug
+    );
   }
 }
 

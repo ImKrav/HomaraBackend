@@ -6,7 +6,9 @@ export class CartItem {
     public readonly quantity: number,
     public readonly cartId: string,
     public readonly productId: string,
-    public readonly product?: Product
+    public readonly product?: Product,
+    public readonly createdAt?: Date,
+    public readonly updatedAt?: Date
   ) {}
 }
 

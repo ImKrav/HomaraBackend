@@ -18,13 +18,25 @@ export class GetCartUseCase {
 
   async execute(userId: string) {
     const cart = await this.cartRepository.findByUserId(userId);
+    const productIds = (cart.items || []).map(item => item.productId);
+    const reservedQuantities = productIds.length > 0
+      ? await this.cartRepository.getReservedQuantities(cart.id, productIds)
+      : {};
     
     // Formatear items del carrito de la forma que espera el frontend
     const items = (cart.items || []).map((item) => {
       const product = item.product as ProductWithRelations | undefined;
+      const reservedQty = reservedQuantities[item.productId] || 0;
+      const availableStock = Math.max(0, (product?.stockQuantity || 0) - reservedQty);
+      const isBackorder = item.quantity > availableStock;
+      const backorderQuantity = isBackorder ? item.quantity - availableStock : 0;
+
       return {
         id: item.id,
         quantity: item.quantity,
+        availableStock,
+        isBackorder,
+        backorderQuantity,
         product: {
           id: product?.id,
           name: product?.name,

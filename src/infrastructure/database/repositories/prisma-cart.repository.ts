@@ -59,7 +59,9 @@ export class PrismaCartRepository implements ICartRepository {
           item.product.createdAt,
           item.product.updatedAt,
           item.product.tags.map((t) => t.name)
-        )
+        ),
+        item.createdAt,
+        item.updatedAt
       ))
     );
   }
@@ -105,7 +107,9 @@ export class PrismaCartRepository implements ICartRepository {
         item.product.categoryId,
         item.product.createdAt,
         item.product.updatedAt
-      )
+      ),
+      item.createdAt,
+      item.updatedAt
     );
   }
 
@@ -136,7 +140,9 @@ export class PrismaCartRepository implements ICartRepository {
         item.product.categoryId,
         item.product.createdAt,
         item.product.updatedAt
-      )
+      ),
+      item.createdAt,
+      item.updatedAt
     );
   }
 
@@ -154,5 +160,29 @@ export class PrismaCartRepository implements ICartRepository {
       include: { cart: true }
     });
     return item?.cart.userId ?? null;
+  }
+
+  async getReservedQuantities(excludeCartId: string, productIds: string[]): Promise<Record<string, number>> {
+    const timeLimit = new Date(Date.now() - 15 * 60 * 1000);
+    const items = await prisma.cartItem.findMany({
+      where: {
+        productId: { in: productIds },
+        cartId: excludeCartId ? { not: excludeCartId } : undefined,
+        updatedAt: { gte: timeLimit }
+      },
+      select: {
+        productId: true,
+        quantity: true
+      }
+    });
+
+    const result: Record<string, number> = {};
+    for (const id of productIds) {
+      result[id] = 0;
+    }
+    for (const item of items) {
+      result[item.productId] = (result[item.productId] || 0) + item.quantity;
+    }
+    return result;
   }
 }

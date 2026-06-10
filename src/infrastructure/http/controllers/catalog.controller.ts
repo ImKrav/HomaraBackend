@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaCategoryRepository } from "../../database/repositories/prisma-category.repository.js";
 import { PrismaProductRepository } from "../../database/repositories/prisma-product.repository.js";
 import { PrismaReviewRepository } from "../../database/repositories/prisma-review.repository.js";
+import { PrismaCartRepository } from "../../database/repositories/prisma-cart.repository.js";
 import {
   ListCategoriesUseCase,
   ListProductsUseCase,
@@ -17,10 +18,11 @@ import {
 const categoryRepository = new PrismaCategoryRepository();
 const productRepository = new PrismaProductRepository();
 const reviewRepository = new PrismaReviewRepository();
+const cartRepository = new PrismaCartRepository();
 
 const listCategoriesUseCase = new ListCategoriesUseCase(categoryRepository);
-const listProductsUseCase = new ListProductsUseCase(productRepository);
-const getProductDetailUseCase = new GetProductDetailUseCase(productRepository);
+const listProductsUseCase = new ListProductsUseCase(productRepository, cartRepository);
+const getProductDetailUseCase = new GetProductDetailUseCase(productRepository, cartRepository);
 const createProductReviewUseCase = new CreateProductReviewUseCase(productRepository, reviewRepository);
 const getProductReviewsUseCase = new GetProductReviewsUseCase(reviewRepository);
 const getStorefrontProductsUseCase = new GetStorefrontProductsUseCase(productRepository);
@@ -45,7 +47,7 @@ export class CatalogController {
         categorySlug: category as string,
         query: q as string,
         tag: tag as string
-      });
+      }, req.user?.id);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -54,7 +56,7 @@ export class CatalogController {
 
   static async getProductDetail(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await getProductDetailUseCase.execute(req.params.id as string);
+      const result = await getProductDetailUseCase.execute(req.params.id as string, req.user?.id);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
