@@ -7,7 +7,7 @@ import {
   producto,
   datosProyecto,
   capturarError,
-} from "../_ayudas.js";
+} from "../test-helpers.js";
 
 describe("F-PROY-01 · Crear un proyecto", () => {
   let repoProyectos: ReturnType<typeof mockProjectRepository>;

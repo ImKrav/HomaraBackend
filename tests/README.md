@@ -84,7 +84,7 @@ npm test -- F-CHK     # solo un módulo
 ## Archivos
 
 - `tests/backend/*.test.ts` — un archivo por grafo.
-- `tests/_ayudas.ts` — dobles de prueba y constructores de datos compartidos.
+- `tests/test-helpers.ts` — dobles de prueba y constructores de datos compartidos.
 - `tests/_caminos.json` — los 98 caminos exportados desde los grafos, con el
   texto de cada nodo. Es la fuente de la que se derivaron los casos y sirve
   para regenerarlos si un grafo cambia.

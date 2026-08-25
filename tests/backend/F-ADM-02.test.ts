@@ -7,7 +7,7 @@ import {
   contextoExpress,
   errorDeNext,
   usuario,
-} from "../_ayudas.js";
+} from "../test-helpers.js";
 
 const findById = vi.fn();
 vi.mock("../../src/infrastructure/database/repositories/prisma-user.repository.js", () => ({

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { RegisterUserUseCase } from "../../src/application/use-cases/auth.use-cases.js";
 import { registerSchema } from "../../src/infrastructure/http/validators/auth.validator.js";
 import { AppError } from "../../src/shared/errors/AppError.js";
-import { mockUserRepository, usuario, datosRegistro } from "../_ayudas.js";
+import { mockUserRepository, usuario, datosRegistro } from "../test-helpers.js";
 
 describe("F-AUTH-01 · Registro de usuario", () => {
   let repo: ReturnType<typeof mockUserRepository>;

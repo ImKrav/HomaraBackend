@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { GetProductDetailUseCase } from "../../src/application/use-cases/catalog.use-cases.js";
 import { AppError } from "../../src/shared/errors/AppError.js";
-import { mockProductRepository, mockCartRepository, producto, carrito } from "../_ayudas.js";
+import { mockProductRepository, mockCartRepository, producto, carrito } from "../test-helpers.js";
 
 describe("F-CAT-02 · Ver el detalle de un producto", () => {
   let productos: ReturnType<typeof mockProductRepository>;

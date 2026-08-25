@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { contextoExpress, errorDeNext } from "../_ayudas.js";
+import { contextoExpress, errorDeNext } from "../test-helpers.js";
 
 const carritoBuscar = vi.fn();
 const carritoCrear = vi.fn();

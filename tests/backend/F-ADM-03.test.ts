@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { contextoExpress, mockPrismaAdmin, filaProductoPrisma } from "../_ayudas.js";
+import { contextoExpress, mockPrismaAdmin, filaProductoPrisma } from "../test-helpers.js";
 
 const prismaFalso = mockPrismaAdmin();
 vi.mock("../../src/infrastructure/database/prisma-client.js", () => ({ prisma: prismaFalso }));

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { mockCartRepository, mockProductRepository, mockOrderRepository } from "../_ayudas.js";
+import { mockCartRepository, mockProductRepository, mockOrderRepository } from "../test-helpers.js";
 import { CreateOrderUseCase } from "../../src/application/use-cases/order.use-cases.js";
 import { AppError } from "../../src/shared/errors/AppError.js";
 

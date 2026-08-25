@@ -3,7 +3,7 @@ import { LoginUserUseCase } from "../../src/application/use-cases/auth.use-cases
 import { loginSchema } from "../../src/infrastructure/http/validators/auth.validator.js";
 import { hashPassword } from "../../src/shared/utils/authHelper.js";
 import { AppError } from "../../src/shared/errors/AppError.js";
-import { mockUserRepository, usuario } from "../_ayudas.js";
+import { mockUserRepository, usuario } from "../test-helpers.js";
 
 const MENSAJE_GENERICO = "Credenciales incorrectas. Verifique correo y contraseña.";
 

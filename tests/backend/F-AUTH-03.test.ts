@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import jwt from "jsonwebtoken";
-import { contextoExpress, errorDeNext, usuario } from "../_ayudas.js";
+import { contextoExpress, errorDeNext, usuario } from "../test-helpers.js";
 
 const findById = vi.fn();
 vi.mock("../../src/infrastructure/database/repositories/prisma-user.repository.js", () => ({

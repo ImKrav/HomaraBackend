@@ -8,7 +8,7 @@ import {
   proyecto,
   materialManual,
   capturarError,
-} from "../_ayudas.js";
+} from "../test-helpers.js";
 
 describe("F-PROY-03 · Asignar un producto al proyecto", () => {
   let repoProyectos: ReturnType<typeof mockProjectRepository>;

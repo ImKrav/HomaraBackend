@@ -8,7 +8,7 @@ import {
   producto,
   resena,
   datosResena,
-} from "../_ayudas.js";
+} from "../test-helpers.js";
 
 describe("F-CAT-03 · Publicar una reseña", () => {
   let productos: ReturnType<typeof mockProductRepository>;

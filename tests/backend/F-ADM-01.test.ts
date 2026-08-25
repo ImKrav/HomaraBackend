@@ -5,7 +5,7 @@ import {
   ordenEntregada,
   itemVendido,
   programarOrdenes,
-} from "../_ayudas.js";
+} from "../test-helpers.js";
 
 const prismaFalso = mockPrismaAdmin();
 vi.mock("../../src/infrastructure/database/prisma-client.js", () => ({ prisma: prismaFalso }));

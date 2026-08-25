@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { mockCartRepository, filaProductoPrisma, carrito } from "../_ayudas.js";
+import { mockCartRepository, filaProductoPrisma, carrito } from "../test-helpers.js";
 
 const findMany = vi.fn();
 vi.mock("../../src/infrastructure/database/prisma-client.js", () => ({
