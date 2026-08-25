@@ -1,10 +1,13 @@
-// ============================================================================
-// Utilidades compartidas por las pruebas de cobertura de ruta básica
-// ============================================================================
 import { vi } from "vitest";
 import type { IUserRepository } from "../src/domain/repositories/user-repository.interface.js";
+import type { IProjectRepository } from "../src/domain/repositories/project-repository.interface.js";
+import type { IProductRepository } from "../src/domain/repositories/product-repository.interface.js";
+import type { ICartRepository } from "../src/domain/repositories/cart-repository.interface.js";
+import type { IReviewRepository } from "../src/domain/repositories/review-repository.interface.js";
+import type { IOrderRepository } from "../src/domain/repositories/order-repository.interface.js";
 
-/** Doble de prueba del repositorio de usuarios. */
+// --- Mocks de repositorios ---
+
 export function mockUserRepository(): IUserRepository & Record<string, any> {
   return {
     findById: vi.fn(),
@@ -14,7 +17,73 @@ export function mockUserRepository(): IUserRepository & Record<string, any> {
   } as any;
 }
 
-/** Usuario válido de referencia. */
+export function mockProjectRepository(): IProjectRepository & Record<string, any> {
+  return {
+    findAllByUserId: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(async (p: any) => proyecto(p)),
+    update: vi.fn(async (id: string, d: any) => proyecto({ id, ...d })),
+    delete: vi.fn(),
+  } as any;
+}
+
+export function mockProductRepository(): IProductRepository & Record<string, any> {
+  return {
+    findAll: vi.fn(),
+    findById: vi.fn(),
+    create: vi.fn(),
+    updateStock: vi.fn(),
+    findStorefrontRecommended: vi.fn(),
+    findStorefrontOffers: vi.fn(),
+    findStorefrontBestSellers: vi.fn(),
+    updateProductRating: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+  } as any;
+}
+
+export function mockCartRepository(): ICartRepository & Record<string, any> {
+  return {
+    findByUserId: vi.fn(),
+    addItem: vi.fn(),
+    updateItemQuantity: vi.fn(),
+    removeItem: vi.fn(),
+    clear: vi.fn(),
+    findItemOwner: vi.fn(),
+    getReservedQuantities: vi.fn(),
+  } as any;
+}
+
+export function mockReviewRepository(): IReviewRepository & Record<string, any> {
+  return {
+    create: vi.fn(),
+    findByUserAndProduct: vi.fn(),
+    findByProductId: vi.fn(),
+    getAverageRatingAndCount: vi.fn(),
+  } as any;
+}
+
+export function mockOrderRepository(): IOrderRepository & Record<string, any> {
+  return {
+    findAll: vi.fn(),
+    findByIdOrNumber: vi.fn(),
+    create: vi.fn(),
+    updateStatus: vi.fn(),
+    countByYear: vi.fn(),
+  } as any;
+}
+
+export function mockPrismaAdmin() {
+  return {
+    order: { findMany: vi.fn(), count: vi.fn() },
+    orderItem: { findMany: vi.fn() },
+    product: { count: vi.fn(), findMany: vi.fn() },
+    user: { count: vi.fn() },
+  } as any;
+}
+
+// --- Entidades y fábricas de datos ---
+
 export function usuario(over: Record<string, any> = {}) {
   return {
     id: "usr_001",
@@ -34,7 +103,6 @@ export function usuario(over: Record<string, any> = {}) {
   };
 }
 
-/** Datos de registro que superan el esquema del servidor. */
 export function datosRegistro(over: Record<string, any> = {}) {
   return {
     email: "ana@homara.com",
@@ -45,58 +113,6 @@ export function datosRegistro(over: Record<string, any> = {}) {
   };
 }
 
-/** Triple (req, res, next) mínimo para probar middlewares de Express. */
-export function contextoExpress(authHeader?: string) {
-  const req: any = { headers: authHeader ? { authorization: authHeader } : {} };
-  const res: any = {
-    statusCode: 200,
-    body: undefined,
-    status(c: number) { this.statusCode = c; return this; },
-    json(b: unknown) { this.body = b; return this; },
-  };
-  const next = vi.fn();
-  return { req, res, next };
-}
-
-/** Recupera el error que el middleware pasó a next(). */
-export function errorDeNext(next: any) {
-  return next.mock.calls[0]?.[0];
-}
-
-// ----------------------------------------------------------------------------
-// Ayudas para los grafos de PROYECTOS (F-PROY-01 · F-PROY-03)
-// ----------------------------------------------------------------------------
-import type { IProjectRepository } from "../src/domain/repositories/project-repository.interface.js";
-import type { IProductRepository } from "../src/domain/repositories/product-repository.interface.js";
-
-/** Doble de prueba del repositorio de proyectos. */
-export function mockProjectRepository(): IProjectRepository & Record<string, any> {
-  return {
-    findAllByUserId: vi.fn(),
-    findById: vi.fn(),
-    create: vi.fn(async (p: any) => proyecto(p)),
-    update: vi.fn(async (id: string, d: any) => proyecto({ id, ...d })),
-    delete: vi.fn(),
-  } as any;
-}
-
-/** Doble de prueba del repositorio de productos del catálogo. */
-export function mockProductRepository(): IProductRepository & Record<string, any> {
-  return {
-    findAll: vi.fn(),
-    findById: vi.fn(),
-    create: vi.fn(),
-    updateStock: vi.fn(),
-    findStorefrontRecommended: vi.fn(),
-    findStorefrontOffers: vi.fn(),
-    findStorefrontBestSellers: vi.fn(),
-    updateProductRating: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  } as any;
-}
-
-/** Producto del catálogo de referencia (por defecto, un piso cerámico válido). */
 export function producto(over: Record<string, any> = {}) {
   return {
     id: "prd_001",
@@ -120,7 +136,28 @@ export function producto(over: Record<string, any> = {}) {
   };
 }
 
-/** Proyecto guardado de referencia (el dueño es usr_001). */
+export function filaProductoPrisma(over: Record<string, any> = {}) {
+  return {
+    id: "prd_001",
+    name: "Piso Ceramico Beige 60x60",
+    description: "Piso ceramico para interiores",
+    price: 38900,
+    originalPrice: null,
+    image: "piso.png",
+    rating: 4.5,
+    reviewCount: 10,
+    inStock: true,
+    stockQuantity: 100,
+    unit: "m²",
+    categoryId: "cat_001",
+    createdAt: new Date("2026-01-01"),
+    updatedAt: new Date("2026-01-01"),
+    tags: [{ name: "nuevo" }],
+    category: { name: "Pisos y Ceramicas", slug: "pisos-ceramicas" },
+    ...over,
+  };
+}
+
 export function proyecto(over: Record<string, any> = {}) {
   return {
     id: "proy_001",
@@ -153,7 +190,6 @@ export function proyecto(over: Record<string, any> = {}) {
   };
 }
 
-/** Datos mínimos válidos para crear un proyecto (F-PROY-01). */
 export function datosProyecto(over: Record<string, any> = {}) {
   return {
     name: "Cocina",
@@ -166,7 +202,6 @@ export function datosProyecto(over: Record<string, any> = {}) {
   };
 }
 
-/** Material manual que el cliente puede enviar en una actualización (F-PROY-03). */
 export function materialManual(over: Record<string, any> = {}) {
   return {
     name: "Ceramica traida por el cliente",
@@ -177,65 +212,10 @@ export function materialManual(over: Record<string, any> = {}) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Dobles y datos de referencia del módulo CATÁLOGO (F-CAT-01 · F-CAT-02 · F-CAT-03)
-// (reutiliza mockProductRepository() y producto() declarados más arriba)
-// ---------------------------------------------------------------------------
-import type { ICartRepository } from "../src/domain/repositories/cart-repository.interface.js";
-import type { IReviewRepository } from "../src/domain/repositories/review-repository.interface.js";
-
-/** Doble de prueba del repositorio de carritos. */
-export function mockCartRepository(): ICartRepository & Record<string, any> {
-  return {
-    findByUserId: vi.fn(),
-    addItem: vi.fn(),
-    updateItemQuantity: vi.fn(),
-    removeItem: vi.fn(),
-    clear: vi.fn(),
-    findItemOwner: vi.fn(),
-    getReservedQuantities: vi.fn(),
-  } as any;
-}
-
-/** Doble de prueba del repositorio de reseñas. */
-export function mockReviewRepository(): IReviewRepository & Record<string, any> {
-  return {
-    create: vi.fn(),
-    findByUserAndProduct: vi.fn(),
-    findByProductId: vi.fn(),
-    getAverageRatingAndCount: vi.fn(),
-  } as any;
-}
-
-/** Fila cruda tal como la devuelve prisma.product.findMany/findUnique (con include). */
-export function filaProductoPrisma(over: Record<string, any> = {}) {
-  return {
-    id: "prd_001",
-    name: "Piso Ceramico Beige 60x60",
-    description: "Piso ceramico para interiores",
-    price: 38900,
-    originalPrice: null,
-    image: "piso.png",
-    rating: 4.5,
-    reviewCount: 10,
-    inStock: true,
-    stockQuantity: 100,
-    unit: "m²",
-    categoryId: "cat_001",
-    createdAt: new Date("2026-01-01"),
-    updatedAt: new Date("2026-01-01"),
-    tags: [{ name: "nuevo" }],
-    category: { name: "Pisos y Ceramicas", slug: "pisos-ceramicas" },
-    ...over,
-  };
-}
-
-/** Carrito de referencia del usuario que consulta el catálogo. */
 export function carrito(over: Record<string, any> = {}) {
   return { id: "cart_001", userId: "usr_001", items: [], ...over };
 }
 
-/** Reseña de referencia ya persistida. */
 export function resena(over: Record<string, any> = {}) {
   return {
     id: "rev_001",
@@ -248,62 +228,10 @@ export function resena(over: Record<string, any> = {}) {
   };
 }
 
-/** Datos de una reseña que superan el esquema del servidor (createReviewSchema). */
 export function datosResena(over: Record<string, any> = {}) {
   return { rating: 5, comment: "Excelente producto.", ...over };
 }
 
-/** Ejecuta una promesa y devuelve el error lanzado (para inspeccionar mensaje y statusCode). */
-export async function capturarError(promesa: Promise<unknown>): Promise<any> {
-  return await promesa.then(
-    () => { throw new Error("Se esperaba un error y la operación terminó bien."); },
-    (e) => e
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Dobles y datos de referencia del módulo ADMINISTRACIÓN (F-ADM-01 · F-ADM-02 · F-ADM-03)
-// (reutiliza mockProductRepository(), producto() y filaProductoPrisma() de más arriba)
-// ---------------------------------------------------------------------------
-
-/**
- * Doble del cliente Prisma que usa AdminController.
- * Solo declara los modelos y métodos que el controlador consulta.
- */
-export function mockPrismaAdmin() {
-  return {
-    order: { findMany: vi.fn(), count: vi.fn() },
-    orderItem: { findMany: vi.fn() },
-    product: { count: vi.fn(), findMany: vi.fn() },
-    user: { count: vi.fn() },
-  } as any;
-}
-
-/** Orden ENTREGADO tal como la devuelve prisma.order.findMany (solo total y fecha). */
-export function ordenEntregada(over: Record<string, any> = {}) {
-  return { total: 100000, createdAt: new Date(2026, 0, 15), ...over };
-}
-
-/** Línea de pedido con su producto y categoría, tal como la devuelve prisma.orderItem.findMany. */
-export function itemVendido(total: number, categoria = "Pisos y Ceramicas") {
-  return { total, product: { category: { name: categoria } } };
-}
-
-/**
- * Programa las tres llamadas seguidas a prisma.order.findMany de getMetrics():
- * 1) mes actual, 2) mes anterior, 3) año en curso.
- */
-export function programarOrdenes(
-  p: any,
-  o: { actual?: any[]; anterior?: any[]; anio?: any[] } = {}
-) {
-  p.order.findMany
-    .mockResolvedValueOnce(o.actual ?? [])
-    .mockResolvedValueOnce(o.anterior ?? [])
-    .mockResolvedValueOnce(o.anio ?? []);
-}
-
-/** Datos mínimos válidos para crear un producto (createProductSchema). */
 export function datosProducto(over: Record<string, any> = {}) {
   return {
     name: "Cemento Gris 50 kg",
@@ -314,4 +242,47 @@ export function datosProducto(over: Record<string, any> = {}) {
     categoryId: "cat_002",
     ...over,
   };
+}
+
+export function ordenEntregada(over: Record<string, any> = {}) {
+  return { total: 100000, createdAt: new Date(2026, 0, 15), ...over };
+}
+
+export function itemVendido(total: number, categoria = "Pisos y Ceramicas") {
+  return { total, product: { category: { name: categoria } } };
+}
+
+export function programarOrdenes(
+  p: any,
+  o: { actual?: any[]; anterior?: any[]; anio?: any[] } = {}
+) {
+  p.order.findMany
+    .mockResolvedValueOnce(o.actual ?? [])
+    .mockResolvedValueOnce(o.anterior ?? [])
+    .mockResolvedValueOnce(o.anio ?? []);
+}
+
+// --- Utilidades HTTP y Express ---
+
+export function contextoExpress(authHeader?: string) {
+  const req: any = { headers: authHeader ? { authorization: authHeader } : {} };
+  const res: any = {
+    statusCode: 200,
+    body: undefined,
+    status(c: number) { this.statusCode = c; return this; },
+    json(b: unknown) { this.body = b; return this; },
+  };
+  const next = vi.fn();
+  return { req, res, next };
+}
+
+export function errorDeNext(next: any) {
+  return next.mock.calls[0]?.[0];
+}
+
+export async function capturarError(promesa: Promise<unknown>): Promise<any> {
+  return await promesa.then(
+    () => { throw new Error("Se esperaba un error y la operación terminó bien."); },
+    (e) => e
+  );
 }

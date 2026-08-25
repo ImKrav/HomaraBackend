@@ -1,16 +1,7 @@
-// ============================================================================
-// F-AUTH-03 · Control de acceso por rol — Backend
-// Grafo:   05_F-AUTH-03_BACKEND_Control_de_acceso_por_rol.drawio
-// Unidad:  requireAuth / requireAdmin (middlewares de autorización)
-// Métrica: N=20  A=24  P=5  →  V(G) = 24 − 20 + 2 = 6
-// Cobertura de ruta básica: 6 caminos independientes → 6 casos de prueba
-// Trazabilidad: RF03 · HU3 · ESC03 · RNF03–ESC38
-// ============================================================================
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import jwt from "jsonwebtoken";
 import { contextoExpress, errorDeNext, usuario } from "../_ayudas.js";
 
-// El middleware instancia PrismaUserRepository al cargar el módulo: se sustituye.
 const findById = vi.fn();
 vi.mock("../../src/infrastructure/database/repositories/prisma-user.repository.js", () => ({
   PrismaUserRepository: class {
@@ -32,8 +23,8 @@ describe("F-AUTH-03 · Control de acceso por rol", () => {
     findById.mockReset();
   });
 
-  it("CP-F-AUTH-03-01 · camino 1,2,3,15,16,18,F · Paso 2 = NO → sin cabecera Authorization se corta en 401", async () => {
-    const { req, res, next } = contextoExpress();          // sin cabecera
+  it("CP-F-AUTH-03-01: Retorna 401 si no se provee cabecera Authorization", async () => {
+    const { req, res, next } = contextoExpress();
 
     await requireAuth(req, res, next);
 
@@ -41,10 +32,10 @@ describe("F-AUTH-03 · Control de acceso por rol", () => {
     expect(error).toBeInstanceOf(AppError);
     expect(error.statusCode).toBe(401);
     expect(error.message).toBe("Token no provisto.");
-    expect(findById).not.toHaveBeenCalled();               // no se consulta la base de datos
+    expect(findById).not.toHaveBeenCalled();
   });
 
-  it("CP-F-AUTH-03-02 · camino 1,2,4,5,6,7,15,16,18,F · Paso 6 = NO → credencial caducada", async () => {
+  it("CP-F-AUTH-03-02: Retorna error cuando el token JWT ha caducado", async () => {
     const caducado = tokenDe({ id: "usr_001", email: "ana@homara.com", role: "CUSTOMER" }, { expiresIn: "-1s" });
     const { req, res, next } = contextoExpress(`Bearer ${caducado}`);
 
@@ -54,8 +45,8 @@ describe("F-AUTH-03 · Control de acceso por rol", () => {
     expect(findById).not.toHaveBeenCalled();
   });
 
-  it("CP-F-AUTH-03-03 · camino 1,2,4,5,6,8,9,10,15,16,18,F · Paso 6 = SI, Paso 9 = NO → el usuario ya no existe", async () => {
-    findById.mockResolvedValue(null);                      // fuerza Paso 9 = NO
+  it("CP-F-AUTH-03-03: Retorna 401 si el usuario asociado al token no existe en la base de datos", async () => {
+    findById.mockResolvedValue(null);
     const { req, res, next } = contextoExpress(
       `Bearer ${tokenDe({ id: "usr_borrado", email: "x@homara.com", role: "CUSTOMER" })}`
     );
@@ -68,7 +59,7 @@ describe("F-AUTH-03 · Control de acceso por rol", () => {
     expect(req.user).toBeUndefined();
   });
 
-  it("CP-F-AUTH-03-04 · camino 1,2,4,5,6,8,9,11,12,13,15,16,18,F · Paso 12 = NO → cliente sin permisos recibe 403", async () => {
+  it("CP-F-AUTH-03-04: Retorna 403 cuando un usuario cliente intenta acceder a rutas de administración", async () => {
     findById.mockResolvedValue(usuario({ role: "CUSTOMER" }));
     const { req, res, next } = contextoExpress(
       `Bearer ${tokenDe({ id: "usr_001", email: "ana@homara.com", role: "ADMIN" })}`
@@ -81,7 +72,7 @@ describe("F-AUTH-03 · Control de acceso por rol", () => {
     expect(error.message).toContain("permisos de administrador");
   });
 
-  it("CP-F-AUTH-03-05 · camino 1,2,4,5,6,8,9,11,12,14,F · Paso 12 = SI → el administrador pasa al controlador", async () => {
+  it("CP-F-AUTH-03-05: Permite el acceso cuando el usuario tiene rol ADMIN en base de datos", async () => {
     findById.mockResolvedValue(usuario({ role: "ADMIN" }));
     const { req, res, next } = contextoExpress(
       `Bearer ${tokenDe({ id: "usr_001", email: "ana@homara.com", role: "ADMIN" })}`
@@ -89,12 +80,11 @@ describe("F-AUTH-03 · Control de acceso por rol", () => {
 
     await requireAdmin(req, res, next);
 
-    expect(next).toHaveBeenCalledWith();                   // next() sin error
+    expect(next).toHaveBeenCalledWith();
     expect(req.user).toMatchObject({ id: "usr_001", role: "ADMIN" });
   });
 
-  it("CP-F-AUTH-03-06 · arista 15→17 · Paso 15 = NO → un fallo ajeno a la sesión se traduce a 500", async () => {
-    // Rama NO del nodo 15: el error no es AppError ni de JWT, así que se envuelve en un 500.
+  it("CP-F-AUTH-03-06: Traduce fallos internos no controlados a error 500", async () => {
     findById.mockRejectedValue(new TypeError("la base de datos no responde"));
     const { req, res, next } = contextoExpress(
       `Bearer ${tokenDe({ id: "usr_001", email: "ana@homara.com", role: "CUSTOMER" })}`
@@ -108,8 +98,7 @@ describe("F-AUTH-03 · Control de acceso por rol", () => {
     expect(error.message).toBe("Error durante la autenticación.");
   });
 
-  it("CP-F-AUTH-03-04b · el rol que manda es el de la base de datos, no el de la credencial", async () => {
-    // Una credencial manipulada que dice ADMIN no basta: el nodo 12 lee req.user, que viene del nodo 8.
+  it("CP-F-AUTH-03-04b: Valida el rol real de base de datos ignorando el payload del token", async () => {
     findById.mockResolvedValue(usuario({ role: "CUSTOMER" }));
     const { req, res, next } = contextoExpress(
       `Bearer ${tokenDe({ id: "usr_001", email: "ana@homara.com", role: "ADMIN" })}`

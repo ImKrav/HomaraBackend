@@ -17,13 +17,10 @@ pruebas. La derivación es directa:
 | Columna **Entrada** | Los datos con los que se invoca la unidad |
 | Columna **Salida** | Las aserciones |
 
-El nombre de cada test lleva el identificador del caso, el camino recorrido y
-las condiciones que fuerza, de modo que se puede rastrear del test al grafo y
-del grafo al requisito sin pasos intermedios:
+El nombre de cada test lleva el identificador del caso y su descripción concisa, de modo que se puede rastrear del test al grafo y del grafo al requisito:
 
 ```
-CP-F-AUTH-01-02 · camino 1,2,3,5,6,8,9,12,F · Paso 3 = SI, Paso 8 = SI
-                  → el correo ya está registrado
+CP-F-AUTH-01-02: Rechaza registro si el correo ya existe
 ```
 
 ## Cobertura
