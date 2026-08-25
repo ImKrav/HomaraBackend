@@ -1,0 +1,4614 @@
+[
+ {
+  "func": "F-AUTH-01",
+  "titulo": "Registro de usuario",
+  "spec": "BE-AUTH-01",
+  "unidad": "RegisterUserUseCase.execute() (endpoint POST /api/v1/users/register)",
+  "archivo": "src/application/use-cases/auth.use-cases.ts (lineas 10-56), src/infrastructure/http/middlewares/validateZod.ts, validators/auth.validator.ts",
+  "VG": 3,
+  "nodos": {
+   "1": {
+    "cod": "Recibir POST /api/v1/users/register con el cuerpo de registro",
+    "nat": "El visitante envía el formulario de registro"
+   },
+   "2": {
+    "cod": "validateZod(registerSchema): parsear, transformar y normalizar el cuerpo",
+    "nat": "Revisar el formato de los datos recibidos"
+   },
+   "3": {
+    "cod": "El esquema es valido? (correo con formato, contrasena >= 8 caracteres, nombre y apellido presentes)",
+    "nat": "¿Los datos están completos y bien escritos?"
+   },
+   "4": {
+    "cod": "Lanzar AppError 400 con el detalle 'Validacion fallida: <campo>: <mensaje>'",
+    "nat": "Avisar qué dato está mal escrito"
+   },
+   "5": {
+    "cod": "RegisterUserUseCase: normalizar el correo a minusculas y recortar espacios",
+    "nat": "Pasar el correo a minúsculas y quitar los espacios"
+   },
+   "6": {
+    "cod": "userRepository.findByEmail(correoNormalizado)",
+    "nat": "Buscar si ese correo ya está en la base de datos"
+   },
+   "7": {
+    "cod": "errorHandler: responder {success: false, error} con el codigo HTTP correspondiente",
+    "nat": "Mostrar el mensaje de error al visitante"
+   },
+   "8": {
+    "cod": "Ya existe un usuario registrado con ese correo?",
+    "nat": "¿El correo ya está registrado?"
+   },
+   "9": {
+    "cod": "Lanzar AppError 400 'El correo electronico ya esta registrado'",
+    "nat": "Avisar que el correo ya está registrado"
+   },
+   "10": {
+    "cod": "hashPassword(contrasena): cifrar con bcrypt",
+    "nat": "Cifrar la contraseña"
+   },
+   "11": {
+    "cod": "userRepository.create({...datos, email normalizado, hash, role: CUSTOMER})",
+    "nat": "Guardar el usuario nuevo como cliente"
+   },
+   "12": {
+    "cod": "errorHandler: responder {success: false, error} con el codigo HTTP correspondiente",
+    "nat": "Mostrar el mensaje de error al visitante"
+   },
+   "13": {
+    "cod": "generateToken({id, email, role}): emitir el JWT de sesion",
+    "nat": "Generar la credencial de sesión"
+   },
+   "14": {
+    "cod": "Responder 201 {success: true, data: {token, user}}",
+    "nat": "Entregar la cuenta creada y la sesión iniciada"
+   },
+   "15": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     7,
+     15
+    ],
+    "condiciones": [
+     "Paso 3 (¿Los datos están completos y bien escritos?) = NO"
+    ],
+    "salida": [
+     "Avisar qué dato está mal escrito",
+     "Mostrar el mensaje de error al visitante"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     9,
+     12,
+     15
+    ],
+    "condiciones": [
+     "Paso 3 (¿Los datos están completos y bien escritos?) = SI",
+     "Paso 8 (¿El correo ya está registrado?) = SI"
+    ],
+    "salida": [
+     "Avisar que el correo ya está registrado",
+     "Mostrar el mensaje de error al visitante"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     10,
+     11,
+     13,
+     14,
+     15
+    ],
+    "condiciones": [
+     "Paso 3 (¿Los datos están completos y bien escritos?) = SI",
+     "Paso 8 (¿El correo ya está registrado?) = NO"
+    ],
+    "salida": [
+     "Generar la credencial de sesión",
+     "Entregar la cuenta creada y la sesión iniciada"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-AUTH-02",
+  "titulo": "Inicio de sesión",
+  "spec": "BE-AUTH-02",
+  "unidad": "LoginUserUseCase.execute() (endpoint POST /api/v1/users/login)",
+  "archivo": "src/application/use-cases/auth.use-cases.ts (lineas 58-96), validators/auth.validator.ts",
+  "VG": 4,
+  "nodos": {
+   "1": {
+    "cod": "Recibir POST /api/v1/users/login con {email, password}",
+    "nat": "El usuario envía su correo y su contraseña"
+   },
+   "2": {
+    "cod": "validateZod(loginSchema): validar formato del correo y contrasena no vacia",
+    "nat": "Revisar el formato de los datos recibidos"
+   },
+   "3": {
+    "cod": "El esquema es valido?",
+    "nat": "¿Los datos están completos y bien escritos?"
+   },
+   "4": {
+    "cod": "Lanzar AppError 400 'Validacion fallida'",
+    "nat": "Avisar qué dato está mal escrito"
+   },
+   "5": {
+    "cod": "Normalizar el correo a minusculas y recortar espacios",
+    "nat": "Pasar el correo a minúsculas y quitar los espacios"
+   },
+   "6": {
+    "cod": "userRepository.findByEmail(correoNormalizado)",
+    "nat": "Buscar el usuario por su correo"
+   },
+   "7": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al usuario"
+   },
+   "8": {
+    "cod": "Existe un usuario con ese correo?",
+    "nat": "¿Existe un usuario con ese correo?"
+   },
+   "9": {
+    "cod": "Lanzar AppError 401 'Credenciales incorrectas. Verifique correo y contrasena.'",
+    "nat": "Avisar que las credenciales son incorrectas"
+   },
+   "10": {
+    "cod": "comparePassword(contrasena, hash almacenado): comparar con bcrypt",
+    "nat": "Comparar la contraseña con la guardada"
+   },
+   "11": {
+    "cod": "La contrasena coincide con el hash?",
+    "nat": "¿La contraseña coincide?"
+   },
+   "12": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al usuario"
+   },
+   "13": {
+    "cod": "Lanzar AppError 401 con el MISMO mensaje generico (no revela si el correo existe)",
+    "nat": "Avisar lo mismo: las credenciales son incorrectas"
+   },
+   "14": {
+    "cod": "generateToken({id, email, role}): emitir el JWT con vigencia de 7 dias",
+    "nat": "Generar la credencial de sesión"
+   },
+   "15": {
+    "cod": "Responder 200 {success: true, data: {token, user}}",
+    "nat": "Entregar la sesión iniciada y los datos del usuario"
+   },
+   "16": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al usuario"
+   },
+   "17": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     7,
+     17
+    ],
+    "condiciones": [
+     "Paso 3 (¿Los datos están completos y bien escritos?) = NO"
+    ],
+    "salida": [
+     "Avisar qué dato está mal escrito",
+     "Mostrar el mensaje de error al usuario"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     9,
+     12,
+     17
+    ],
+    "condiciones": [
+     "Paso 3 (¿Los datos están completos y bien escritos?) = SI",
+     "Paso 8 (¿Existe un usuario con ese correo?) = NO"
+    ],
+    "salida": [
+     "Avisar que las credenciales son incorrectas",
+     "Mostrar el mensaje de error al usuario"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     10,
+     11,
+     13,
+     16,
+     17
+    ],
+    "condiciones": [
+     "Paso 3 (¿Los datos están completos y bien escritos?) = SI",
+     "Paso 8 (¿Existe un usuario con ese correo?) = SI",
+     "Paso 11 (¿La contraseña coincide?) = NO"
+    ],
+    "salida": [
+     "Avisar lo mismo: las credenciales son incorrectas",
+     "Mostrar el mensaje de error al usuario"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     10,
+     11,
+     14,
+     15,
+     17
+    ],
+    "condiciones": [
+     "Paso 3 (¿Los datos están completos y bien escritos?) = SI",
+     "Paso 8 (¿Existe un usuario con ese correo?) = SI",
+     "Paso 11 (¿La contraseña coincide?) = SI"
+    ],
+    "salida": [
+     "Generar la credencial de sesión",
+     "Entregar la sesión iniciada y los datos del usuario"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-AUTH-03",
+  "titulo": "Control de acceso por rol",
+  "spec": "BE-AUTH-03",
+  "unidad": "requireAuth / requireAdmin (middleware de autorizacion)",
+  "archivo": "src/infrastructure/http/middlewares/auth.ts (lineas 41-89)",
+  "VG": 6,
+  "nodos": {
+   "1": {
+    "cod": "Peticion a una ruta protegida: leer la cabecera Authorization",
+    "nat": "Llega una petición a una función protegida"
+   },
+   "2": {
+    "cod": "extractToken: la cabecera existe y comienza con 'Bearer '?",
+    "nat": "¿La petición trae credencial de sesión?"
+   },
+   "3": {
+    "cod": "Lanzar AppError 401 'Token no provisto.'",
+    "nat": "Avisar que falta la credencial"
+   },
+   "4": {
+    "cod": "Separar el token de la cabecera (authHeader.split(' ')[1])",
+    "nat": "Tomar la credencial de la petición"
+   },
+   "5": {
+    "cod": "verifyToken(token): verificar firma y vigencia del JWT",
+    "nat": "Revisar la firma y la vigencia de la credencial"
+   },
+   "6": {
+    "cod": "El token es valido y no ha expirado?",
+    "nat": "¿La credencial es válida y está vigente?"
+   },
+   "7": {
+    "cod": "Se propaga TokenExpiredError o JsonWebTokenError",
+    "nat": "La credencial está vencida o fue alterada"
+   },
+   "8": {
+    "cod": "userRepository.findById(decoded.id)",
+    "nat": "Buscar al usuario dueño de la credencial"
+   },
+   "9": {
+    "cod": "El usuario del token sigue existiendo?",
+    "nat": "¿El usuario sigue activo?"
+   },
+   "10": {
+    "cod": "Lanzar AppError 401 'Usuario no encontrado o dado de baja.'",
+    "nat": "Avisar que el usuario ya no existe"
+   },
+   "11": {
+    "cod": "Asignar req.user = {id, email, role, firstName, lastName}",
+    "nat": "Registrar quién hace la petición y con qué rol"
+   },
+   "12": {
+    "cod": "requireAdmin: req.user.role === 'ADMIN'?",
+    "nat": "¿El usuario es administrador?"
+   },
+   "13": {
+    "cod": "Lanzar AppError 403 'Acceso denegado. Se requieren permisos de administrador.'",
+    "nat": "Avisar que no tiene permisos suficientes"
+   },
+   "14": {
+    "cod": "next(): continuar hacia el controlador de la ruta",
+    "nat": "Dejar continuar hacia la función pedida"
+   },
+   "15": {
+    "cod": "forwardAuthError: el error es AppError, TokenExpiredError o JsonWebTokenError?",
+    "nat": "¿El problema es de sesión o de permisos?"
+   },
+   "16": {
+    "cod": "next(error): conservar el codigo y el mensaje originales",
+    "nat": "Conservar el mensaje original del problema"
+   },
+   "17": {
+    "cod": "next(new AppError('Error durante la autenticacion.', 500))",
+    "nat": "Reportar un error inesperado del servidor"
+   },
+   "18": {
+    "cod": "errorHandler: traducir a 401 (token expirado o invalido), 403 o 500",
+    "nat": "Responder al usuario con el motivo del rechazo"
+   },
+   "19": {
+    "cod": "errorHandler: traducir a 401 (token expirado o invalido), 403 o 500",
+    "nat": "Responder al usuario con el motivo del rechazo"
+   },
+   "20": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     15,
+     16,
+     18,
+     20
+    ],
+    "condiciones": [
+     "Paso 2 (¿La petición trae credencial de sesión?) = NO",
+     "Paso 15 (¿El problema es de sesión o de permisos?) = SI"
+    ],
+    "salida": [
+     "Conservar el mensaje original del problema",
+     "Responder al usuario con el motivo del rechazo"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     6,
+     7,
+     15,
+     16,
+     18,
+     20
+    ],
+    "condiciones": [
+     "Paso 2 (¿La petición trae credencial de sesión?) = SI",
+     "Paso 6 (¿La credencial es válida y está vigente?) = NO",
+     "Paso 15 (¿El problema es de sesión o de permisos?) = SI"
+    ],
+    "salida": [
+     "Conservar el mensaje original del problema",
+     "Responder al usuario con el motivo del rechazo"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     6,
+     8,
+     9,
+     10,
+     15,
+     16,
+     18,
+     20
+    ],
+    "condiciones": [
+     "Paso 2 (¿La petición trae credencial de sesión?) = SI",
+     "Paso 6 (¿La credencial es válida y está vigente?) = SI",
+     "Paso 9 (¿El usuario sigue activo?) = NO",
+     "Paso 15 (¿El problema es de sesión o de permisos?) = SI"
+    ],
+    "salida": [
+     "Conservar el mensaje original del problema",
+     "Responder al usuario con el motivo del rechazo"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     6,
+     8,
+     9,
+     11,
+     12,
+     13,
+     15,
+     16,
+     18,
+     20
+    ],
+    "condiciones": [
+     "Paso 2 (¿La petición trae credencial de sesión?) = SI",
+     "Paso 6 (¿La credencial es válida y está vigente?) = SI",
+     "Paso 9 (¿El usuario sigue activo?) = SI",
+     "Paso 12 (¿El usuario es administrador?) = NO",
+     "Paso 15 (¿El problema es de sesión o de permisos?) = SI"
+    ],
+    "salida": [
+     "Conservar el mensaje original del problema",
+     "Responder al usuario con el motivo del rechazo"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     6,
+     8,
+     9,
+     11,
+     12,
+     14,
+     20
+    ],
+    "condiciones": [
+     "Paso 2 (¿La petición trae credencial de sesión?) = SI",
+     "Paso 6 (¿La credencial es válida y está vigente?) = SI",
+     "Paso 9 (¿El usuario sigue activo?) = SI",
+     "Paso 12 (¿El usuario es administrador?) = SI"
+    ],
+    "salida": [
+     "Registrar quién hace la petición y con qué rol",
+     "Dejar continuar hacia la función pedida"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     15,
+     17,
+     19,
+     20
+    ],
+    "condiciones": [
+     "Paso 2 (¿La petición trae credencial de sesión?) = NO",
+     "Paso 15 (¿El problema es de sesión o de permisos?) = NO"
+    ],
+    "salida": [
+     "Reportar un error inesperado del servidor",
+     "Responder al usuario con el motivo del rechazo"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-CAT-01",
+  "titulo": "Listar y filtrar el catálogo",
+  "spec": "BE-CAT-01",
+  "unidad": "ListProductsUseCase.execute() + PrismaProductRepository.findAll()",
+  "archivo": "src/application/use-cases/catalog.use-cases.ts (lineas 21-64), src/infrastructure/database/repositories/prisma-product.repository.ts (lineas 7-51)",
+  "VG": 6,
+  "nodos": {
+   "1": {
+    "cod": "Recibir GET /api/v1/products?category=&q=&tag= (optionalAuth ya resolvio req.user)",
+    "nat": "Alguien abre el catálogo, con filtros o sin ellos"
+   },
+   "2": {
+    "cod": "Construir el objeto de filtro where = {}",
+    "nat": "Preparar la consulta sin ningún filtro"
+   },
+   "3": {
+    "cod": "Se recibio el filtro category?",
+    "nat": "¿Se pidió filtrar por categoría?"
+   },
+   "4": {
+    "cod": "where.category = { slug: category }",
+    "nat": "Agregar la categoría a la consulta"
+   },
+   "5": {
+    "cod": "Se recibio texto de busqueda q?",
+    "nat": "¿Se escribió un texto de búsqueda?"
+   },
+   "6": {
+    "cod": "where.OR = [nombre contiene q, descripcion contiene q] con mode insensitive",
+    "nat": "Buscar ese texto en el nombre y en la descripción"
+   },
+   "7": {
+    "cod": "Se recibio el filtro tag?",
+    "nat": "¿Se pidió filtrar por etiqueta?"
+   },
+   "8": {
+    "cod": "where.tags = { some: { name: tag } }",
+    "nat": "Agregar la etiqueta a la consulta"
+   },
+   "9": {
+    "cod": "prisma.product.findMany(where) incluyendo categoria y etiquetas",
+    "nat": "Pedir a la base de datos los productos que cumplen"
+   },
+   "10": {
+    "cod": "La lista resultante esta vacia?",
+    "nat": "¿No hubo ningún resultado?"
+   },
+   "11": {
+    "cod": "Responder 200 con una lista vacia (sin consultar reservas)",
+    "nat": "Devolver una lista vacía"
+   },
+   "12": {
+    "cod": "La peticion trae un usuario autenticado?",
+    "nat": "¿Quien consulta tiene sesión iniciada?"
+   },
+   "13": {
+    "cod": "Obtener el carrito del usuario para excluirlo del calculo (excludeCartId)",
+    "nat": "Ubicar su carrito para no restarle su propia reserva"
+   },
+   "14": {
+    "cod": "getReservedQuantities: sumar cantidades reservadas en carritos ajenos actualizados en los ultimos 15 minutos",
+    "nat": "Sumar lo que otros reservaron en los últimos 15 minutos"
+   },
+   "15": {
+    "cod": "getReservedQuantities: sumar cantidades reservadas en carritos ajenos actualizados en los ultimos 15 minutos",
+    "nat": "Sumar lo que otros reservaron en los últimos 15 minutos"
+   },
+   "16": {
+    "cod": "Por cada producto: stockDinamico = max(0, stockFisico - reservado); inStock = stockDinamico > 0",
+    "nat": "Restar lo reservado a las existencias de cada producto"
+   },
+   "17": {
+    "cod": "Por cada producto: stockDinamico = max(0, stockFisico - reservado); inStock = stockDinamico > 0",
+    "nat": "Restar lo reservado a las existencias de cada producto"
+   },
+   "18": {
+    "cod": "Responder 200 {success: true, data: productos con disponibilidad real}",
+    "nat": "Entregar los productos con su disponibilidad real"
+   },
+   "19": {
+    "cod": "Responder 200 {success: true, data: productos con disponibilidad real}",
+    "nat": "Entregar los productos con su disponibilidad real"
+   },
+   "20": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (¿Se pidió filtrar por categoría?) = SI",
+     "Paso 5 (¿Se escribió un texto de búsqueda?) = SI",
+     "Paso 7 (¿Se pidió filtrar por etiqueta?) = SI",
+     "Paso 10 (¿No hubo ningún resultado?) = SI"
+    ],
+    "salida": [
+     "Pedir a la base de datos los productos que cumplen",
+     "Devolver una lista vacía"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (¿Se pidió filtrar por categoría?) = NO",
+     "Paso 5 (¿Se escribió un texto de búsqueda?) = SI",
+     "Paso 7 (¿Se pidió filtrar por etiqueta?) = SI",
+     "Paso 10 (¿No hubo ningún resultado?) = SI"
+    ],
+    "salida": [
+     "Pedir a la base de datos los productos que cumplen",
+     "Devolver una lista vacía"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     7,
+     8,
+     9,
+     10,
+     11,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (¿Se pidió filtrar por categoría?) = NO",
+     "Paso 5 (¿Se escribió un texto de búsqueda?) = NO",
+     "Paso 7 (¿Se pidió filtrar por etiqueta?) = SI",
+     "Paso 10 (¿No hubo ningún resultado?) = SI"
+    ],
+    "salida": [
+     "Pedir a la base de datos los productos que cumplen",
+     "Devolver una lista vacía"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     7,
+     9,
+     10,
+     11,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (¿Se pidió filtrar por categoría?) = NO",
+     "Paso 5 (¿Se escribió un texto de búsqueda?) = NO",
+     "Paso 7 (¿Se pidió filtrar por etiqueta?) = NO",
+     "Paso 10 (¿No hubo ningún resultado?) = SI"
+    ],
+    "salida": [
+     "Pedir a la base de datos los productos que cumplen",
+     "Devolver una lista vacía"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     7,
+     9,
+     10,
+     12,
+     13,
+     15,
+     17,
+     19,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (¿Se pidió filtrar por categoría?) = NO",
+     "Paso 5 (¿Se escribió un texto de búsqueda?) = NO",
+     "Paso 7 (¿Se pidió filtrar por etiqueta?) = NO",
+     "Paso 10 (¿No hubo ningún resultado?) = NO",
+     "Paso 12 (¿Quien consulta tiene sesión iniciada?) = SI"
+    ],
+    "salida": [
+     "Restar lo reservado a las existencias de cada producto",
+     "Entregar los productos con su disponibilidad real"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     7,
+     9,
+     10,
+     12,
+     14,
+     16,
+     18,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (¿Se pidió filtrar por categoría?) = NO",
+     "Paso 5 (¿Se escribió un texto de búsqueda?) = NO",
+     "Paso 7 (¿Se pidió filtrar por etiqueta?) = NO",
+     "Paso 10 (¿No hubo ningún resultado?) = NO",
+     "Paso 12 (¿Quien consulta tiene sesión iniciada?) = NO"
+    ],
+    "salida": [
+     "Restar lo reservado a las existencias de cada producto",
+     "Entregar los productos con su disponibilidad real"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-CAT-02",
+  "titulo": "Ver el detalle de un producto",
+  "spec": "BE-CAT-02",
+  "unidad": "GetProductDetailUseCase.execute() (endpoint GET /api/v1/products/:id)",
+  "archivo": "src/application/use-cases/catalog.use-cases.ts (lineas 66-108)",
+  "VG": 3,
+  "nodos": {
+   "1": {
+    "cod": "Recibir GET /api/v1/products/:id",
+    "nat": "Alguien abre la ficha de un producto"
+   },
+   "2": {
+    "cod": "productRepository.findById(id) incluyendo categoria y etiquetas",
+    "nat": "Buscar el producto en el catálogo"
+   },
+   "3": {
+    "cod": "Existe el producto?",
+    "nat": "¿El producto existe?"
+   },
+   "4": {
+    "cod": "Lanzar AppError 404 'Producto no encontrado'",
+    "nat": "Avisar que el producto no existe"
+   },
+   "5": {
+    "cod": "La peticion trae un usuario autenticado?",
+    "nat": "¿Quien consulta tiene sesión iniciada?"
+   },
+   "6": {
+    "cod": "Obtener el carrito del usuario -> excludeCartId (no se autorreserva)",
+    "nat": "Ubicar su carrito para no restarle su propia reserva"
+   },
+   "7": {
+    "cod": "excludeCartId = '' (visitante anonimo: se descuentan todas las reservas)",
+    "nat": "Tener en cuenta todas las reservas (visitante sin sesión)"
+   },
+   "8": {
+    "cod": "errorHandler: responder 404 {success: false, error}",
+    "nat": "Mostrar el aviso de producto no encontrado"
+   },
+   "9": {
+    "cod": "getReservedQuantities(excludeCartId, [id]): reservas activas de los ultimos 15 minutos",
+    "nat": "Sumar lo que otros reservaron hace menos de 15 minutos"
+   },
+   "10": {
+    "cod": "reservado = reservedQuantities[id] o 0",
+    "nat": "Tomar la cantidad reservada de ese producto"
+   },
+   "11": {
+    "cod": "stockDinamico = max(0, stockFisico - reservado)",
+    "nat": "Restar lo reservado a las existencias"
+   },
+   "12": {
+    "cod": "inStock = stockDinamico > 0",
+    "nat": "Marcar si queda disponible o no"
+   },
+   "13": {
+    "cod": "Responder 200 con la ficha: precio, precio original, unidad, categoria y disponibilidad",
+    "nat": "Entregar la ficha con precio y disponibilidad"
+   },
+   "14": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     8,
+     14
+    ],
+    "condiciones": [
+     "Paso 3 (¿El producto existe?) = NO"
+    ],
+    "salida": [
+     "Avisar que el producto no existe",
+     "Mostrar el aviso de producto no encontrado"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "condiciones": [
+     "Paso 3 (¿El producto existe?) = SI",
+     "Paso 5 (¿Quien consulta tiene sesión iniciada?) = SI"
+    ],
+    "salida": [
+     "Marcar si queda disponible o no",
+     "Entregar la ficha con precio y disponibilidad"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     7,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "condiciones": [
+     "Paso 3 (¿El producto existe?) = SI",
+     "Paso 5 (¿Quien consulta tiene sesión iniciada?) = NO"
+    ],
+    "salida": [
+     "Marcar si queda disponible o no",
+     "Entregar la ficha con precio y disponibilidad"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-CAT-03",
+  "titulo": "Publicar una reseña",
+  "spec": "BE-CAT-03",
+  "unidad": "CreateProductReviewUseCase.execute() (POST /api/v1/products/:id/reviews)",
+  "archivo": "src/application/use-cases/catalog.use-cases.ts (lineas 110-139)",
+  "VG": 4,
+  "nodos": {
+   "1": {
+    "cod": "Recibir POST /api/v1/products/:id/reviews (requireAuth ya valido el token)",
+    "nat": "Un cliente envía su calificación de un producto"
+   },
+   "2": {
+    "cod": "validateZod: rating entero entre 1 y 5 y comentario dentro del limite permitido?",
+    "nat": "¿La calificación está entre 1 y 5?"
+   },
+   "3": {
+    "cod": "Lanzar AppError 400 'Validacion fallida'",
+    "nat": "Avisar que la calificación no es válida"
+   },
+   "4": {
+    "cod": "productRepository.findById(productId)",
+    "nat": "Buscar el producto"
+   },
+   "5": {
+    "cod": "Existe el producto?",
+    "nat": "¿El producto existe?"
+   },
+   "6": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "7": {
+    "cod": "Lanzar AppError 404 'Producto no encontrado'",
+    "nat": "Avisar que el producto no existe"
+   },
+   "8": {
+    "cod": "reviewRepository.findByUserAndProduct(userId, productId)",
+    "nat": "Revisar si ese cliente ya lo había calificado"
+   },
+   "9": {
+    "cod": "El usuario ya habia calificado este producto?",
+    "nat": "¿Ya lo había calificado?"
+   },
+   "10": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "11": {
+    "cod": "Lanzar AppError 400 'Ya has calificado este producto'",
+    "nat": "Avisar que solo puede calificarlo una vez"
+   },
+   "12": {
+    "cod": "reviewRepository.create({userId, productId, rating, comment})",
+    "nat": "Guardar la calificación y el comentario"
+   },
+   "13": {
+    "cod": "getAverageRatingAndCount(productId): recalcular promedio y numero de resenas",
+    "nat": "Volver a calcular el promedio del producto"
+   },
+   "14": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "15": {
+    "cod": "productRepository.updateProductRating(productId, promedio, conteo)",
+    "nat": "Actualizar el promedio y el número de opiniones"
+   },
+   "16": {
+    "cod": "Responder 201 con la resena creada",
+    "nat": "Confirmar que la opinión quedó publicada"
+   },
+   "17": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     6,
+     17
+    ],
+    "condiciones": [
+     "Paso 2 (¿La calificación está entre 1 y 5?) = NO"
+    ],
+    "salida": [
+     "Avisar que la calificación no es válida",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     10,
+     17
+    ],
+    "condiciones": [
+     "Paso 2 (¿La calificación está entre 1 y 5?) = SI",
+     "Paso 5 (¿El producto existe?) = NO"
+    ],
+    "salida": [
+     "Avisar que el producto no existe",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     9,
+     11,
+     14,
+     17
+    ],
+    "condiciones": [
+     "Paso 2 (¿La calificación está entre 1 y 5?) = SI",
+     "Paso 5 (¿El producto existe?) = SI",
+     "Paso 9 (¿Ya lo había calificado?) = SI"
+    ],
+    "salida": [
+     "Avisar que solo puede calificarlo una vez",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     9,
+     12,
+     13,
+     15,
+     16,
+     17
+    ],
+    "condiciones": [
+     "Paso 2 (¿La calificación está entre 1 y 5?) = SI",
+     "Paso 5 (¿El producto existe?) = SI",
+     "Paso 9 (¿Ya lo había calificado?) = NO"
+    ],
+    "salida": [
+     "Actualizar el promedio y el número de opiniones",
+     "Confirmar que la opinión quedó publicada"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-PROY-01",
+  "titulo": "Crear un proyecto",
+  "spec": "BE-PROY-01",
+  "unidad": "CreateProjectUseCase.execute() (POST /api/v1/projects)",
+  "archivo": "src/application/use-cases/project.use-cases.ts (lineas 31-167)",
+  "VG": 12,
+  "nodos": {
+   "1": {
+    "cod": "Recibir POST /api/v1/projects con los datos del proyecto (requireAuth y esquema ya validados)",
+    "nat": "Un cliente pide crear un proyecto"
+   },
+   "2": {
+    "cod": "materialType esta entre ceramica, porcelanato, madera, vinilo o pintura?",
+    "nat": "¿El tipo de material está entre los permitidos?"
+   },
+   "3": {
+    "cod": "Lanzar AppError 400 'Tipo de material no soportado.'",
+    "nat": "Avisar que ese material no se puede usar"
+   },
+   "4": {
+    "cod": "Se envio selectedProductId (producto real del catalogo)?",
+    "nat": "¿Eligió un producto del catálogo para el proyecto?"
+   },
+   "5": {
+    "cod": "productRepository.findById(selectedProductId)",
+    "nat": "Buscar ese producto"
+   },
+   "6": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "7": {
+    "cod": "Existe el producto?",
+    "nat": "¿El producto existe?"
+   },
+   "8": {
+    "cod": "Lanzar AppError 404 'El producto seleccionado no existe.'",
+    "nat": "Avisar que el producto no existe"
+   },
+   "9": {
+    "cod": "El producto tiene categorySlug asignado?",
+    "nat": "¿El producto tiene categoría asignada?"
+   },
+   "10": {
+    "cod": "Lanzar AppError 400 'El producto seleccionado no tiene una categoria valida.'",
+    "nat": "Avisar que el producto no tiene categoría"
+   },
+   "11": {
+    "cod": "La categoria esta entre pisos-ceramicas, pinturas o materiales-construccion?",
+    "nat": "¿Es de pisos, de pinturas o de materiales de obra?"
+   },
+   "12": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "13": {
+    "cod": "Lanzar AppError 400 'Solo se pueden usar materiales de revestimiento o de construccion.'",
+    "nat": "Avisar que solo se pueden usar esos materiales"
+   },
+   "14": {
+    "cod": "Es material de construccion (categoria o nombre con pegante, cemento, adhesivo, mortero, yeso, cal o boquilla)?",
+    "nat": "¿Es un material de obra (pegante, cemento o boquilla)?"
+   },
+   "15": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "16": {
+    "cod": "categorySlug === 'materiales-construccion'?",
+    "nat": "¿Está en la categoría de materiales de obra?"
+   },
+   "17": {
+    "cod": "El proyecto es de tipo pintura?",
+    "nat": "¿El proyecto es de pintura?"
+   },
+   "18": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "19": {
+    "cod": "Lanzar AppError 400 'El material de construccion no pertenece a la categoria correcta.'",
+    "nat": "Avisar que no está en la categoría que le corresponde"
+   },
+   "20": {
+    "cod": "El tipo de material del proyecto es ceramica o porcelanato?",
+    "nat": "¿El proyecto es de cerámica o de porcelanato?"
+   },
+   "21": {
+    "cod": "categorySlug === 'pinturas'?",
+    "nat": "¿El producto elegido es una pintura?"
+   },
+   "22": {
+    "cod": "categorySlug === 'pisos-ceramicas'?",
+    "nat": "¿El producto elegido es de pisos y cerámicas?"
+   },
+   "23": {
+    "cod": "Lanzar AppError 400 'Los materiales de construccion solo son compatibles con ceramica o porcelanato.'",
+    "nat": "Avisar que ese material solo sirve para cerámica o porcelanato"
+   },
+   "24": {
+    "cod": "Lanzar AppError 400 'Para proyectos de pintura el producto debe ser de la categoria pinturas.'",
+    "nat": "Avisar que un proyecto de pintura necesita una pintura"
+   },
+   "25": {
+    "cod": "Lanzar AppError 400 'Para revestimiento fisico el producto debe ser de pisos y ceramicas.'",
+    "nat": "Avisar que el proyecto necesita un producto de pisos"
+   },
+   "26": {
+    "cod": "Armar selectedProduct = {id, name, price, unit}",
+    "nat": "Tomar el precio y la unidad del producto elegido"
+   },
+   "27": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "28": {
+    "cod": "calculateMaterials({tipo, area, material, formato, desperdicio, deducciones, insumos, selectedProduct})",
+    "nat": "Calcular la lista de materiales del proyecto"
+   },
+   "29": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "30": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "31": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "32": {
+    "cod": "estimatedCost = suma de los precios de la lista de materiales",
+    "nat": "Sumar el costo de todos los materiales"
+   },
+   "33": {
+    "cod": "projectRepository.create({...datos, status EN_PROGRESO, materiales, estimatedCost, valores por defecto})",
+    "nat": "Guardar el proyecto con sus materiales"
+   },
+   "34": {
+    "cod": "Responder 201 con el proyecto y su lista de materiales",
+    "nat": "Mostrar el proyecto con su presupuesto"
+   },
+   "35": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     6,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = NO"
+    ],
+    "salida": [
+     "Avisar que ese material no se puede usar",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     8,
+     12,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = NO"
+    ],
+    "salida": [
+     "Avisar que el producto no existe",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     28,
+     32,
+     33,
+     34,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = NO"
+    ],
+    "salida": [
+     "Guardar el proyecto con sus materiales",
+     "Mostrar el proyecto con su presupuesto"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     10,
+     15,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = NO"
+    ],
+    "salida": [
+     "Avisar que el producto no tiene categoría",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     13,
+     18,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = NO"
+    ],
+    "salida": [
+     "Avisar que solo se pueden usar esos materiales",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     14,
+     16,
+     19,
+     27,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = SI",
+     "Paso 14 (¿Es un material de obra (pegante, cemento o boquilla)?) = SI",
+     "Paso 16 (¿Está en la categoría de materiales de obra?) = NO"
+    ],
+    "salida": [
+     "Avisar que no está en la categoría que le corresponde",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     14,
+     17,
+     21,
+     24,
+     30,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = SI",
+     "Paso 14 (¿Es un material de obra (pegante, cemento o boquilla)?) = NO",
+     "Paso 17 (¿El proyecto es de pintura?) = SI",
+     "Paso 21 (¿El producto elegido es una pintura?) = NO"
+    ],
+    "salida": [
+     "Avisar que un proyecto de pintura necesita una pintura",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     14,
+     16,
+     20,
+     23,
+     29,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = SI",
+     "Paso 14 (¿Es un material de obra (pegante, cemento o boquilla)?) = SI",
+     "Paso 16 (¿Está en la categoría de materiales de obra?) = SI",
+     "Paso 20 (¿El proyecto es de cerámica o de porcelanato?) = NO"
+    ],
+    "salida": [
+     "Avisar que ese material solo sirve para cerámica o porcelanato",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     14,
+     17,
+     22,
+     25,
+     31,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = SI",
+     "Paso 14 (¿Es un material de obra (pegante, cemento o boquilla)?) = NO",
+     "Paso 17 (¿El proyecto es de pintura?) = NO",
+     "Paso 22 (¿El producto elegido es de pisos y cerámicas?) = NO"
+    ],
+    "salida": [
+     "Avisar que el proyecto necesita un producto de pisos",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     14,
+     16,
+     20,
+     26,
+     28,
+     32,
+     33,
+     34,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = SI",
+     "Paso 14 (¿Es un material de obra (pegante, cemento o boquilla)?) = SI",
+     "Paso 16 (¿Está en la categoría de materiales de obra?) = SI",
+     "Paso 20 (¿El proyecto es de cerámica o de porcelanato?) = SI"
+    ],
+    "salida": [
+     "Guardar el proyecto con sus materiales",
+     "Mostrar el proyecto con su presupuesto"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     14,
+     17,
+     21,
+     26,
+     28,
+     32,
+     33,
+     34,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = SI",
+     "Paso 14 (¿Es un material de obra (pegante, cemento o boquilla)?) = NO",
+     "Paso 17 (¿El proyecto es de pintura?) = SI",
+     "Paso 21 (¿El producto elegido es una pintura?) = SI"
+    ],
+    "salida": [
+     "Guardar el proyecto con sus materiales",
+     "Mostrar el proyecto con su presupuesto"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     9,
+     11,
+     14,
+     17,
+     22,
+     26,
+     28,
+     32,
+     33,
+     34,
+     35
+    ],
+    "condiciones": [
+     "Paso 2 (¿El tipo de material está entre los permitidos?) = SI",
+     "Paso 4 (¿Eligió un producto del catálogo para el proyecto?) = SI",
+     "Paso 7 (¿El producto existe?) = SI",
+     "Paso 9 (¿El producto tiene categoría asignada?) = SI",
+     "Paso 11 (¿Es de pisos, de pinturas o de materiales de obra?) = SI",
+     "Paso 14 (¿Es un material de obra (pegante, cemento o boquilla)?) = NO",
+     "Paso 17 (¿El proyecto es de pintura?) = NO",
+     "Paso 22 (¿El producto elegido es de pisos y cerámicas?) = SI"
+    ],
+    "salida": [
+     "Guardar el proyecto con sus materiales",
+     "Mostrar el proyecto con su presupuesto"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-PROY-02",
+  "titulo": "Calcular los materiales",
+  "spec": "BE-PROY-02",
+  "unidad": "calculateMaterials() (servicio de dominio)",
+  "archivo": "src/domain/services/materialCalculator.ts (lineas 144-460)",
+  "VG": 22,
+  "nodos": {
+   "1": {
+    "cod": "Entrada: {type, area, materialType, tileFormat, wastePercent, layingPattern, deducciones, insumos, selectedProduct}",
+    "nat": "Llegan las medidas, el material y los acabados elegidos"
+   },
+   "2": {
+    "cod": "doorsDeduction = puertas x 2.0 m2; windowsDeduction = ventanas x 1.5 m2",
+    "nat": "Descontar 2 m² por cada puerta y 1,5 m² por cada ventana"
+   },
+   "3": {
+    "cod": "netArea = max(0.1, area - (puertas + ventanas + deducciones personalizadas))",
+    "nat": "Área neta = área menos los descuentos (mínimo 0,1 m²)"
+   },
+   "4": {
+    "cod": "Se recibio wastePercent explicito?",
+    "nat": "¿El cliente indicó su propio porcentaje de desperdicio?"
+   },
+   "5": {
+    "cod": "El materialType es pintura?",
+    "nat": "¿El proyecto es de pintura?"
+   },
+   "6": {
+    "cod": "wastePercent = 5 %",
+    "nat": "Usar 5 % de desperdicio"
+   },
+   "7": {
+    "cod": "Seleccionar el desperdicio segun layingPattern",
+    "nat": "Elegir el desperdicio según la forma de instalación"
+   },
+   "8": {
+    "cod": "wastePercent = 15 % (diagonal)",
+    "nat": "En diagonal: 15 %"
+   },
+   "9": {
+    "cod": "wastePercent = 12 % (trabadura)",
+    "nat": "A media junta: 12 %"
+   },
+   "10": {
+    "cod": "wastePercent = 10 % (directo o valor por defecto)",
+    "nat": "Recto, la forma habitual: 10 %"
+   },
+   "11": {
+    "cod": "totalArea = ceil(netArea x (1 + wastePercent/100))",
+    "nat": "Área a comprar = área neta más el desperdicio"
+   },
+   "12": {
+    "cod": "Calcular banderas del producto: isConstructionMaterial, isPeganteProduct, isBoquillaProduct",
+    "nat": "Ver si el producto elegido es de obra o de acabado"
+   },
+   "13": {
+    "cod": "Hay producto seleccionado y NO es material de construccion?",
+    "nat": "¿Eligió del catálogo un producto de acabado?"
+   },
+   "14": {
+    "cod": "La unidad es galon o el materialType es pintura?",
+    "nat": "¿Se vende por galones o el proyecto es de pintura?"
+   },
+   "15": {
+    "cod": "materialType === 'pintura'?",
+    "nat": "¿El proyecto es de pintura?"
+   },
+   "16": {
+    "cod": "galones = ceil(totalArea / 30); agregar el producto de pintura del catalogo",
+    "nat": "Calcular los galones (uno rinde 30 m²) y agregarlo"
+   },
+   "17": {
+    "cod": "Agregar el producto de revestimiento del catalogo: precio x totalArea m2",
+    "nat": "Agregar ese producto por metro cuadrado"
+   },
+   "18": {
+    "cod": "galones = ceil(totalArea / 30); agregar 'Pintura Premium' generica",
+    "nat": "Agregar pintura común por galones"
+   },
+   "19": {
+    "cod": "Agregar baldosa generica: TILE_PRICES[material][formato] x totalArea",
+    "nat": "Agregar baldosa común según el material y el formato"
+   },
+   "20": {
+    "cod": "isTile = (materialType es ceramica o porcelanato)",
+    "nat": "Recordar si el proyecto lleva baldosa"
+   },
+   "21": {
+    "cod": "isTile?",
+    "nat": "¿Lleva baldosa (cerámica o porcelanato)?"
+   },
+   "22": {
+    "cod": "includeAdhesive?",
+    "nat": "¿Incluye pegante?"
+   },
+   "23": {
+    "cod": "El producto seleccionado es un pegante real?",
+    "nat": "¿Eligió un pegante del catálogo?"
+   },
+   "24": {
+    "cod": "Leer el peso del nombre; rendimiento = peso x 0.16; bultos = ceil(netArea / rendimiento)",
+    "nat": "Calcular los bultos según el peso de ese pegante"
+   },
+   "25": {
+    "cod": "bultos = ceil(netArea / 4); agregar pegante ceramico generico de 25 kg",
+    "nat": "Calcular los bultos de pegante común (uno rinde 4 m²)"
+   },
+   "26": {
+    "cod": "includeGrout?",
+    "nat": "¿Incluye boquilla?"
+   },
+   "27": {
+    "cod": "El producto seleccionado es una boquilla real?",
+    "nat": "¿Eligió una boquilla del catálogo?"
+   },
+   "28": {
+    "cod": "Leer el peso; unidades = ceil(netArea / (peso x 8))",
+    "nat": "Calcular las unidades según el peso de esa boquilla"
+   },
+   "29": {
+    "cod": "kg = ceil(netArea / 8); agregar boquilla generica",
+    "nat": "Calcular los kilos de boquilla común (uno rinde 8 m²)"
+   },
+   "30": {
+    "cod": "includeSpacers?",
+    "nat": "¿Incluye crucetas?"
+   },
+   "31": {
+    "cod": "bolsas = ceil(netArea / 15); agregar crucetas de 2 mm",
+    "nat": "Calcular las bolsas de crucetas (una rinde 15 m²)"
+   },
+   "32": {
+    "cod": "materialType es madera o el producto contiene 'madera'?",
+    "nat": "¿El proyecto es de madera?"
+   },
+   "33": {
+    "cod": "includeAdhesive?",
+    "nat": "¿Incluye base aislante?"
+   },
+   "34": {
+    "cod": "rollos = ceil(netArea / 20); agregar cinta underlayment",
+    "nat": "Calcular los rollos de cinta aislante (uno rinde 20 m²)"
+   },
+   "35": {
+    "cod": "materialType es vinilo o el producto contiene 'vinilo'?",
+    "nat": "¿El proyecto es de vinilo?"
+   },
+   "36": {
+    "cod": "includeAdhesive?",
+    "nat": "¿Incluye adhesivo?"
+   },
+   "37": {
+    "cod": "galones = ceil(netArea / 15); agregar primer para vinilo",
+    "nat": "Calcular los galones de adhesivo (uno rinde 15 m²)"
+   },
+   "38": {
+    "cod": "includeTools?",
+    "nat": "¿Incluye herramientas?"
+   },
+   "39": {
+    "cod": "materialType es pintura o la unidad del producto es galon?",
+    "nat": "¿Es un trabajo de pintura?"
+   },
+   "40": {
+    "cod": "Agregar kit de rodillo, brocha y 2 rollos de cinta de enmascarar",
+    "nat": "Agregar rodillo, brocha y cinta de enmascarar"
+   },
+   "41": {
+    "cod": "Agregar nivel de burbuja profesional de 60 cm",
+    "nat": "Agregar nivel de burbuja"
+   },
+   "42": {
+    "cod": "isTile?",
+    "nat": "¿Lleva baldosa?"
+   },
+   "43": {
+    "cod": "Agregar llana metalica dentada y mazo de goma",
+    "nat": "Agregar llana dentada y mazo de goma"
+   },
+   "44": {
+    "cod": "type === 'integral' y materialType distinto de pintura?",
+    "nat": "¿Es un proyecto integral que no es de pintura?"
+   },
+   "45": {
+    "cod": "wallArea = ceil(netArea x 0.6); wallTotal = ceil(wallArea x multiplicador); agregar revestimiento de pared",
+    "nat": "Agregar el revestimiento de paredes (60 % del piso)"
+   },
+   "46": {
+    "cod": "Retornar la lista de materiales calculados",
+    "nat": "Entregar la lista de materiales con su costo"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = NO",
+     "Paso 5 (¿El proyecto es de pintura?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     8,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = NO",
+     "Paso 5 (¿El proyecto es de pintura?) = NO",
+     "Paso 7 (Elegir el desperdicio según la forma de instalación) = diagonal",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     9,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = NO",
+     "Paso 5 (¿El proyecto es de pintura?) = NO",
+     "Paso 7 (Elegir el desperdicio según la forma de instalación) = trabadura",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     7,
+     10,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = NO",
+     "Paso 5 (¿El proyecto es de pintura?) = NO",
+     "Paso 7 (Elegir el desperdicio según la forma de instalación) = directo",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     15,
+     18,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = NO",
+     "Paso 15 (¿El proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     17,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = NO",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     15,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = NO",
+     "Paso 15 (¿El proyecto es de pintura?) = NO",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = SI",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = NO",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     23,
+     25,
+     26,
+     27,
+     28,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = SI",
+     "Paso 23 (¿Eligió un pegante del catálogo?) = NO",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = SI",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     26,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = NO",
+     "Paso 26 (¿Incluye boquilla?) = NO",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     26,
+     27,
+     29,
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = NO",
+     "Paso 26 (¿Incluye boquilla?) = SI",
+     "Paso 27 (¿Eligió una boquilla del catálogo?) = NO",
+     "Paso 30 (¿Incluye crucetas?) = SI",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     22,
+     26,
+     30,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = SI",
+     "Paso 22 (¿Incluye pegante?) = NO",
+     "Paso 26 (¿Incluye boquilla?) = NO",
+     "Paso 30 (¿Incluye crucetas?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = SI",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     33,
+     35,
+     36,
+     37,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = SI",
+     "Paso 33 (¿Incluye base aislante?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = SI",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     35,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = NO",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     35,
+     36,
+     38,
+     39,
+     40,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = SI",
+     "Paso 36 (¿Incluye adhesivo?) = NO",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar rodillo, brocha y cinta de enmascarar",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     35,
+     38,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = NO",
+     "Paso 38 (¿Incluye herramientas?) = NO",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Recordar si el proyecto lleva baldosa",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     35,
+     38,
+     39,
+     41,
+     42,
+     43,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = NO",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = NO",
+     "Paso 42 (¿Lleva baldosa?) = SI",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar llana dentada y mazo de goma",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     35,
+     38,
+     39,
+     41,
+     42,
+     44,
+     45,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = NO",
+     "Paso 38 (¿Incluye herramientas?) = SI",
+     "Paso 39 (¿Es un trabajo de pintura?) = NO",
+     "Paso 42 (¿Lleva baldosa?) = NO",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = SI"
+    ],
+    "salida": [
+     "Agregar nivel de burbuja",
+     "Agregar el revestimiento de paredes (60 % del piso)"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     11,
+     12,
+     13,
+     14,
+     16,
+     20,
+     21,
+     32,
+     35,
+     38,
+     44,
+     46
+    ],
+    "condiciones": [
+     "Paso 4 (¿El cliente indicó su propio porcentaje de desperdicio?) = SI",
+     "Paso 13 (¿Eligió del catálogo un producto de acabado?) = SI",
+     "Paso 14 (¿Se vende por galones o el proyecto es de pintura?) = SI",
+     "Paso 21 (¿Lleva baldosa (cerámica o porcelanato)?) = NO",
+     "Paso 32 (¿El proyecto es de madera?) = NO",
+     "Paso 35 (¿El proyecto es de vinilo?) = NO",
+     "Paso 38 (¿Incluye herramientas?) = NO",
+     "Paso 44 (¿Es un proyecto integral que no es de pintura?) = NO"
+    ],
+    "salida": [
+     "Calcular los galones (uno rinde 30 m²) y agregarlo",
+     "Recordar si el proyecto lleva baldosa"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-PROY-03",
+  "titulo": "Asignar un producto al proyecto",
+  "spec": "BE-PROY-03",
+  "unidad": "UpdateProjectUseCase.execute() (PUT /api/v1/projects/:id)",
+  "archivo": "src/application/use-cases/project.use-cases.ts (lineas 171-347)",
+  "VG": 8,
+  "nodos": {
+   "1": {
+    "cod": "Recibir PUT /api/v1/projects/:id (requireAuth ya identifico al usuario)",
+    "nat": "Un cliente pide modificar su proyecto"
+   },
+   "2": {
+    "cod": "Si se envio materialType: esta entre los tipos permitidos?",
+    "nat": "¿El material enviado está entre los permitidos?"
+   },
+   "3": {
+    "cod": "Lanzar AppError 400 'Tipo de material no soportado.'",
+    "nat": "Avisar que ese material no se puede usar"
+   },
+   "4": {
+    "cod": "projectRepository.findById(id)",
+    "nat": "Buscar el proyecto"
+   },
+   "5": {
+    "cod": "Existe el proyecto?",
+    "nat": "¿El proyecto existe?"
+   },
+   "6": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "7": {
+    "cod": "Lanzar AppError 404 'Proyecto no encontrado'",
+    "nat": "Avisar que el proyecto no existe"
+   },
+   "8": {
+    "cod": "existing.userId === userId (el solicitante es el dueno)?",
+    "nat": "¿El proyecto es de quien lo está modificando?"
+   },
+   "9": {
+    "cod": "Lanzar AppError 403 'No tienes permiso para modificar este proyecto.'",
+    "nat": "Avisar que no tiene permiso sobre ese proyecto"
+   },
+   "10": {
+    "cod": "Separar materials del resto de campos y armar updateData",
+    "nat": "Separar los cambios recibidos"
+   },
+   "11": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "12": {
+    "cod": "Evaluar los 14 campos que disparan recalculo (area, material, formato, tipo, desperdicio, patron, deducciones, insumos, producto)",
+    "nat": "Ver si cambió algo que afecte el cálculo"
+   },
+   "13": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "14": {
+    "cod": "needsRecalculation es verdadero?",
+    "nat": "¿Hay que volver a calcular los materiales?"
+   },
+   "15": {
+    "cod": "Resolver cada parametro: valor enviado o valor actual del proyecto",
+    "nat": "Tomar cada dato del cambio o, si no vino, el que ya tenía"
+   },
+   "16": {
+    "cod": "Se envio una lista de materiales manual (materials)?",
+    "nat": "¿El cliente envió su propia lista de materiales?"
+   },
+   "17": {
+    "cod": "Hay selectedProductId resuelto?",
+    "nat": "¿Hay un producto del catálogo vinculado?"
+   },
+   "18": {
+    "cod": "Normalizar la lista recibida y recalcular estimatedCost a partir de ella",
+    "nat": "Usar esa lista y recalcular el presupuesto"
+   },
+   "19": {
+    "cod": "projectRepository.update(id, updateData)",
+    "nat": "Guardar los cambios del proyecto"
+   },
+   "20": {
+    "cod": "Cargar el producto y validar categoria y compatibilidad con el tipo de material",
+    "nat": "Revisar que ese producto sirva para este proyecto"
+   },
+   "21": {
+    "cod": "projectRepository.update(id, updateData)",
+    "nat": "Guardar los cambios del proyecto"
+   },
+   "22": {
+    "cod": "Responder 200 con el proyecto actualizado",
+    "nat": "Mostrar el proyecto actualizado"
+   },
+   "23": {
+    "cod": "Las validaciones de producto pasan?",
+    "nat": "¿El producto es compatible?"
+   },
+   "24": {
+    "cod": "Responder 200 con el proyecto actualizado",
+    "nat": "Mostrar el proyecto actualizado"
+   },
+   "25": {
+    "cod": "Lanzar AppError 404 o 400 segun la validacion que fallo",
+    "nat": "Avisar por qué el producto no sirve"
+   },
+   "26": {
+    "cod": "calculateMaterials(...) con los parametros resueltos",
+    "nat": "Volver a calcular la lista de materiales"
+   },
+   "27": {
+    "cod": "updateData.estimatedCost = suma de precios; updateData.materials = lista recalculada",
+    "nat": "Actualizar el presupuesto con los materiales nuevos"
+   },
+   "28": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "29": {
+    "cod": "projectRepository.update(id, updateData)",
+    "nat": "Guardar los cambios del proyecto"
+   },
+   "30": {
+    "cod": "Responder 200 con el proyecto actualizado",
+    "nat": "Mostrar el proyecto actualizado"
+   },
+   "31": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     6,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = NO"
+    ],
+    "salida": [
+     "Avisar que ese material no se puede usar",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     7,
+     11,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = SI",
+     "Paso 5 (¿El proyecto existe?) = NO"
+    ],
+    "salida": [
+     "Avisar que el proyecto no existe",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     9,
+     13,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = SI",
+     "Paso 5 (¿El proyecto existe?) = SI",
+     "Paso 8 (¿El proyecto es de quien lo está modificando?) = NO"
+    ],
+    "salida": [
+     "Avisar que no tiene permiso sobre ese proyecto",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     10,
+     12,
+     14,
+     15,
+     17,
+     20,
+     23,
+     25,
+     28,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = SI",
+     "Paso 5 (¿El proyecto existe?) = SI",
+     "Paso 8 (¿El proyecto es de quien lo está modificando?) = SI",
+     "Paso 14 (¿Hay que volver a calcular los materiales?) = SI",
+     "Paso 17 (¿Hay un producto del catálogo vinculado?) = SI",
+     "Paso 23 (¿El producto es compatible?) = NO"
+    ],
+    "salida": [
+     "Avisar por qué el producto no sirve",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     10,
+     12,
+     14,
+     16,
+     18,
+     21,
+     24,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = SI",
+     "Paso 5 (¿El proyecto existe?) = SI",
+     "Paso 8 (¿El proyecto es de quien lo está modificando?) = SI",
+     "Paso 14 (¿Hay que volver a calcular los materiales?) = NO",
+     "Paso 16 (¿El cliente envió su propia lista de materiales?) = SI"
+    ],
+    "salida": [
+     "Guardar los cambios del proyecto",
+     "Mostrar el proyecto actualizado"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     10,
+     12,
+     14,
+     16,
+     19,
+     22,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = SI",
+     "Paso 5 (¿El proyecto existe?) = SI",
+     "Paso 8 (¿El proyecto es de quien lo está modificando?) = SI",
+     "Paso 14 (¿Hay que volver a calcular los materiales?) = NO",
+     "Paso 16 (¿El cliente envió su propia lista de materiales?) = NO"
+    ],
+    "salida": [
+     "Guardar los cambios del proyecto",
+     "Mostrar el proyecto actualizado"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     10,
+     12,
+     14,
+     15,
+     17,
+     26,
+     27,
+     29,
+     30,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = SI",
+     "Paso 5 (¿El proyecto existe?) = SI",
+     "Paso 8 (¿El proyecto es de quien lo está modificando?) = SI",
+     "Paso 14 (¿Hay que volver a calcular los materiales?) = SI",
+     "Paso 17 (¿Hay un producto del catálogo vinculado?) = NO"
+    ],
+    "salida": [
+     "Guardar los cambios del proyecto",
+     "Mostrar el proyecto actualizado"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     4,
+     5,
+     8,
+     10,
+     12,
+     14,
+     15,
+     17,
+     20,
+     23,
+     26,
+     27,
+     29,
+     30,
+     31
+    ],
+    "condiciones": [
+     "Paso 2 (¿El material enviado está entre los permitidos?) = SI",
+     "Paso 5 (¿El proyecto existe?) = SI",
+     "Paso 8 (¿El proyecto es de quien lo está modificando?) = SI",
+     "Paso 14 (¿Hay que volver a calcular los materiales?) = SI",
+     "Paso 17 (¿Hay un producto del catálogo vinculado?) = SI",
+     "Paso 23 (¿El producto es compatible?) = SI"
+    ],
+    "salida": [
+     "Guardar los cambios del proyecto",
+     "Mostrar el proyecto actualizado"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-CHK-01",
+  "titulo": "Agregar un producto al carrito",
+  "spec": "BE-CHK-04",
+  "unidad": "AddCartItemUseCase.execute() (endpoint POST /api/v1/cart/items)",
+  "archivo": "src/application/use-cases/cart.use-cases.ts (lineas 77-84), src/infrastructure/database/repositories/prisma-cart.repository.ts (lineas 7-40, 69-114), src/infrastructure/http/validators/cart.validator.ts",
+  "VG": 5,
+  "nodos": {
+   "1": {
+    "cod": "POST /api/v1/cart/items con {productId, quantity}",
+    "nat": "El usuario pulsa Agregar al carrito"
+   },
+   "2": {
+    "cod": "requireAuth: verificar la firma del JWT de la cabecera Authorization",
+    "nat": "El sistema revisa que la sesion este iniciada"
+   },
+   "3": {
+    "cod": "Quedo definido req.user?",
+    "nat": "El usuario inicio sesion?"
+   },
+   "4": {
+    "cod": "AppError 401 'Token no proporcionado o invalido'",
+    "nat": "Avisar que primero hay que iniciar sesion"
+   },
+   "5": {
+    "cod": "validateZod(addItemSchema): productId cuid, quantity entero entre 1 y 9999",
+    "nat": "Revisar que el producto y la cantidad sean correctos"
+   },
+   "6": {
+    "cod": "El esquema paso la validacion?",
+    "nat": "Los datos son correctos?"
+   },
+   "7": {
+    "cod": "errorHandler: {success: false, error} con el codigo HTTP",
+    "nat": "Devolver el aviso de error al usuario"
+   },
+   "8": {
+    "cod": "AppError 400 'Validacion fallida: <campo>'",
+    "nat": "Avisar que la cantidad o el producto no son validos"
+   },
+   "9": {
+    "cod": "cartRepository.findByUserId(userId)",
+    "nat": "Buscar el carrito del usuario"
+   },
+   "10": {
+    "cod": "prisma.cart.findUnique devolvio un carrito?",
+    "nat": "El usuario ya tenia un carrito?"
+   },
+   "11": {
+    "cod": "errorHandler: {success: false, error} con el codigo HTTP",
+    "nat": "Devolver el aviso de error al usuario"
+   },
+   "12": {
+    "cod": "prisma.cart.create({data: {userId}}): crear el carrito vacio",
+    "nat": "Crear un carrito vacio para el usuario"
+   },
+   "13": {
+    "cod": "prisma.cartItem.findUnique({cartId_productId})",
+    "nat": "Buscar si ese producto ya esta en el carrito"
+   },
+   "14": {
+    "cod": "Ya existe la linea de ese producto?",
+    "nat": "El producto ya estaba en el carrito?"
+   },
+   "15": {
+    "cod": "prisma.cartItem.update: quantity = existing.quantity + quantity",
+    "nat": "Sumar la cantidad nueva a la que ya habia"
+   },
+   "16": {
+    "cod": "prisma.cartItem.create({cartId, productId, quantity})",
+    "nat": "Agregar el producto al carrito"
+   },
+   "17": {
+    "cod": "Responder 201 {success: true, data: item}",
+    "nat": "Confirmar que el producto se agrego"
+   },
+   "18": {
+    "cod": "Responder 201 {success: true, data: item}",
+    "nat": "Confirmar que el producto se agrego"
+   },
+   "19": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     7,
+     19
+    ],
+    "condiciones": [
+     "Paso 3 (El usuario inicio sesion?) = NO"
+    ],
+    "salida": [
+     "Avisar que primero hay que iniciar sesion",
+     "Devolver el aviso de error al usuario"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     11,
+     19
+    ],
+    "condiciones": [
+     "Paso 3 (El usuario inicio sesion?) = SI",
+     "Paso 6 (Los datos son correctos?) = NO"
+    ],
+    "salida": [
+     "Avisar que la cantidad o el producto no son validos",
+     "Devolver el aviso de error al usuario"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10,
+     12,
+     13,
+     14,
+     15,
+     17,
+     19
+    ],
+    "condiciones": [
+     "Paso 3 (El usuario inicio sesion?) = SI",
+     "Paso 6 (Los datos son correctos?) = SI",
+     "Paso 10 (El usuario ya tenia un carrito?) = NO",
+     "Paso 14 (El producto ya estaba en el carrito?) = SI"
+    ],
+    "salida": [
+     "Sumar la cantidad nueva a la que ya habia",
+     "Confirmar que el producto se agrego"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10,
+     13,
+     14,
+     15,
+     17,
+     19
+    ],
+    "condiciones": [
+     "Paso 3 (El usuario inicio sesion?) = SI",
+     "Paso 6 (Los datos son correctos?) = SI",
+     "Paso 10 (El usuario ya tenia un carrito?) = SI",
+     "Paso 14 (El producto ya estaba en el carrito?) = SI"
+    ],
+    "salida": [
+     "Sumar la cantidad nueva a la que ya habia",
+     "Confirmar que el producto se agrego"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10,
+     13,
+     14,
+     16,
+     18,
+     19
+    ],
+    "condiciones": [
+     "Paso 3 (El usuario inicio sesion?) = SI",
+     "Paso 6 (Los datos son correctos?) = SI",
+     "Paso 10 (El usuario ya tenia un carrito?) = SI",
+     "Paso 14 (El producto ya estaba en el carrito?) = NO"
+    ],
+    "salida": [
+     "Agregar el producto al carrito",
+     "Confirmar que el producto se agrego"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-CHK-02",
+  "titulo": "Ver y modificar el carrito",
+  "spec": "BE-CHK-01",
+  "unidad": "GetCartUseCase.execute() (GET /api/v1/cart)",
+  "archivo": "src/application/use-cases/cart.use-cases.ts (lineas 16-75), src/infrastructure/database/repositories/prisma-cart.repository.ts",
+  "VG": 6,
+  "nodos": {
+   "1": {
+    "cod": "Recibir GET /api/v1/cart (requireAuth ya identifico al usuario)",
+    "nat": "Un cliente abre su carrito"
+   },
+   "2": {
+    "cod": "cartRepository.findByUserId(userId)",
+    "nat": "Buscar el carrito del cliente"
+   },
+   "3": {
+    "cod": "El usuario ya tiene un carrito?",
+    "nat": "¿Ya tenía un carrito?"
+   },
+   "4": {
+    "cod": "Crear un carrito vacio asociado al usuario",
+    "nat": "Crear un carrito vacío para él"
+   },
+   "5": {
+    "cod": "Extraer los productIds de los items del carrito",
+    "nat": "Reunir los productos que hay en el carrito"
+   },
+   "6": {
+    "cod": "Hay al menos un item en el carrito?",
+    "nat": "¿El carrito tiene al menos un producto?"
+   },
+   "7": {
+    "cod": "reservedQuantities = {} (no se consulta la base de datos)",
+    "nat": "No hay nada reservado por otros clientes"
+   },
+   "8": {
+    "cod": "getReservedQuantities(cart.id, productIds): sumar cantidades de OTROS carritos actualizados en los ultimos 15 minutos",
+    "nat": "Sumar lo que otros reservaron hace menos de 15 minutos"
+   },
+   "9": {
+    "cod": "Tomar el siguiente item del carrito",
+    "nat": "Tomar el siguiente producto del carrito"
+   },
+   "10": {
+    "cod": "availableStock = max(0, stockFisico del producto - cantidad reservada por terceros)",
+    "nat": "Disponible = existencias menos lo reservado por otros"
+   },
+   "11": {
+    "cod": "item.quantity > availableStock?",
+    "nat": "¿Se pidió más de lo disponible?"
+   },
+   "12": {
+    "cod": "isBackorder = true; backorderQuantity = cantidad - disponible",
+    "nat": "Marcarlo como pedido pendiente e indicar cuánto falta"
+   },
+   "13": {
+    "cod": "isBackorder = false; backorderQuantity = 0",
+    "nat": "Marcarlo como disponible completo"
+   },
+   "14": {
+    "cod": "Quedan items por procesar?",
+    "nat": "¿Faltan productos por revisar?"
+   },
+   "15": {
+    "cod": "subtotal = suma de (precio unitario x cantidad) de todos los items",
+    "nat": "Sumar el precio por la cantidad de cada producto"
+   },
+   "16": {
+    "cod": "subtotal > 500000?",
+    "nat": "¿El subtotal supera $500.000?"
+   },
+   "17": {
+    "cod": "shipping = 0 (envio gratuito)",
+    "nat": "El envío es gratis"
+   },
+   "18": {
+    "cod": "shipping = 25000",
+    "nat": "El envío cuesta $25.000"
+   },
+   "19": {
+    "cod": "total = subtotal + shipping; itemCount = numero de items",
+    "nat": "Total = subtotal más envío"
+   },
+   "20": {
+    "cod": "total = subtotal + shipping; itemCount = numero de items",
+    "nat": "Total = subtotal más envío"
+   },
+   "21": {
+    "cod": "Responder 200 con items, disponibilidad, avisos de pedido pendiente y totales",
+    "nat": "Mostrar el carrito con los avisos, el envío y el total"
+   },
+   "22": {
+    "cod": "Responder 200 con items, disponibilidad, avisos de pedido pendiente y totales",
+    "nat": "Mostrar el carrito con los avisos, el envío y el total"
+   },
+   "23": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     15,
+     16,
+     17,
+     19,
+     21,
+     23
+    ],
+    "condiciones": [
+     "Paso 3 (¿Ya tenía un carrito?) = NO",
+     "Paso 6 (¿El carrito tiene al menos un producto?) = NO",
+     "Paso 16 (¿El subtotal supera $500.000?) = SI"
+    ],
+    "salida": [
+     "Total = subtotal más envío",
+     "Mostrar el carrito con los avisos, el envío y el total"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     7,
+     15,
+     16,
+     17,
+     19,
+     21,
+     23
+    ],
+    "condiciones": [
+     "Paso 3 (¿Ya tenía un carrito?) = SI",
+     "Paso 6 (¿El carrito tiene al menos un producto?) = NO",
+     "Paso 16 (¿El subtotal supera $500.000?) = SI"
+    ],
+    "salida": [
+     "Total = subtotal más envío",
+     "Mostrar el carrito con los avisos, el envío y el total"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     9,
+     10,
+     11,
+     12,
+     14,
+     15,
+     16,
+     17,
+     19,
+     21,
+     23
+    ],
+    "condiciones": [
+     "Paso 3 (¿Ya tenía un carrito?) = SI",
+     "Paso 6 (¿El carrito tiene al menos un producto?) = SI",
+     "Paso 11 (¿Se pidió más de lo disponible?) = SI",
+     "Paso 14 (¿Faltan productos por revisar?) = NO",
+     "Paso 16 (¿El subtotal supera $500.000?) = SI"
+    ],
+    "salida": [
+     "Total = subtotal más envío",
+     "Mostrar el carrito con los avisos, el envío y el total"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     9,
+     10,
+     11,
+     13,
+     14,
+     15,
+     16,
+     17,
+     19,
+     21,
+     23
+    ],
+    "condiciones": [
+     "Paso 3 (¿Ya tenía un carrito?) = SI",
+     "Paso 6 (¿El carrito tiene al menos un producto?) = SI",
+     "Paso 11 (¿Se pidió más de lo disponible?) = NO",
+     "Paso 14 (¿Faltan productos por revisar?) = NO",
+     "Paso 16 (¿El subtotal supera $500.000?) = SI"
+    ],
+    "salida": [
+     "Total = subtotal más envío",
+     "Mostrar el carrito con los avisos, el envío y el total"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     9,
+     10,
+     11,
+     12,
+     14,
+     15,
+     16,
+     17,
+     19,
+     21,
+     23
+    ],
+    "condiciones": [
+     "Paso 3 (¿Ya tenía un carrito?) = SI",
+     "Paso 6 (¿El carrito tiene al menos un producto?) = SI",
+     "Paso 11 (¿Se pidió más de lo disponible?) = SI",
+     "Paso 14 (¿Faltan productos por revisar?) = NO",
+     "Paso 16 (¿El subtotal supera $500.000?) = SI"
+    ],
+    "salida": [
+     "Total = subtotal más envío",
+     "Mostrar el carrito con los avisos, el envío y el total"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     7,
+     15,
+     16,
+     18,
+     20,
+     22,
+     23
+    ],
+    "condiciones": [
+     "Paso 3 (¿Ya tenía un carrito?) = SI",
+     "Paso 6 (¿El carrito tiene al menos un producto?) = NO",
+     "Paso 16 (¿El subtotal supera $500.000?) = NO"
+    ],
+    "salida": [
+     "Total = subtotal más envío",
+     "Mostrar el carrito con los avisos, el envío y el total"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-CHK-03",
+  "titulo": "Confirmar el pedido",
+  "spec": "BE-CHK-02",
+  "unidad": "CreateOrderUseCase.execute() (POST /api/v1/orders)",
+  "archivo": "src/application/use-cases/order.use-cases.ts (lineas 77-136)",
+  "VG": 3,
+  "nodos": {
+   "1": {
+    "cod": "Recibir POST /api/v1/orders (requireAuth y esquema de envio ya validados)",
+    "nat": "Un cliente confirma su pedido"
+   },
+   "2": {
+    "cod": "cartRepository.findByUserId(userId)",
+    "nat": "Buscar el carrito del cliente"
+   },
+   "3": {
+    "cod": "El carrito existe y tiene al menos un item?",
+    "nat": "¿El carrito tiene al menos un producto?"
+   },
+   "4": {
+    "cod": "Lanzar AppError 400 'El carrito esta vacio'",
+    "nat": "Avisar que el carrito está vacío"
+   },
+   "5": {
+    "cod": "subtotal = suma de (precio del producto x cantidad) de todos los items",
+    "nat": "Sumar el precio por la cantidad de cada producto"
+   },
+   "6": {
+    "cod": "subtotal > 500000?",
+    "nat": "¿El subtotal supera $500.000?"
+   },
+   "7": {
+    "cod": "errorHandler: responder el error con su codigo HTTP",
+    "nat": "Mostrar el mensaje de error al cliente"
+   },
+   "8": {
+    "cod": "shippingCost = 0 (envio gratuito)",
+    "nat": "El envío es gratis"
+   },
+   "9": {
+    "cod": "shippingCost = 25000",
+    "nat": "El envío cuesta $25.000"
+   },
+   "10": {
+    "cod": "total = subtotal + shippingCost",
+    "nat": "Total = subtotal más envío"
+   },
+   "11": {
+    "cod": "Construir los items de la orden {productId, quantity, unitPrice, total}",
+    "nat": "Armar el detalle del pedido con sus productos"
+   },
+   "12": {
+    "cod": "orderRepository.create(...): ejecutar el checkout transaccional (ver BE-CHK-03)",
+    "nat": "Registrar el pedido y descontar las existencias"
+   },
+   "13": {
+    "cod": "Responder 201 con la orden creada y su numero ORD-AAAA-NNN",
+    "nat": "Entregar el número de pedido al cliente"
+   },
+   "14": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     7,
+     14
+    ],
+    "condiciones": [
+     "Paso 3 (¿El carrito tiene al menos un producto?) = NO"
+    ],
+    "salida": [
+     "Avisar que el carrito está vacío",
+     "Mostrar el mensaje de error al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "condiciones": [
+     "Paso 3 (¿El carrito tiene al menos un producto?) = SI",
+     "Paso 6 (¿El subtotal supera $500.000?) = SI"
+    ],
+    "salida": [
+     "Registrar el pedido y descontar las existencias",
+     "Entregar el número de pedido al cliente"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14
+    ],
+    "condiciones": [
+     "Paso 3 (¿El carrito tiene al menos un producto?) = SI",
+     "Paso 6 (¿El subtotal supera $500.000?) = NO"
+    ],
+    "salida": [
+     "Registrar el pedido y descontar las existencias",
+     "Entregar el número de pedido al cliente"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-ADM-01",
+  "titulo": "Tablero de indicadores",
+  "spec": "BE-ADM-01",
+  "unidad": "AdminController.getMetrics() (GET /api/v1/admin/metrics)",
+  "archivo": "src/infrastructure/http/controllers/admin.controller.ts (lineas 5-140)",
+  "VG": 6,
+  "nodos": {
+   "1": {
+    "cod": "Recibir GET /api/v1/admin/metrics (requireAdmin ya valido el rol)",
+    "nat": "El administrador abre el tablero"
+   },
+   "2": {
+    "cod": "Calcular los limites: inicio del mes actual, inicio y fin del mes anterior",
+    "nat": "Ubicar el mes actual y el mes anterior"
+   },
+   "3": {
+    "cod": "Consultar ordenes ENTREGADO del mes actual y sumar sus totales -> currentMonthSales",
+    "nat": "Sumar las ventas entregadas de este mes"
+   },
+   "4": {
+    "cod": "Consultar ordenes ENTREGADO del mes anterior y sumar -> lastMonthSales",
+    "nat": "Sumar las ventas entregadas del mes pasado"
+   },
+   "5": {
+    "cod": "Contar los pedidos activos (PENDIENTE, PROCESANDO, ENVIADO)",
+    "nat": "Contar los pedidos que siguen en curso"
+   },
+   "6": {
+    "cod": "Contar el total de productos y los clientes CUSTOMER creados en el mes",
+    "nat": "Contar los productos y los clientes nuevos del mes"
+   },
+   "7": {
+    "cod": "lastMonthSales > 0?",
+    "nat": "¿Hubo ventas el mes pasado?"
+   },
+   "8": {
+    "cod": "salesChange = ((actual - anterior) / anterior) x 100",
+    "nat": "Calcular cuánto subieron o bajaron las ventas"
+   },
+   "9": {
+    "cod": "salesChange = 0 (sin base de comparacion, se evita la division por cero)",
+    "nat": "No hay con qué comparar: la variación queda en cero"
+   },
+   "10": {
+    "cod": "Consultar las ordenes ENTREGADO del ano en curso",
+    "nat": "Traer las ventas entregadas de todo el año"
+   },
+   "11": {
+    "cod": "Tomar la siguiente orden del ano",
+    "nat": "Tomar la siguiente venta del año"
+   },
+   "12": {
+    "cod": "Acumular su total en monthlySales[mes de la orden]",
+    "nat": "Sumarla al mes que le corresponde"
+   },
+   "13": {
+    "cod": "Quedan ordenes por acumular?",
+    "nat": "¿Faltan ventas por sumar?"
+   },
+   "14": {
+    "cod": "Consultar los orderItem de ordenes ENTREGADO con su producto y categoria",
+    "nat": "Traer los productos vendidos con su categoría"
+   },
+   "15": {
+    "cod": "Tomar el siguiente orderItem",
+    "nat": "Tomar el siguiente producto vendido"
+   },
+   "16": {
+    "cod": "La categoria ya esta inicializada en categorySales?",
+    "nat": "¿Ya se estaba contando esa categoría?"
+   },
+   "17": {
+    "cod": "categorySales[categoria] = 0",
+    "nat": "Empezar a contar esa categoría desde cero"
+   },
+   "18": {
+    "cod": "Acumular el total en la categoria y en totalCategorySales",
+    "nat": "Sumar su valor a la categoría y al total"
+   },
+   "19": {
+    "cod": "Quedan items por acumular?",
+    "nat": "¿Faltan productos por sumar?"
+   },
+   "20": {
+    "cod": "totalCategorySales > 0?",
+    "nat": "¿Hubo ventas por categoría?"
+   },
+   "21": {
+    "cod": "Calcular el porcentaje de cada categoria sobre el total",
+    "nat": "Calcular el porcentaje de cada categoría"
+   },
+   "22": {
+    "cod": "Asignar 0 % a todas las categorias",
+    "nat": "Todas las categorías quedan en cero"
+   },
+   "23": {
+    "cod": "Ordenar de mayor a menor porcentaje y tomar las 5 primeras",
+    "nat": "Ordenar y dejar las cinco categorías más vendidas"
+   },
+   "24": {
+    "cod": "Ordenar de mayor a menor porcentaje y tomar las 5 primeras",
+    "nat": "Ordenar y dejar las cinco categorías más vendidas"
+   },
+   "25": {
+    "cod": "Responder 200 con las 4 tarjetas de KPI y los datos de las graficas",
+    "nat": "Mostrar el tablero con los indicadores y las gráficas"
+   },
+   "26": {
+    "cod": "Responder 200 con las 4 tarjetas de KPI y los datos de las graficas",
+    "nat": "Mostrar el tablero con los indicadores y las gráficas"
+   },
+   "27": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     23,
+     25,
+     27
+    ],
+    "condiciones": [
+     "Paso 7 (¿Hubo ventas el mes pasado?) = SI",
+     "Paso 13 (¿Faltan ventas por sumar?) = NO",
+     "Paso 16 (¿Ya se estaba contando esa categoría?) = NO",
+     "Paso 19 (¿Faltan productos por sumar?) = NO",
+     "Paso 20 (¿Hubo ventas por categoría?) = SI"
+    ],
+    "salida": [
+     "Ordenar y dejar las cinco categorías más vendidas",
+     "Mostrar el tablero con los indicadores y las gráficas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     23,
+     25,
+     27
+    ],
+    "condiciones": [
+     "Paso 7 (¿Hubo ventas el mes pasado?) = NO",
+     "Paso 13 (¿Faltan ventas por sumar?) = NO",
+     "Paso 16 (¿Ya se estaba contando esa categoría?) = NO",
+     "Paso 19 (¿Faltan productos por sumar?) = NO",
+     "Paso 20 (¿Hubo ventas por categoría?) = SI"
+    ],
+    "salida": [
+     "Ordenar y dejar las cinco categorías más vendidas",
+     "Mostrar el tablero con los indicadores y las gráficas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     23,
+     25,
+     27
+    ],
+    "condiciones": [
+     "Paso 7 (¿Hubo ventas el mes pasado?) = SI",
+     "Paso 13 (¿Faltan ventas por sumar?) = SI",
+     "Paso 13 (¿Faltan ventas por sumar?) = NO",
+     "Paso 16 (¿Ya se estaba contando esa categoría?) = NO",
+     "Paso 19 (¿Faltan productos por sumar?) = NO",
+     "Paso 20 (¿Hubo ventas por categoría?) = SI"
+    ],
+    "salida": [
+     "Ordenar y dejar las cinco categorías más vendidas",
+     "Mostrar el tablero con los indicadores y las gráficas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     18,
+     19,
+     20,
+     21,
+     23,
+     25,
+     27
+    ],
+    "condiciones": [
+     "Paso 7 (¿Hubo ventas el mes pasado?) = SI",
+     "Paso 13 (¿Faltan ventas por sumar?) = NO",
+     "Paso 16 (¿Ya se estaba contando esa categoría?) = SI",
+     "Paso 19 (¿Faltan productos por sumar?) = NO",
+     "Paso 20 (¿Hubo ventas por categoría?) = SI"
+    ],
+    "salida": [
+     "Ordenar y dejar las cinco categorías más vendidas",
+     "Mostrar el tablero con los indicadores y las gráficas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     18,
+     19,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     23,
+     25,
+     27
+    ],
+    "condiciones": [
+     "Paso 7 (¿Hubo ventas el mes pasado?) = SI",
+     "Paso 13 (¿Faltan ventas por sumar?) = NO",
+     "Paso 16 (¿Ya se estaba contando esa categoría?) = SI",
+     "Paso 19 (¿Faltan productos por sumar?) = SI",
+     "Paso 16 (¿Ya se estaba contando esa categoría?) = NO",
+     "Paso 19 (¿Faltan productos por sumar?) = NO",
+     "Paso 20 (¿Hubo ventas por categoría?) = SI"
+    ],
+    "salida": [
+     "Ordenar y dejar las cinco categorías más vendidas",
+     "Mostrar el tablero con los indicadores y las gráficas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     18,
+     19,
+     20,
+     22,
+     24,
+     26,
+     27
+    ],
+    "condiciones": [
+     "Paso 7 (¿Hubo ventas el mes pasado?) = SI",
+     "Paso 13 (¿Faltan ventas por sumar?) = NO",
+     "Paso 16 (¿Ya se estaba contando esa categoría?) = SI",
+     "Paso 19 (¿Faltan productos por sumar?) = NO",
+     "Paso 20 (¿Hubo ventas por categoría?) = NO"
+    ],
+    "salida": [
+     "Ordenar y dejar las cinco categorías más vendidas",
+     "Mostrar el tablero con los indicadores y las gráficas"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-ADM-02",
+  "titulo": "Gestión de productos",
+  "spec": "BE-ADM-04",
+  "unidad": "CreateProductUseCase.execute() y UpdateProductUseCase.execute() (POST /api/v1/products y PUT /api/v1/products/:id)",
+  "archivo": "src/application/use-cases/catalog.use-cases.ts (lineas 167-222), src/infrastructure/http/routes/products.ts (lineas 68-69), src/infrastructure/http/validators/catalog.validator.ts (lineas 16-38)",
+  "VG": 5,
+  "nodos": {
+   "1": {
+    "cod": "POST /api/v1/products o PUT /api/v1/products/:id",
+    "nat": "El administrador guarda un producto, nuevo o editado"
+   },
+   "2": {
+    "cod": "requireAdmin: verificar el JWT y leer el rol del usuario",
+    "nat": "El sistema revisa la sesion y el rol de quien lo envia"
+   },
+   "3": {
+    "cod": "req.user.role es ADMIN?",
+    "nat": "Es un administrador?"
+   },
+   "4": {
+    "cod": "AppError 403 'Acceso restringido a administradores'",
+    "nat": "Avisar que solo los administradores pueden hacerlo"
+   },
+   "5": {
+    "cod": "validateZod(createProductSchema | updateProductSchema)",
+    "nat": "Revisar los campos del formulario"
+   },
+   "6": {
+    "cod": "Los campos pasaron la validacion?",
+    "nat": "Los campos son correctos?"
+   },
+   "7": {
+    "cod": "errorHandler: {success: false, error} con el codigo HTTP",
+    "nat": "Devolver el aviso de error"
+   },
+   "8": {
+    "cod": "AppError 400 'Validacion fallida: <campo>'",
+    "nat": "Avisar cual campo esta mal"
+   },
+   "9": {
+    "cod": "La ruta trae el parametro :id?",
+    "nat": "Se esta editando un producto que ya existia?"
+   },
+   "10": {
+    "cod": "productRepository.findById(id)",
+    "nat": "Buscar el producto por su identificador"
+   },
+   "11": {
+    "cod": "Calcular inStock = stockQuantity > 0, image por defecto, rating 0, reviewCount 0",
+    "nat": "Marcar disponible si queda stock y poner la imagen por defecto"
+   },
+   "12": {
+    "cod": "errorHandler: {success: false, error} con el codigo HTTP",
+    "nat": "Devolver el aviso de error"
+   },
+   "13": {
+    "cod": "El producto existe?",
+    "nat": "El producto existe?"
+   },
+   "14": {
+    "cod": "productRepository.create({...data, inStock, tags})",
+    "nat": "Crear el producto nuevo"
+   },
+   "15": {
+    "cod": "AppError 404 'Producto no encontrado'",
+    "nat": "Avisar que el producto no existe"
+   },
+   "16": {
+    "cod": "productRepository.update(id, data): aplicar solo los campos enviados",
+    "nat": "Guardar solo los campos que cambiaron"
+   },
+   "17": {
+    "cod": "Responder {success: true, data: producto}",
+    "nat": "Confirmar que el producto quedo guardado"
+   },
+   "18": {
+    "cod": "Responder {success: true, data: producto}",
+    "nat": "Confirmar que el producto quedo guardado"
+   },
+   "19": {
+    "cod": "errorHandler: {success: false, error} con el codigo HTTP",
+    "nat": "Devolver el aviso de error"
+   },
+   "20": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     7,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (Es un administrador?) = NO"
+    ],
+    "salida": [
+     "Avisar que solo los administradores pueden hacerlo",
+     "Devolver el aviso de error"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     8,
+     12,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (Es un administrador?) = SI",
+     "Paso 6 (Los campos son correctos?) = NO"
+    ],
+    "salida": [
+     "Avisar cual campo esta mal",
+     "Devolver el aviso de error"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10,
+     13,
+     15,
+     19,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (Es un administrador?) = SI",
+     "Paso 6 (Los campos son correctos?) = SI",
+     "Paso 9 (Se esta editando un producto que ya existia?) = SI",
+     "Paso 13 (El producto existe?) = NO"
+    ],
+    "salida": [
+     "Avisar que el producto no existe",
+     "Devolver el aviso de error"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     11,
+     14,
+     17,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (Es un administrador?) = SI",
+     "Paso 6 (Los campos son correctos?) = SI",
+     "Paso 9 (Se esta editando un producto que ya existia?) = NO"
+    ],
+    "salida": [
+     "Crear el producto nuevo",
+     "Confirmar que el producto quedo guardado"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     5,
+     6,
+     9,
+     10,
+     13,
+     16,
+     18,
+     20
+    ],
+    "condiciones": [
+     "Paso 3 (Es un administrador?) = SI",
+     "Paso 6 (Los campos son correctos?) = SI",
+     "Paso 9 (Se esta editando un producto que ya existia?) = SI",
+     "Paso 13 (El producto existe?) = SI"
+    ],
+    "salida": [
+     "Guardar solo los campos que cambiaron",
+     "Confirmar que el producto quedo guardado"
+    ]
+   }
+  ]
+ },
+ {
+  "func": "F-ADM-03",
+  "titulo": "Inventario y stock",
+  "spec": "BE-ADM-02",
+  "unidad": "AdminController.getInventoryReport() (GET /api/v1/admin/inventory)",
+  "archivo": "src/infrastructure/http/controllers/admin.controller.ts (lineas 142-187)",
+  "VG": 5,
+  "nodos": {
+   "1": {
+    "cod": "Recibir GET /api/v1/admin/inventory (requireAdmin ya valido el rol)",
+    "nat": "El administrador abre el inventario"
+   },
+   "2": {
+    "cod": "Consultar todos los productos con su categoria, ordenados por stockQuantity ascendente",
+    "nat": "Traer todos los productos ordenados por existencias"
+   },
+   "3": {
+    "cod": "lowStock = productos con 0 < stock < 50",
+    "nat": "Separar los que tienen menos de 50 unidades"
+   },
+   "4": {
+    "cod": "outOfStock = productos con stock === 0",
+    "nat": "Separar los que están agotados"
+   },
+   "5": {
+    "cod": "negativeStock = productos con stock < 0",
+    "nat": "Separar los que quedaron en negativo"
+   },
+   "6": {
+    "cod": "totalUnits = suma de stockQuantity de todos los productos",
+    "nat": "Sumar el total de unidades en bodega"
+   },
+   "7": {
+    "cod": "Tomar el siguiente producto para construir su fila del reporte",
+    "nat": "Tomar el siguiente producto del listado"
+   },
+   "8": {
+    "cod": "stockQuantity < 0?",
+    "nat": "¿Las existencias están en negativo?"
+   },
+   "9": {
+    "cod": "stockStatus = 'stock_negativo'",
+    "nat": "Marcarlo como inventario negativo"
+   },
+   "10": {
+    "cod": "stockQuantity === 0?",
+    "nat": "¿Está en cero?"
+   },
+   "11": {
+    "cod": "stockStatus = 'sin_stock'",
+    "nat": "Marcarlo como agotado"
+   },
+   "12": {
+    "cod": "stockQuantity < 50?",
+    "nat": "¿Tiene menos de 50 unidades?"
+   },
+   "13": {
+    "cod": "stockValue = precio x stockQuantity; agregar la fila al reporte",
+    "nat": "Calcular cuánto vale su inventario y sumarlo al reporte"
+   },
+   "14": {
+    "cod": "stockStatus = 'stock_bajo'",
+    "nat": "Marcarlo como existencias bajas"
+   },
+   "15": {
+    "cod": "stockStatus = 'normal'",
+    "nat": "Marcarlo como normal"
+   },
+   "16": {
+    "cod": "stockValue = precio x stockQuantity; agregar la fila al reporte",
+    "nat": "Calcular cuánto vale su inventario y sumarlo al reporte"
+   },
+   "17": {
+    "cod": "Quedan productos por clasificar?",
+    "nat": "¿Faltan productos por clasificar?"
+   },
+   "18": {
+    "cod": "stockValue = precio x stockQuantity; agregar la fila al reporte",
+    "nat": "Calcular cuánto vale su inventario y sumarlo al reporte"
+   },
+   "19": {
+    "cod": "stockValue = precio x stockQuantity; agregar la fila al reporte",
+    "nat": "Calcular cuánto vale su inventario y sumarlo al reporte"
+   },
+   "20": {
+    "cod": "Quedan productos por clasificar?",
+    "nat": "¿Faltan productos por clasificar?"
+   },
+   "21": {
+    "cod": "Responder 200 con stats (totales y conteos de alertas) y el detalle de productos",
+    "nat": "Mostrar el reporte con los totales y las alertas"
+   },
+   "22": {
+    "cod": "Quedan productos por clasificar?",
+    "nat": "¿Faltan productos por clasificar?"
+   },
+   "23": {
+    "cod": "Quedan productos por clasificar?",
+    "nat": "¿Faltan productos por clasificar?"
+   },
+   "24": {
+    "cod": "Responder 200 con stats (totales y conteos de alertas) y el detalle de productos",
+    "nat": "Mostrar el reporte con los totales y las alertas"
+   },
+   "25": {
+    "cod": "Responder 200 con stats (totales y conteos de alertas) y el detalle de productos",
+    "nat": "Mostrar el reporte con los totales y las alertas"
+   },
+   "26": {
+    "cod": "Responder 200 con stats (totales y conteos de alertas) y el detalle de productos",
+    "nat": "Mostrar el reporte con los totales y las alertas"
+   },
+   "27": {
+    "cod": "Fin de la peticion",
+    "nat": "Fin"
+   }
+  },
+  "caminos": [
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     13,
+     17,
+     21,
+     27
+    ],
+    "condiciones": [
+     "Paso 8 (¿Las existencias están en negativo?) = SI",
+     "Paso 17 (¿Faltan productos por clasificar?) = NO"
+    ],
+    "salida": [
+     "Calcular cuánto vale su inventario y sumarlo al reporte",
+     "Mostrar el reporte con los totales y las alertas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     11,
+     16,
+     20,
+     24,
+     27
+    ],
+    "condiciones": [
+     "Paso 8 (¿Las existencias están en negativo?) = NO",
+     "Paso 10 (¿Está en cero?) = SI"
+    ],
+    "salida": [
+     "¿Faltan productos por clasificar?",
+     "Mostrar el reporte con los totales y las alertas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     12,
+     14,
+     18,
+     22,
+     25,
+     27
+    ],
+    "condiciones": [
+     "Paso 8 (¿Las existencias están en negativo?) = NO",
+     "Paso 10 (¿Está en cero?) = NO",
+     "Paso 12 (¿Tiene menos de 50 unidades?) = SI"
+    ],
+    "salida": [
+     "¿Faltan productos por clasificar?",
+     "Mostrar el reporte con los totales y las alertas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     10,
+     12,
+     15,
+     19,
+     23,
+     26,
+     27
+    ],
+    "condiciones": [
+     "Paso 8 (¿Las existencias están en negativo?) = NO",
+     "Paso 10 (¿Está en cero?) = NO",
+     "Paso 12 (¿Tiene menos de 50 unidades?) = NO"
+    ],
+    "salida": [
+     "¿Faltan productos por clasificar?",
+     "Mostrar el reporte con los totales y las alertas"
+    ]
+   },
+   {
+    "camino": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     13,
+     17,
+     7,
+     8,
+     10,
+     11,
+     16,
+     20,
+     24,
+     27
+    ],
+    "condiciones": [
+     "Paso 8 (¿Las existencias están en negativo?) = SI",
+     "Paso 17 (¿Faltan productos por clasificar?) = SI",
+     "Paso 8 (¿Las existencias están en negativo?) = NO",
+     "Paso 10 (¿Está en cero?) = SI"
+    ],
+    "salida": [
+     "¿Faltan productos por clasificar?",
+     "Mostrar el reporte con los totales y las alertas"
+    ]
+   }
+  ]
+ }
+]
