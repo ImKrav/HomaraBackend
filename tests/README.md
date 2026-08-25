@@ -259,4 +259,3 @@ npm test -- F-CHK     # Ejecuta solo un módulo específico
 
 - `tests/backend/F-*.test.ts` — Un archivo por unidad/grafo del sistema.
 - `tests/test-helpers.ts` — Dobles de prueba (`mocks`), fábricas de datos y utilidades compartidas.
-- `tests/_caminos.json` — Volcado JSON de caminos y nodos de diseño.
