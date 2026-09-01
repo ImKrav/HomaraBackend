@@ -4,6 +4,8 @@ import { prisma } from "../prisma-client.js";
 import { Prisma } from "../../../generated/prisma/client.js";
 
 export class PrismaProductRepository implements IProductRepository {
+  constructor(private readonly db = prisma) {}
+
   async findAll(filters?: { categorySlug?: string; query?: string; tag?: string }): Promise<Product[]> {
     const where: Prisma.ProductWhereInput = {};
 
@@ -22,7 +24,7 @@ export class PrismaProductRepository implements IProductRepository {
       where.tags = { some: { name: filters.tag } };
     }
 
-    const products = await prisma.product.findMany({
+    const products = await this.db.product.findMany({
       where,
       include: {
         category: true,
@@ -52,7 +54,7 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async findById(id: string): Promise<Product | null> {
-    const p = await prisma.product.findUnique({
+    const p = await this.db.product.findUnique({
       where: { id },
       include: { category: true, tags: true }
     });
@@ -80,7 +82,7 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async create(data: Omit<Product, "id" | "createdAt" | "updatedAt" | "tags"> & { id?: string; tags?: string[] }): Promise<Product> {
-    const p = await prisma.product.create({
+    const p = await this.db.product.create({
       data: {
         id: data.id,
         name: data.name,
@@ -145,11 +147,11 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async updateStock(id: string, quantityChange: number): Promise<void> {
-    const p = await prisma.product.findUnique({ where: { id } });
+    const p = await this.db.product.findUnique({ where: { id } });
     if (!p) return;
 
     const newStock = Math.max(0, p.stockQuantity + quantityChange);
-    await prisma.product.update({
+    await this.db.product.update({
       where: { id },
       data: {
         stockQuantity: newStock,
@@ -159,7 +161,7 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async findStorefrontRecommended(): Promise<Product[]> {
-    const products = await prisma.product.findMany({
+    const products = await this.db.product.findMany({
       where: {
         OR: [
           { tags: { some: { name: "nuevo" } } },
@@ -178,7 +180,7 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async findStorefrontOffers(): Promise<Product[]> {
-    const products = await prisma.product.findMany({
+    const products = await this.db.product.findMany({
       where: {
         originalPrice: { not: null }
       },
@@ -197,7 +199,7 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async findStorefrontBestSellers(): Promise<Product[]> {
-    const orderAggregates = await prisma.orderItem.groupBy({
+    const orderAggregates = await this.db.orderItem.groupBy({
       by: ["productId"],
       where: {
         order: {
@@ -220,7 +222,7 @@ export class PrismaProductRepository implements IProductRepository {
     const bestSellerIds = orderAggregates.map((a) => a.productId);
     let bestSellers: Prisma.ProductGetPayload<{ include: { tags: true; category: true } }>[] = [];
     if (bestSellerIds.length > 0) {
-      bestSellers = await prisma.product.findMany({
+      bestSellers = await this.db.product.findMany({
         where: {
           id: { in: bestSellerIds }
         },
@@ -231,7 +233,7 @@ export class PrismaProductRepository implements IProductRepository {
 
     if (bestSellers.length < 4) {
       const needed = 4 - bestSellers.length;
-      const fallbacks = await prisma.product.findMany({
+      const fallbacks = await this.db.product.findMany({
         where: {
           id: { notIn: bestSellerIds }
         },
@@ -249,7 +251,7 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async updateProductRating(id: string, rating: number, reviewCount: number): Promise<void> {
-    await prisma.product.update({
+    await this.db.product.update({
       where: { id },
       data: {
         rating,
@@ -261,7 +263,7 @@ export class PrismaProductRepository implements IProductRepository {
   async update(id: string, data: Partial<Omit<Product, "id" | "createdAt" | "updatedAt">> & { tags?: string[] }): Promise<Product> {
     const { tags, ...productData } = data;
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const updated = await this.db.$transaction(async (tx) => {
       if (tags !== undefined) {
         await tx.productTag.deleteMany({ where: { productId: id } });
         if (tags.length > 0) {
@@ -297,7 +299,7 @@ export class PrismaProductRepository implements IProductRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await prisma.$transaction(async (tx) => {
+    await this.db.$transaction(async (tx) => {
       // 1. Eliminar ítems de carrito
       await tx.cartItem.deleteMany({ where: { productId: id } });
       

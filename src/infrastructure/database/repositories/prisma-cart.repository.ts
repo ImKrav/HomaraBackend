@@ -4,8 +4,10 @@ import { Product } from "../../../domain/entities/product.js";
 import { prisma } from "../prisma-client.js";
 
 export class PrismaCartRepository implements ICartRepository {
+  constructor(private readonly db = prisma) {}
+
   async findByUserId(userId: string): Promise<Cart> {
-    let cart = await prisma.cart.findUnique({
+    let cart = await this.db.cart.findUnique({
       where: { userId },
       include: {
         items: {
@@ -19,7 +21,7 @@ export class PrismaCartRepository implements ICartRepository {
     });
 
     if (!cart) {
-      cart = await prisma.cart.create({
+      cart = await this.db.cart.create({
         data: { userId },
         include: {
           items: {
@@ -67,7 +69,7 @@ export class PrismaCartRepository implements ICartRepository {
   }
 
   async addItem(cartId: string, productId: string, quantity: number): Promise<CartItem> {
-    const existing = await prisma.cartItem.findUnique({
+    const existing = await this.db.cartItem.findUnique({
       where: {
         cartId_productId: { cartId, productId }
       }
@@ -75,13 +77,13 @@ export class PrismaCartRepository implements ICartRepository {
 
     let item;
     if (existing) {
-      item = await prisma.cartItem.update({
+      item = await this.db.cartItem.update({
         where: { id: existing.id },
         data: { quantity: existing.quantity + quantity },
         include: { product: true }
       });
     } else {
-      item = await prisma.cartItem.create({
+      item = await this.db.cartItem.create({
         data: { cartId, productId, quantity },
         include: { product: true }
       });
@@ -114,7 +116,7 @@ export class PrismaCartRepository implements ICartRepository {
   }
 
   async updateItemQuantity(itemId: string, quantity: number): Promise<CartItem> {
-    const item = await prisma.cartItem.update({
+    const item = await this.db.cartItem.update({
       where: { id: itemId },
       data: { quantity },
       include: { product: true }
@@ -147,15 +149,15 @@ export class PrismaCartRepository implements ICartRepository {
   }
 
   async removeItem(itemId: string): Promise<void> {
-    await prisma.cartItem.delete({ where: { id: itemId } });
+    await this.db.cartItem.delete({ where: { id: itemId } });
   }
 
   async clear(cartId: string): Promise<void> {
-    await prisma.cartItem.deleteMany({ where: { cartId } });
+    await this.db.cartItem.deleteMany({ where: { cartId } });
   }
 
   async findItemOwner(itemId: string): Promise<string | null> {
-    const item = await prisma.cartItem.findUnique({
+    const item = await this.db.cartItem.findUnique({
       where: { id: itemId },
       include: { cart: true }
     });
@@ -164,7 +166,7 @@ export class PrismaCartRepository implements ICartRepository {
 
   async getReservedQuantities(excludeCartId: string, productIds: string[]): Promise<Record<string, number>> {
     const timeLimit = new Date(Date.now() - 15 * 60 * 1000);
-    const items = await prisma.cartItem.findMany({
+    const items = await this.db.cartItem.findMany({
       where: {
         productId: { in: productIds },
         cartId: excludeCartId ? { not: excludeCartId } : undefined,
