@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "tsx watch src/infrastructure/entrypoints/api.ts",
     "start": "npx prisma db push && npm run seed && tsx src/infrastructure/entrypoints/api.ts",
+    "prisma:generate": "npx prisma generate",
     "seed": "tsx prisma/seed.ts",
-    "build": "npx prisma generate && tsc",
+    "build": "npm run prisma:generate && tsc",
     "test": "tsx tests/run-all.ts",
-    "test:coverage": "c8 --all --src src --exclude tests --exclude prisma --exclude dist --reporter=text --reporter=lcov npm test"
+    "test:coverage": "npm run prisma:generate && c8 --all --src src --exclude src/generated --exclude tests --exclude prisma --exclude dist --reporter=text --reporter=lcov npm test"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
