@@ -19,20 +19,23 @@ export function errorHandler(err: Error & { statusCode?: number }, _req: Request
   // Manejar errores de Prisma ORM
   else if (err instanceof Prisma.PrismaClientKnownRequestError) {
     switch (err.code) {
-      case "P2002": // Unique constraint violation
+      case "P2002": { // Unique constraint violation
         statusCode = 409;
         const targets = (err.meta?.target as string[]) || [];
         message = `El registro ya existe. Campo duplicado: ${targets.join(", ")}`;
         break;
-      case "P2025": // Record not found
+      }
+      case "P2025": { // Record not found
         statusCode = 404;
         message = "El recurso solicitado no fue encontrado o no tienes permisos para acceder a él.";
         break;
-      case "P2003": // Foreign key constraint violation
+      }
+      case "P2003": {// Foreign key constraint violation
         statusCode = 400;
         message = "Error de integridad de datos. La entidad referenciada no existe.";
         break;
-      default:
+      }
+      default:{
         statusCode = 400;
         message = `Error en base de datos (${err.code}): ${err.message}`;
         break;
