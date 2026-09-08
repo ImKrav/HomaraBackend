@@ -195,3 +195,15 @@ Una vez que el servidor esté corriendo (en cualquier modalidad):
 - `GET /api/v1/cart` - Carrito de compras actual del usuario.
 - `POST /api/v1/cart/items` - Añadir productos al carrito.
 - `POST /api/v1/orders` - Creación de órdenes (compra en un clic).
+
+---
+
+## ✅ Coverage para SonarQube Cloud
+
+Para generar el reporte de coverage en formato **LCOV** (consumido por SonarQube Cloud), ejecuta:
+
+```bash
+npm run test:coverage
+```
+
+Esto crea `coverage/lcov.info`, archivo que SonarQube Cloud usa para poblar la métrica de Coverage.
