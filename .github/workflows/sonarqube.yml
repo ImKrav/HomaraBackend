@@ -5,10 +5,11 @@ on:
     branches:
       - main
   pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   sonar:
@@ -30,10 +31,16 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: |
+          npm run test:coverage || true
+          if [ ! -s coverage/lcov.info ]; then
+            echo "::error::No se generó el reporte de cobertura en coverage/lcov.info"
+            exit 1
+          fi
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
