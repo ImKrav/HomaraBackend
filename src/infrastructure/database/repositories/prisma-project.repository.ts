@@ -47,8 +47,10 @@ function mapToProjectEntity(p: any): Project {
 }
 
 export class PrismaProjectRepository implements IProjectRepository {
+  constructor(private readonly db = prisma) {}
+
   async findAllByUserId(userId: string): Promise<Project[]> {
-    const projects = await prisma.project.findMany({
+    const projects = await this.db.project.findMany({
       where: { userId },
       include: { materials: true },
       orderBy: { createdAt: "desc" }
@@ -58,7 +60,7 @@ export class PrismaProjectRepository implements IProjectRepository {
   }
 
   async findById(id: string): Promise<Project | null> {
-    const p = await prisma.project.findUnique({
+    const p = await this.db.project.findUnique({
       where: { id },
       include: { materials: true }
     });
@@ -66,7 +68,7 @@ export class PrismaProjectRepository implements IProjectRepository {
   }
 
   async create(data: Omit<Project, "id" | "createdAt" | "updatedAt" | "materials"> & { id?: string; materials?: Omit<ProjectMaterial, "id" | "projectId">[] }): Promise<Project> {
-    const p = await prisma.project.create({
+    const p = await this.db.project.create({
       data: {
         id: data.id,
         name: data.name,
@@ -135,7 +137,7 @@ export class PrismaProjectRepository implements IProjectRepository {
     };
 
     if (data.materials) {
-      await prisma.projectMaterial.deleteMany({ where: { projectId: id } });
+      await this.db.projectMaterial.deleteMany({ where: { projectId: id } });
       updatePayload.materials = {
         create: data.materials.map((m) => ({
           name: m.name,
@@ -148,7 +150,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       };
     }
 
-    const p = await prisma.project.update({
+    const p = await this.db.project.update({
       where: { id },
       data: updatePayload,
       include: { materials: true }
@@ -158,6 +160,6 @@ export class PrismaProjectRepository implements IProjectRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await prisma.project.delete({ where: { id } });
+    await this.db.project.delete({ where: { id } });
   }
 }

@@ -5,22 +5,37 @@ import { prisma } from "../prisma-client.js";
 import { Prisma } from "../../../generated/prisma/client.js";
 
 export class PrismaOrderRepository implements IOrderRepository {
-  async findAll(filters?: { userId?: string; admin?: boolean }): Promise<Order[]> {
-    const userId = filters?.userId;
-    const isAdmin = filters?.admin === true;
+  constructor(private readonly db = prisma) {}
 
-    const where = isAdmin ? {} : { userId };
-
-    const orders = await prisma.order.findMany({
-      where,
-      include: {
-        user: { select: { firstName: true, lastName: true } },
-        items: true
-      },
-      orderBy: { createdAt: "desc" }
-    });
-
-    return orders.map((o) => new Order(
+  private mapOrderSummary(o: {
+    id: string;
+    orderNumber: string;
+    status: string;
+    subtotal: number;
+    shippingCost: number;
+    total: number;
+    paymentMethod: string | null;
+    shippingAddress: string | null;
+    shippingCity: string | null;
+    shippingState: string | null;
+    shippingZip: string | null;
+    shippingNotes?: string | null;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    items: Array<{
+      id: string;
+      quantity: number;
+      unitPrice: number;
+      total: number;
+      orderId: string;
+      productId: string;
+      isBackorder?: boolean;
+      backorderQuantity?: number;
+    }>;
+    user: { firstName: string; lastName: string };
+  }): Order {
+    return new Order(
       o.id,
       o.orderNumber,
       o.status as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO",
@@ -32,17 +47,35 @@ export class PrismaOrderRepository implements IOrderRepository {
       o.shippingCity,
       o.shippingState,
       o.shippingZip,
-      o.shippingNotes,
+      o.shippingNotes ?? null,
       o.userId,
       o.createdAt,
       o.updatedAt,
       o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId, undefined, item.isBackorder, item.backorderQuantity)),
       { firstName: o.user.firstName, lastName: o.user.lastName }
-    ));
+    );
+  }
+
+  async findAll(filters?: { userId?: string; admin?: boolean }): Promise<Order[]> {
+    const userId = filters?.userId;
+    const isAdmin = filters?.admin === true;
+
+    const where = isAdmin ? {} : { userId };
+
+    const orders = await this.db.order.findMany({
+      where,
+      include: {
+        user: { select: { firstName: true, lastName: true } },
+        items: true
+      },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return orders.map((o) => this.mapOrderSummary(o));
   }
 
   async findByIdOrNumber(idOrNumber: string): Promise<Order | null> {
-    const o = await prisma.order.findFirst({
+    const o = await this.db.order.findFirst({
       where: {
         OR: [
           { id: idOrNumber },
@@ -112,7 +145,7 @@ export class PrismaOrderRepository implements IOrderRepository {
 
   async create(data: Omit<Order, "id" | "createdAt" | "updatedAt" | "items" | "orderNumber" | "user"> & { items: Omit<OrderItem, "id" | "orderId" | "product">[] }): Promise<Order> {
     // Ejecutar transaccionalmente el checkout completo
-    const createdOrder = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const createdOrder = await this.db.$transaction(async (tx: Prisma.TransactionClient) => {
       // A. Load cart to get excludeCartId
       const cart = await tx.cart.findUnique({ where: { userId: data.userId } });
       const excludeCartId = cart?.id || "";
@@ -234,29 +267,11 @@ export class PrismaOrderRepository implements IOrderRepository {
       return order;
     });
 
-    return new Order(
-      createdOrder.id,
-      createdOrder.orderNumber,
-      createdOrder.status as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO",
-      createdOrder.subtotal,
-      createdOrder.shippingCost,
-      createdOrder.total,
-      createdOrder.paymentMethod,
-      createdOrder.shippingAddress,
-      createdOrder.shippingCity,
-      createdOrder.shippingState,
-      createdOrder.shippingZip,
-      createdOrder.shippingNotes,
-      createdOrder.userId,
-      createdOrder.createdAt,
-      createdOrder.updatedAt,
-      createdOrder.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId, undefined, item.isBackorder, item.backorderQuantity)),
-      { firstName: createdOrder.user.firstName, lastName: createdOrder.user.lastName }
-    );
+    return this.mapOrderSummary(createdOrder);
   }
 
   async updateStatus(id: string, status: "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO"): Promise<Order> {
-    const o = await prisma.order.update({
+    const o = await this.db.order.update({
       where: { id },
       data: { status },
       include: {
@@ -265,29 +280,11 @@ export class PrismaOrderRepository implements IOrderRepository {
       }
     });
 
-    return new Order(
-      o.id,
-      o.orderNumber,
-      o.status as "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO",
-      o.subtotal,
-      o.shippingCost,
-      o.total,
-      o.paymentMethod,
-      o.shippingAddress,
-      o.shippingCity,
-      o.shippingState,
-      o.shippingZip,
-      o.shippingNotes,
-      o.userId,
-      o.createdAt,
-      o.updatedAt,
-      o.items.map((item) => new OrderItem(item.id, item.quantity, item.unitPrice, item.total, item.orderId, item.productId, undefined, item.isBackorder, item.backorderQuantity)),
-      { firstName: o.user.firstName, lastName: o.user.lastName }
-    );
+    return this.mapOrderSummary(o);
   }
 
   async countByYear(year: number): Promise<number> {
-    return await prisma.order.count({
+    return await this.db.order.count({
       where: {
         createdAt: {
           gte: new Date(`${year}-01-01`),
