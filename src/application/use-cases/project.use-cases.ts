@@ -7,8 +7,8 @@ import { IProductRepository } from "../../domain/repositories/product-repository
 import { calculateMaterials } from "../../domain/services/materialCalculator.js";
 import { AppError } from "../../shared/errors/AppError.js";
 
-const ALLOWED_MATERIAL_TYPES = ["ceramica", "porcelanato", "madera", "vinilo", "pintura"];
-const ALLOWED_PRODUCT_CATEGORIES = ["pisos-ceramicas", "pinturas", "materiales-construccion"];
+const ALLOWED_MATERIAL_TYPES = new Set(["ceramica", "porcelanato", "madera", "vinilo", "pintura"]);
+const ALLOWED_PRODUCT_CATEGORIES = new Set(["pisos-ceramicas", "pinturas", "materiales-construccion"]);
 
 async function resolveSelectedProduct(
   productRepository: IProductRepository | undefined,
@@ -26,7 +26,7 @@ async function resolveSelectedProduct(
   if (!product.categorySlug) {
     throw new AppError("El producto seleccionado no tiene una categoría válida.", 400);
   }
-  if (!ALLOWED_PRODUCT_CATEGORIES.includes(product.categorySlug)) {
+  if (!ALLOWED_PRODUCT_CATEGORIES.has(product.categorySlug)) {
     throw new AppError("Solo se pueden usar materiales de revestimiento (pisos, cerámicas o pinturas) o de construcción en un proyecto.", 400);
   }
 
@@ -124,7 +124,7 @@ export class CreateProjectUseCase {
     includeTools?: boolean;
     selectedProductId?: string;
   }) {
-    if (data.materialType && !ALLOWED_MATERIAL_TYPES.includes(data.materialType.toLowerCase())) {
+    if (data.materialType && !ALLOWED_MATERIAL_TYPES.has(data.materialType.toLowerCase())) {
       throw new AppError("Tipo de material no soportado.", 400);
     }
 
@@ -227,7 +227,7 @@ export class UpdateProjectUseCase {
       }[];
     }
   ) {
-    if (data.materialType && !ALLOWED_MATERIAL_TYPES.includes(data.materialType.toLowerCase())) {
+    if (data.materialType && !ALLOWED_MATERIAL_TYPES.has(data.materialType.toLowerCase())) {
       throw new AppError("Tipo de material no soportado.", 400);
     }
 

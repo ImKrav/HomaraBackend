@@ -223,6 +223,74 @@ function calculateMainCovering(
   };
 }
 
+function calculateAdhesiveSupply(
+  netArea: number,
+  selectedProduct: CalculatorParams["selectedProduct"],
+  isPeganteProduct: boolean
+): CalculatedMaterial {
+  if (isPeganteProduct && selectedProduct) {
+    const parsedWeight = parseWeightFromProductName(selectedProduct.name);
+    const weight = parsedWeight ?? 25;
+    const coverage = weight * 0.16;
+    const bultos = Math.ceil(netArea / coverage);
+    const formattedCoverage = Number(coverage.toFixed(2));
+    return {
+      name: selectedProduct.name,
+      quantity: `${bultos} ${selectedProduct?.unit || "bultos"}`,
+      note: parsedWeight !== null
+        ? `Pegante real vinculado: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
+        : "Pegante real vinculado: 1 bulto por cada 4m²",
+      icon: "🧱",
+      price: selectedProduct.price * bultos,
+      productId: selectedProduct.id,
+    };
+  }
+
+  const bultos = Math.ceil(netArea / COVERAGE.pegante);
+  return {
+    name: "Pegante cerámico flexible 25kg",
+    quantity: `${bultos} bultos`,
+    note: "25kg c/u (Rendimiento: 4m²/bulto)",
+    icon: "🧱",
+    price: PRICES.pegante * bultos,
+    productId: null,
+  };
+}
+
+function calculateGroutSupply(
+  netArea: number,
+  selectedProduct: CalculatorParams["selectedProduct"],
+  isBoquillaProduct: boolean
+): CalculatedMaterial {
+  if (isBoquillaProduct && selectedProduct) {
+    const parsedWeight = parseWeightFromProductName(selectedProduct.name);
+    const weight = parsedWeight ?? 1;
+    const coverage = weight * 8;
+    const units = Math.ceil(netArea / coverage);
+    const formattedCoverage = Number(coverage.toFixed(2));
+    return {
+      name: selectedProduct.name,
+      quantity: `${units} ${selectedProduct?.unit || "unidades"}`,
+      note: parsedWeight !== null
+        ? `Boquilla real vinculada: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
+        : "Boquilla real vinculada: 1 kg por cada 8m²",
+      icon: "🪣",
+      price: selectedProduct.price * units,
+      productId: selectedProduct.id,
+    };
+  }
+
+  const kgBoquilla = Math.ceil(netArea / COVERAGE.boquilla);
+  return {
+    name: "Boquilla",
+    quantity: `${kgBoquilla} kg`,
+    note: "Rendimiento: 8m²/kg",
+    icon: "🪣",
+    price: PRICES.boquilla * kgBoquilla,
+    productId: null,
+  };
+}
+
 function calculateTileSupplies(
   netArea: number,
   includeAdhesive: boolean,
@@ -235,63 +303,11 @@ function calculateTileSupplies(
   const supplies: CalculatedMaterial[] = [];
 
   if (includeAdhesive) {
-    if (isPeganteProduct && selectedProduct) {
-      const parsedWeight = parseWeightFromProductName(selectedProduct.name);
-      const weight = parsedWeight ?? 25;
-      const coverage = weight * 0.16;
-      const bultos = Math.ceil(netArea / coverage);
-      const formattedCoverage = Number(coverage.toFixed(2));
-      supplies.push({
-        name: selectedProduct.name,
-        quantity: `${bultos} ${selectedProduct.unit || "bultos"}`,
-        note: parsedWeight !== null
-          ? `Pegante real vinculado: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
-          : "Pegante real vinculado: 1 bulto por cada 4m²",
-        icon: "🧱",
-        price: selectedProduct.price * bultos,
-        productId: selectedProduct.id,
-      });
-    } else {
-      const bultos = Math.ceil(netArea / COVERAGE.pegante);
-      supplies.push({
-        name: "Pegante cerámico flexible 25kg",
-        quantity: `${bultos} bultos`,
-        note: "25kg c/u (Rendimiento: 4m²/bulto)",
-        icon: "🧱",
-        price: PRICES.pegante * bultos,
-        productId: null,
-      });
-    }
+    supplies.push(calculateAdhesiveSupply(netArea, selectedProduct, isPeganteProduct));
   }
 
   if (includeGrout) {
-    if (isBoquillaProduct && selectedProduct) {
-      const parsedWeight = parseWeightFromProductName(selectedProduct.name);
-      const weight = parsedWeight ?? 1;
-      const coverage = weight * 8;
-      const units = Math.ceil(netArea / coverage);
-      const formattedCoverage = Number(coverage.toFixed(2));
-      supplies.push({
-        name: selectedProduct.name,
-        quantity: `${units} ${selectedProduct.unit || "unidades"}`,
-        note: parsedWeight !== null
-          ? `Boquilla real vinculada: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
-          : "Boquilla real vinculada: 1 kg por cada 8m²",
-        icon: "🪣",
-        price: selectedProduct.price * units,
-        productId: selectedProduct.id,
-      });
-    } else {
-      const kgBoquilla = Math.ceil(netArea / COVERAGE.boquilla);
-      supplies.push({
-        name: "Boquilla",
-        quantity: `${kgBoquilla} kg`,
-        note: "Rendimiento: 8m²/kg",
-        icon: "🪣",
-        price: PRICES.boquilla * kgBoquilla,
-        productId: null,
-      });
-    }
+    supplies.push(calculateGroutSupply(netArea, selectedProduct, isBoquillaProduct));
   }
 
   if (includeSpacers) {
@@ -448,7 +464,7 @@ export function calculateMaterials({
   }
 
   // 6. Insumos para Madera laminada
-  if ((materialType === "madera" || (selectedProduct && selectedProduct.name.toLowerCase().includes("madera"))) && includeAdhesive) {
+  if ((materialType === "madera" || selectedProduct?.name.toLowerCase().includes("madera")) && includeAdhesive) {
     const rollos = Math.ceil(netArea / 20);
     materials.push({
       name: "Cinta underlayment",
@@ -461,7 +477,7 @@ export function calculateMaterials({
   }
 
   // 7. Insumos para Vinilo
-  if ((materialType === "vinilo" || (selectedProduct && selectedProduct.name.toLowerCase().includes("vinilo"))) && includeAdhesive) {
+  if ((materialType === "vinilo" || selectedProduct?.name.toLowerCase().includes("vinilo")) && includeAdhesive) {
     const galones = Math.ceil(netArea / 15);
     materials.push({
       name: "Primer para vinilo",
