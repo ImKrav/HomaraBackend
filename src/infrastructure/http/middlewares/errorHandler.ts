@@ -35,10 +35,11 @@ export function errorHandler(err: Error & { statusCode?: number }, _req: Request
         message = "Error de integridad de datos. La entidad referenciada no existe.";
         break;
       }
-      default:{
+      default: {
         statusCode = 400;
         message = `Error en base de datos (${err.code}): ${err.message}`;
         break;
+      }
     }
   } else if (err instanceof Prisma.PrismaClientValidationError) {
     statusCode = 400;

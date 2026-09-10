@@ -5,6 +5,7 @@
 import express from "express";
 import swaggerUi from "swagger-ui-express";
 import { specs } from "../config/swagger.config.js";
+import { envConfig } from "../config/env.config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 // Importar rutas de Express
@@ -17,13 +18,18 @@ import usersRouter from "./routes/users.js";
 import adminRouter from "./routes/admin.js";
 
 const app = express();
+app.disable("x-powered-by");
 
 // Middlewares globales
 app.use(express.json());
 
-// CORS — habilita accesos remotos y del frontend
+// CORS — solo permite orígenes explícitamente configurados
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const requestOrigin = req.headers.origin;
+  if (requestOrigin && envConfig.corsOrigins.includes(requestOrigin)) {
+    res.setHeader("Access-Control-Allow-Origin", requestOrigin);
+  }
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") {

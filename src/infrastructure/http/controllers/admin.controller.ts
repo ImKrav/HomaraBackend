@@ -7,13 +7,19 @@ export function setPrismaClientForTests(client: any) {
   db = client;
 }
 
+export function getStockStatus(stockQuantity: number): "stock_negativo" | "sin_stock" | "stock_bajo" | "normal" {
+  if (stockQuantity < 0) return "stock_negativo";
+  if (stockQuantity === 0) return "sin_stock";
+  if (stockQuantity < 50) return "stock_bajo";
+  return "normal";
+}
+
 export class AdminController {
   static async getMetrics(req: Request, res: Response, next: NextFunction) {
     try {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
       // Ventas del mes actual
       const currentMonthOrders = await db.order.findMany({
@@ -75,7 +81,7 @@ export class AdminController {
         select: { createdAt: true, total: true },
       });
       
-      const monthlySales = Array(12).fill(0);
+      const monthlySales = new Array(12).fill(0);
       currentYearOrders.forEach((o) => {
         monthlySales[o.createdAt.getMonth()] += o.total;
       });
@@ -176,14 +182,7 @@ export class AdminController {
             price: p.price,
             stockValue: p.price * p.stockQuantity,
             inStock: p.inStock,
-            stockStatus:
-              p.stockQuantity < 0
-                ? "stock_negativo"
-                : p.stockQuantity === 0
-                ? "sin_stock"
-                : p.stockQuantity < 50
-                ? "stock_bajo"
-                : "normal",
+            stockStatus: getStockStatus(p.stockQuantity),
           })),
         },
       });
