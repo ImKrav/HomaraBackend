@@ -3,6 +3,49 @@ import { Project, ProjectMaterial } from "../../../domain/entities/project.js";
 import { prisma } from "../prisma-client.js";
 import { Prisma } from "../../../generated/prisma/client.js";
 
+type ProjectType = "PISO" | "PARED" | "TECHO" | "INTEGRAL";
+type ProjectStatus = "EN_PROGRESO" | "COMPLETADO" | "PAUSADO";
+
+function mapToProjectEntity(p: any): Project {
+  return new Project(
+    p.id,
+    p.name,
+    p.type as ProjectType,
+    p.status as ProjectStatus,
+    p.length,
+    p.width,
+    p.height,
+    p.area,
+    p.materialType,
+    p.tileFormat,
+    p.thumbnail,
+    p.estimatedCost,
+    p.userId,
+    p.createdAt,
+    p.updatedAt,
+    p.materials?.map((m: any) => new ProjectMaterial(
+      m.id,
+      m.name,
+      m.quantity,
+      m.note,
+      m.icon,
+      m.price,
+      m.projectId,
+      m.productId
+    )) ?? [],
+    p.wastePercent,
+    p.layingPattern,
+    p.deductDoors,
+    p.deductWindows,
+    p.customSubtractions,
+    p.includeAdhesive,
+    p.includeGrout,
+    p.includeSpacers,
+    p.includeTools,
+    p.selectedProductId
+  );
+}
+
 export class PrismaProjectRepository implements IProjectRepository {
   async findAllByUserId(userId: string): Promise<Project[]> {
     const projects = await prisma.project.findMany({
@@ -11,44 +54,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       orderBy: { createdAt: "desc" }
     });
 
-    return projects.map((p) => new Project(
-      p.id,
-      p.name,
-      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
-      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
-      p.length,
-      p.width,
-      p.height,
-      p.area,
-      p.materialType,
-      p.tileFormat,
-      p.thumbnail,
-      p.estimatedCost,
-      p.userId,
-      p.createdAt,
-      p.updatedAt,
-      p.materials.map((m) => new ProjectMaterial(
-        m.id,
-        m.name,
-        m.quantity,
-        m.note,
-        m.icon,
-        m.price,
-        m.projectId,
-        m.productId
-      )),
-      // Nuevos campos mapeados
-      p.wastePercent,
-      p.layingPattern,
-      p.deductDoors,
-      p.deductWindows,
-      p.customSubtractions,
-      p.includeAdhesive,
-      p.includeGrout,
-      p.includeSpacers,
-      p.includeTools,
-      p.selectedProductId
-    ));
+    return projects.map(mapToProjectEntity);
   }
 
   async findById(id: string): Promise<Project | null> {
@@ -56,46 +62,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       where: { id },
       include: { materials: true }
     });
-    if (!p) return null;
-
-    return new Project(
-      p.id,
-      p.name,
-      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
-      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
-      p.length,
-      p.width,
-      p.height,
-      p.area,
-      p.materialType,
-      p.tileFormat,
-      p.thumbnail,
-      p.estimatedCost,
-      p.userId,
-      p.createdAt,
-      p.updatedAt,
-      p.materials.map((m) => new ProjectMaterial(
-        m.id,
-        m.name,
-        m.quantity,
-        m.note,
-        m.icon,
-        m.price,
-        m.projectId,
-        m.productId
-      )),
-      // Nuevos campos mapeados
-      p.wastePercent,
-      p.layingPattern,
-      p.deductDoors,
-      p.deductWindows,
-      p.customSubtractions,
-      p.includeAdhesive,
-      p.includeGrout,
-      p.includeSpacers,
-      p.includeTools,
-      p.selectedProductId
-    );
+    return p ? mapToProjectEntity(p) : null;
   }
 
   async create(data: Omit<Project, "id" | "createdAt" | "updatedAt" | "materials"> & { id?: string; materials?: Omit<ProjectMaterial, "id" | "projectId">[] }): Promise<Project> {
@@ -138,34 +105,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       include: { materials: true }
     });
 
-    return new Project(
-      p.id,
-      p.name,
-      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
-      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
-      p.length,
-      p.width,
-      p.height,
-      p.area,
-      p.materialType,
-      p.tileFormat,
-      p.thumbnail,
-      p.estimatedCost,
-      p.userId,
-      p.createdAt,
-      p.updatedAt,
-      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId)),
-      p.wastePercent,
-      p.layingPattern,
-      p.deductDoors,
-      p.deductWindows,
-      p.customSubtractions,
-      p.includeAdhesive,
-      p.includeGrout,
-      p.includeSpacers,
-      p.includeTools,
-      p.selectedProductId
-    );
+    return mapToProjectEntity(p);
   }
 
   async update(id: string, data: Partial<Omit<Project, "id" | "createdAt" | "updatedAt" | "materials">> & { materials?: Omit<ProjectMaterial, "id" | "projectId">[] }): Promise<Project> {
@@ -214,34 +154,7 @@ export class PrismaProjectRepository implements IProjectRepository {
       include: { materials: true }
     });
 
-    return new Project(
-      p.id,
-      p.name,
-      p.type as "PISO" | "PARED" | "TECHO" | "INTEGRAL",
-      p.status as "EN_PROGRESO" | "COMPLETADO" | "PAUSADO",
-      p.length,
-      p.width,
-      p.height,
-      p.area,
-      p.materialType,
-      p.tileFormat,
-      p.thumbnail,
-      p.estimatedCost,
-      p.userId,
-      p.createdAt,
-      p.updatedAt,
-      p.materials.map((m) => new ProjectMaterial(m.id, m.name, m.quantity, m.note, m.icon, m.price, m.projectId, m.productId)),
-      p.wastePercent,
-      p.layingPattern,
-      p.deductDoors,
-      p.deductWindows,
-      p.customSubtractions,
-      p.includeAdhesive,
-      p.includeGrout,
-      p.includeSpacers,
-      p.includeTools,
-      p.selectedProductId
-    );
+    return mapToProjectEntity(p);
   }
 
   async delete(id: string): Promise<void> {

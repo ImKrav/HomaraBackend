@@ -4,7 +4,6 @@
 
 import { IProjectRepository } from "../../domain/repositories/project-repository.interface.js";
 import { IProductRepository } from "../../domain/repositories/product-repository.interface.js";
-import { Project } from "../../domain/entities/project.js";
 import { calculateMaterials } from "../../domain/services/materialCalculator.js";
 import { AppError } from "../../shared/errors/AppError.js";
 
@@ -61,6 +60,18 @@ async function resolveSelectedProduct(
     price: product.price,
     unit: product.unit,
   };
+}
+
+export async function resolveAndValidateProjectProduct(
+  productRepository: IProductRepository,
+  productId: string,
+  materialType: string
+) {
+  const selectedProduct = await resolveSelectedProduct(productRepository, productId, materialType);
+  if (!selectedProduct) {
+    throw new AppError("El producto seleccionado no existe.", 404);
+  }
+  return selectedProduct;
 }
 
 export class ListUserProjectsUseCase {
@@ -245,22 +256,22 @@ export class UpdateProjectUseCase {
     );
 
     if (needsRecalculation) {
-      const calcArea = data.area !== undefined ? data.area : existing.area;
-      const calcType = data.materialType !== undefined ? data.materialType : (existing.materialType ?? "ceramica");
-      const calcFormat = data.tileFormat !== undefined ? data.tileFormat : (existing.tileFormat ?? "60x60");
-      const calcProjectType = data.type !== undefined ? data.type : existing.type;
+      const calcArea = data.area ?? existing.area;
+      const calcType = data.materialType ?? (existing.materialType ?? "ceramica");
+      const calcFormat = data.tileFormat ?? (existing.tileFormat ?? "60x60");
+      const calcProjectType = data.type ?? existing.type;
 
       // Nuevos campos
-      const calcWaste = data.wastePercent !== undefined ? data.wastePercent : (existing.wastePercent ?? 10.0);
-      const calcPattern = data.layingPattern !== undefined ? data.layingPattern : (existing.layingPattern ?? "directo");
-      const calcDoors = data.deductDoors !== undefined ? data.deductDoors : (existing.deductDoors ?? 0);
-      const calcWindows = data.deductWindows !== undefined ? data.deductWindows : (existing.deductWindows ?? 0);
-      const calcCustomSub = data.customSubtractions !== undefined ? data.customSubtractions : (existing.customSubtractions ?? 0.0);
-      const calcAdhesive = data.includeAdhesive !== undefined ? data.includeAdhesive : (existing.includeAdhesive ?? true);
-      const calcGrout = data.includeGrout !== undefined ? data.includeGrout : (existing.includeGrout ?? true);
-      const calcSpacers = data.includeSpacers !== undefined ? data.includeSpacers : (existing.includeSpacers ?? true);
-      const calcTools = data.includeTools !== undefined ? data.includeTools : (existing.includeTools ?? true);
-      const calcSelectedProdId = data.selectedProductId !== undefined ? data.selectedProductId : existing.selectedProductId;
+      const calcWaste = data.wastePercent ?? (existing.wastePercent ?? 10.0);
+      const calcPattern = data.layingPattern ?? (existing.layingPattern ?? "directo");
+      const calcDoors = data.deductDoors ?? (existing.deductDoors ?? 0);
+      const calcWindows = data.deductWindows ?? (existing.deductWindows ?? 0);
+      const calcCustomSub = data.customSubtractions ?? (existing.customSubtractions ?? 0.0);
+      const calcAdhesive = data.includeAdhesive ?? (existing.includeAdhesive ?? true);
+      const calcGrout = data.includeGrout ?? (existing.includeGrout ?? true);
+      const calcSpacers = data.includeSpacers ?? (existing.includeSpacers ?? true);
+      const calcTools = data.includeTools ?? (existing.includeTools ?? true);
+      const calcSelectedProdId = data.selectedProductId ?? existing.selectedProductId;
 
       const selectedProduct = await resolveSelectedProduct(
         this.productRepository,

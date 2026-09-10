@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../../../shared/utils/authHelper.js";
 import { PrismaUserRepository } from "../../database/repositories/prisma-user.repository.js";
+import { IUserRepository } from "../../../domain/repositories/user-repository.interface.js";
 import { AppError } from "../../../shared/errors/AppError.js";
 import jwt from "jsonwebtoken";
 
@@ -20,7 +21,12 @@ declare global {
   }
 }
 
-const userRepository = new PrismaUserRepository();
+let userRepository: IUserRepository = new PrismaUserRepository();
+
+// Costura de pruebas: permite inyectar un repositorio falso sin tocar la base de datos.
+export function setUserRepositoryForTests(repo: IUserRepository) {
+  userRepository = repo;
+}
 
 function toRequestUser(user: {
   id: string;
