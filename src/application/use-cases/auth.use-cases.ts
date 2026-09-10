@@ -7,6 +7,30 @@ import { User } from "../../domain/entities/user.js";
 import { hashPassword, comparePassword, generateToken } from "../../shared/utils/authHelper.js";
 import { AppError } from "../../shared/errors/AppError.js";
 
+function createAuthResult(user: User) {
+  const token = generateToken({
+    id: user.id,
+    email: user.email,
+    role: user.role!,
+  });
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      address: user.address,
+      city: user.city,
+      state: user.state,
+      zipCode: user.zipCode,
+      role: user.role,
+    },
+  };
+}
+
 export class RegisterUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
@@ -30,28 +54,7 @@ export class RegisterUserUseCase {
       role: "CUSTOMER",
     });
 
-    // Firmar token
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      role: user.role!,
-    });
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-        address: user.address,
-        city: user.city,
-        state: user.state,
-        zipCode: user.zipCode,
-        role: user.role,
-      },
-    };
+    return createAuthResult(user);
   }
 }
 
@@ -71,27 +74,7 @@ export class LoginUserUseCase {
       throw new AppError("Credenciales incorrectas. Verifique correo y contraseña.", 401);
     }
 
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      role: user.role!,
-    });
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phone: user.phone,
-        address: user.address,
-        city: user.city,
-        state: user.state,
-        zipCode: user.zipCode,
-        role: user.role,
-      },
-    };
+    return createAuthResult(user);
   }
 }
 
