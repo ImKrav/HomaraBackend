@@ -18,6 +18,11 @@ import "./F-PROY-03.js";
 import "./F-ADM-01.js";
 import "./F-ADM-02.js";
 import "./F-ADM-03.js";
+import "./unit-validate-zod.js";
+import "./unit-error-handler.js";
+import "./unit-validators.js";
+import "./unit-entities.js";
+import "./unit-auth-middleware.js";
 
 import { run } from "./harness.js";
 
