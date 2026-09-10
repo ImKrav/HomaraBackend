@@ -32,25 +32,7 @@ export class PrismaProductRepository implements IProductRepository {
       }
     });
 
-    return products.map((p) => new Product(
-      p.id,
-      p.name,
-      p.description,
-      p.price,
-      p.originalPrice,
-      p.image,
-      p.rating,
-      p.reviewCount,
-      p.inStock,
-      p.stockQuantity,
-      p.unit,
-      p.categoryId,
-      p.createdAt,
-      p.updatedAt,
-      p.tags.map((t) => t.name),
-      p.category?.name,
-      p.category?.slug
-    ));
+    return products.map((p: any) => this.mapToEntity(p));
   }
 
   async findById(id: string): Promise<Product | null> {
@@ -60,25 +42,7 @@ export class PrismaProductRepository implements IProductRepository {
     });
     if (!p) return null;
 
-    return new Product(
-      p.id,
-      p.name,
-      p.description,
-      p.price,
-      p.originalPrice,
-      p.image,
-      p.rating,
-      p.reviewCount,
-      p.inStock,
-      p.stockQuantity,
-      p.unit,
-      p.categoryId,
-      p.createdAt,
-      p.updatedAt,
-      p.tags.map((t) => t.name),
-      p.category?.name,
-      p.category?.slug
-    );
+    return this.mapToEntity(p as any);
   }
 
   async create(data: Omit<Product, "id" | "createdAt" | "updatedAt" | "tags"> & { id?: string; tags?: string[] }): Promise<Product> {
@@ -103,25 +67,7 @@ export class PrismaProductRepository implements IProductRepository {
       include: { tags: true }
     });
 
-    return new Product(
-      p.id,
-      p.name,
-      p.description,
-      p.price,
-      p.originalPrice,
-      p.image,
-      p.rating,
-      p.reviewCount,
-      p.inStock,
-      p.stockQuantity,
-      p.unit,
-      p.categoryId,
-      p.createdAt,
-      p.updatedAt,
-      p.tags.map((t) => t.name),
-      undefined,
-      undefined
-    );
+    return this.mapToEntity(p as any);
   }
 
   private mapToEntity(p: Prisma.ProductGetPayload<{ include: { tags: true; category: true } }>): Product {

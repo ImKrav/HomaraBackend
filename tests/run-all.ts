@@ -23,6 +23,8 @@ import "./unit-error-handler.js";
 import "./unit-validators.js";
 import "./unit-entities.js";
 import "./unit-auth-middleware.js";
+import "./unit-controllers.js";
+import "./unit-prisma-repositories.js";
 
 import { run } from "./harness.js";
 

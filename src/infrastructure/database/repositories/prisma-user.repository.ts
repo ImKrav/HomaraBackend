@@ -3,9 +3,9 @@ import { User } from "../../../domain/entities/user.js";
 import { prisma } from "../prisma-client.js";
 
 export class PrismaUserRepository implements IUserRepository {
-  async findById(id: string): Promise<User | null> {
-    const user = await prisma.user.findUnique({ where: { id } });
-    if (!user) return null;
+  constructor(private readonly db = prisma) {}
+
+  private toEntity(user: any): User {
     return new User(
       user.id,
       user.email,
@@ -21,30 +21,22 @@ export class PrismaUserRepository implements IUserRepository {
       user.createdAt,
       user.updatedAt
     );
+  }
+
+  async findById(id: string): Promise<User | null> {
+    const user = await this.db.user.findUnique({ where: { id } });
+    if (!user) return null;
+    return this.toEntity(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await this.db.user.findUnique({ where: { email } });
     if (!user) return null;
-    return new User(
-      user.id,
-      user.email,
-      user.password,
-      user.firstName,
-      user.lastName,
-      user.phone,
-      user.address,
-      user.city,
-      user.state,
-      user.zipCode,
-      user.role as "CUSTOMER" | "ADMIN",
-      user.createdAt,
-      user.updatedAt
-    );
+    return this.toEntity(user);
   }
 
   async create(data: Omit<User, "id" | "createdAt" | "updatedAt"> & { id?: string }): Promise<User> {
-    const user = await prisma.user.create({
+    const user = await this.db.user.create({
       data: {
         id: data.id,
         email: data.email,
@@ -63,25 +55,11 @@ export class PrismaUserRepository implements IUserRepository {
       }
     });
 
-    return new User(
-      user.id,
-      user.email,
-      user.password,
-      user.firstName,
-      user.lastName,
-      user.phone,
-      user.address,
-      user.city,
-      user.state,
-      user.zipCode,
-      user.role as "CUSTOMER" | "ADMIN",
-      user.createdAt,
-      user.updatedAt
-    );
+    return this.toEntity(user);
   }
 
   async update(id: string, data: Partial<Omit<User, "id" | "createdAt" | "updatedAt">>): Promise<User> {
-    const user = await prisma.user.update({
+    const user = await this.db.user.update({
       where: { id },
       data: {
         email: data.email,
@@ -97,20 +75,6 @@ export class PrismaUserRepository implements IUserRepository {
       }
     });
 
-    return new User(
-      user.id,
-      user.email,
-      user.password,
-      user.firstName,
-      user.lastName,
-      user.phone,
-      user.address,
-      user.city,
-      user.state,
-      user.zipCode,
-      user.role as "CUSTOMER" | "ADMIN",
-      user.createdAt,
-      user.updatedAt
-    );
+    return this.toEntity(user);
   }
 }

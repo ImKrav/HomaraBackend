@@ -3,16 +3,30 @@ import { PrismaProjectRepository } from "../../database/repositories/prisma-proj
 import { PrismaProductRepository } from "../../database/repositories/prisma-product.repository.js";
 import { ListUserProjectsUseCase, GetProjectUseCase, CreateProjectUseCase, UpdateProjectUseCase, DeleteProjectUseCase } from "../../../application/use-cases/project.use-cases.js";
 
-const projectRepository = new PrismaProjectRepository();
-const productRepository = new PrismaProductRepository();
+import { IProjectRepository } from "../../../domain/repositories/project-repository.interface.js";
+import { IProductRepository } from "../../../domain/repositories/product-repository.interface.js";
 
-const listUserProjectsUseCase = new ListUserProjectsUseCase(projectRepository);
-const getProjectUseCase = new GetProjectUseCase(projectRepository);
-const createProjectUseCase = new CreateProjectUseCase(projectRepository, productRepository);
-const updateProjectUseCase = new UpdateProjectUseCase(projectRepository, productRepository);
-const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
+let projectRepository: IProjectRepository = new PrismaProjectRepository();
+let productRepository: IProductRepository = new PrismaProductRepository();
 
-const DEMO_USER_ID = "demo-user-001";
+let listUserProjectsUseCase = new ListUserProjectsUseCase(projectRepository);
+let getProjectUseCase = new GetProjectUseCase(projectRepository);
+let createProjectUseCase = new CreateProjectUseCase(projectRepository, productRepository);
+let updateProjectUseCase = new UpdateProjectUseCase(projectRepository, productRepository);
+let deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
+
+export function setProjectRepositoriesForTests(repos: {
+  projectRepo?: IProjectRepository;
+  productRepo?: IProductRepository;
+}) {
+  if (repos.projectRepo) projectRepository = repos.projectRepo;
+  if (repos.productRepo) productRepository = repos.productRepo;
+  listUserProjectsUseCase = new ListUserProjectsUseCase(projectRepository);
+  getProjectUseCase = new GetProjectUseCase(projectRepository);
+  createProjectUseCase = new CreateProjectUseCase(projectRepository, productRepository);
+  updateProjectUseCase = new UpdateProjectUseCase(projectRepository, productRepository);
+  deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
+}
 
 export class ProjectController {
   static async list(req: Request, res: Response, next: NextFunction) {

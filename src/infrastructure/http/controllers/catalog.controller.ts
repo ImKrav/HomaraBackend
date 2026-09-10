@@ -15,20 +15,46 @@ import {
   DeleteProductUseCase
 } from "../../../application/use-cases/catalog.use-cases.js";
 
-const categoryRepository = new PrismaCategoryRepository();
-const productRepository = new PrismaProductRepository();
-const reviewRepository = new PrismaReviewRepository();
-const cartRepository = new PrismaCartRepository();
+import { ICategoryRepository } from "../../../domain/repositories/category-repository.interface.js";
+import { IProductRepository } from "../../../domain/repositories/product-repository.interface.js";
+import { IReviewRepository } from "../../../domain/repositories/review-repository.interface.js";
+import { ICartRepository } from "../../../domain/repositories/cart-repository.interface.js";
 
-const listCategoriesUseCase = new ListCategoriesUseCase(categoryRepository);
-const listProductsUseCase = new ListProductsUseCase(productRepository, cartRepository);
-const getProductDetailUseCase = new GetProductDetailUseCase(productRepository, cartRepository);
-const createProductReviewUseCase = new CreateProductReviewUseCase(productRepository, reviewRepository);
-const getProductReviewsUseCase = new GetProductReviewsUseCase(reviewRepository);
-const getStorefrontProductsUseCase = new GetStorefrontProductsUseCase(productRepository);
-const createProductUseCase = new CreateProductUseCase(productRepository);
-const updateProductUseCase = new UpdateProductUseCase(productRepository);
-const deleteProductUseCase = new DeleteProductUseCase(productRepository);
+let categoryRepository: ICategoryRepository = new PrismaCategoryRepository();
+let productRepository: IProductRepository = new PrismaProductRepository();
+let reviewRepository: IReviewRepository = new PrismaReviewRepository();
+let cartRepository: ICartRepository = new PrismaCartRepository();
+
+let listCategoriesUseCase = new ListCategoriesUseCase(categoryRepository);
+let listProductsUseCase = new ListProductsUseCase(productRepository, cartRepository);
+let getProductDetailUseCase = new GetProductDetailUseCase(productRepository, cartRepository);
+let createProductReviewUseCase = new CreateProductReviewUseCase(productRepository, reviewRepository);
+let getProductReviewsUseCase = new GetProductReviewsUseCase(reviewRepository);
+let getStorefrontProductsUseCase = new GetStorefrontProductsUseCase(productRepository);
+let createProductUseCase = new CreateProductUseCase(productRepository);
+let updateProductUseCase = new UpdateProductUseCase(productRepository);
+let deleteProductUseCase = new DeleteProductUseCase(productRepository);
+
+export function setCatalogRepositoriesForTests(repos: {
+  categoryRepo?: ICategoryRepository;
+  productRepo?: IProductRepository;
+  reviewRepo?: IReviewRepository;
+  cartRepo?: ICartRepository;
+}) {
+  if (repos.categoryRepo) categoryRepository = repos.categoryRepo;
+  if (repos.productRepo) productRepository = repos.productRepo;
+  if (repos.reviewRepo) reviewRepository = repos.reviewRepo;
+  if (repos.cartRepo) cartRepository = repos.cartRepo;
+  listCategoriesUseCase = new ListCategoriesUseCase(categoryRepository);
+  listProductsUseCase = new ListProductsUseCase(productRepository, cartRepository);
+  getProductDetailUseCase = new GetProductDetailUseCase(productRepository, cartRepository);
+  createProductReviewUseCase = new CreateProductReviewUseCase(productRepository, reviewRepository);
+  getProductReviewsUseCase = new GetProductReviewsUseCase(reviewRepository);
+  getStorefrontProductsUseCase = new GetStorefrontProductsUseCase(productRepository);
+  createProductUseCase = new CreateProductUseCase(productRepository);
+  updateProductUseCase = new UpdateProductUseCase(productRepository);
+  deleteProductUseCase = new DeleteProductUseCase(productRepository);
+}
 
 export class CatalogController {
   static async listCategories(req: Request, res: Response, next: NextFunction) {
