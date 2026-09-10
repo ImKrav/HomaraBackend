@@ -4,16 +4,32 @@ import { PrismaCartRepository } from "../../database/repositories/prisma-cart.re
 import { PrismaProductRepository } from "../../database/repositories/prisma-product.repository.js";
 import { ListOrdersUseCase, GetOrderDetailUseCase, CreateOrderUseCase, UpdateOrderStatusUseCase } from "../../../application/use-cases/order.use-cases.js";
 
-const orderRepository = new PrismaOrderRepository();
-const cartRepository = new PrismaCartRepository();
-const productRepository = new PrismaProductRepository();
+import { IOrderRepository } from "../../../domain/repositories/order-repository.interface.js";
+import { ICartRepository } from "../../../domain/repositories/cart-repository.interface.js";
+import { IProductRepository } from "../../../domain/repositories/product-repository.interface.js";
 
-const listOrdersUseCase = new ListOrdersUseCase(orderRepository);
-const getOrderDetailUseCase = new GetOrderDetailUseCase(orderRepository);
-const createOrderUseCase = new CreateOrderUseCase(orderRepository, cartRepository, productRepository);
-const updateOrderStatusUseCase = new UpdateOrderStatusUseCase(orderRepository);
+let orderRepository: IOrderRepository = new PrismaOrderRepository();
+let cartRepository: ICartRepository = new PrismaCartRepository();
+let productRepository: IProductRepository = new PrismaProductRepository();
 
-const DEMO_USER_ID = "demo-user-001";
+let listOrdersUseCase = new ListOrdersUseCase(orderRepository);
+let getOrderDetailUseCase = new GetOrderDetailUseCase(orderRepository);
+let createOrderUseCase = new CreateOrderUseCase(orderRepository, cartRepository, productRepository);
+let updateOrderStatusUseCase = new UpdateOrderStatusUseCase(orderRepository);
+
+export function setOrderRepositoriesForTests(repos: {
+  orderRepo?: IOrderRepository;
+  cartRepo?: ICartRepository;
+  productRepo?: IProductRepository;
+}) {
+  if (repos.orderRepo) orderRepository = repos.orderRepo;
+  if (repos.cartRepo) cartRepository = repos.cartRepo;
+  if (repos.productRepo) productRepository = repos.productRepo;
+  listOrdersUseCase = new ListOrdersUseCase(orderRepository);
+  getOrderDetailUseCase = new GetOrderDetailUseCase(orderRepository);
+  createOrderUseCase = new CreateOrderUseCase(orderRepository, cartRepository, productRepository);
+  updateOrderStatusUseCase = new UpdateOrderStatusUseCase(orderRepository);
+}
 
 export class OrderController {
   static async list(req: Request, res: Response, next: NextFunction) {
