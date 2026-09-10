@@ -13,6 +13,30 @@ const getUserProfileUseCase = new GetUserProfileUseCase(userRepository);
 const DEMO_USER_ID = "demo-user-001";
 
 export class AuthController {
+  private static async getUserWithMetrics(userId: string) {
+    const user = await getUserProfileUseCase.execute(userId);
+    const [projectCount, orderCount] = await Promise.all([
+      prisma.project.count({ where: { userId } }),
+      prisma.order.count({ where: { userId } })
+    ]);
+
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      address: user.address,
+      city: user.city,
+      state: user.state,
+      zipCode: user.zipCode,
+      role: user.role,
+      projectCount,
+      orderCount,
+      createdAt: user.createdAt
+    };
+  }
+
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await registerUserUseCase.execute(req.body);
@@ -35,31 +59,8 @@ export class AuthController {
   static async getMe(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.id;
-      const user = await getUserProfileUseCase.execute(userId);
-
-      const [projectCount, orderCount] = await Promise.all([
-        prisma.project.count({ where: { userId } }),
-        prisma.order.count({ where: { userId } })
-      ]);
-
-      res.json({
-        success: true,
-        data: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phone: user.phone,
-          address: user.address,
-          city: user.city,
-          state: user.state,
-          zipCode: user.zipCode,
-          role: user.role,
-          projectCount,
-          orderCount,
-          createdAt: user.createdAt
-        }
-      });
+      const data = await AuthController.getUserWithMetrics(userId);
+      res.json({ success: true, data });
     } catch (error) {
       next(error);
     }
@@ -72,30 +73,8 @@ export class AuthController {
         userId = req.user ? req.user.id : DEMO_USER_ID;
       }
 
-      const user = await getUserProfileUseCase.execute(userId);
-      const [projectCount, orderCount] = await Promise.all([
-        prisma.project.count({ where: { userId } }),
-        prisma.order.count({ where: { userId } })
-      ]);
-
-      res.json({
-        success: true,
-        data: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phone: user.phone,
-          address: user.address,
-          city: user.city,
-          state: user.state,
-          zipCode: user.zipCode,
-          role: user.role,
-          projectCount,
-          orderCount,
-          createdAt: user.createdAt
-        }
-      });
+      const data = await AuthController.getUserWithMetrics(userId);
+      res.json({ success: true, data });
     } catch (error) {
       next(error);
     }
