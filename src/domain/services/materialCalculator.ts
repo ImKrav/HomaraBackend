@@ -127,18 +127,255 @@ const FORMAT_LABELS: Record<string, string> = {
 function parseWeightFromProductName(name: string): number | null {
   const regexKg = /\b(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilogramos)\b/i;
   const regexG = /\b(\d+(?:\.\d+)?)\s*(?:g|gramos)\b/i;
-  
-  const matchKg = name.match(regexKg);
+
+  const matchKg = regexKg.exec(name);
   if (matchKg) {
-    return parseFloat(matchKg[1]);
+    return Number.parseFloat(matchKg[1]);
   }
-  
-  const matchG = name.match(regexG);
+
+  const matchG = regexG.exec(name);
   if (matchG) {
-    return parseFloat(matchG[1]) / 1000;
+    return Number.parseFloat(matchG[1]) / 1000;
   }
-  
+
   return null;
+}
+
+function getEffectiveWastePercent(
+  wastePercent: number | undefined,
+  materialType: string,
+  layingPattern: string
+): number {
+  if (wastePercent !== undefined && wastePercent !== null) {
+    return wastePercent;
+  }
+  if (materialType === "pintura") {
+    return 5;
+  }
+  switch (layingPattern) {
+    case "diagonal":
+      return 15;
+    case "trabadura":
+      return 12;
+    case "directo":
+    default:
+      return 10;
+  }
+}
+
+function calculateMainCovering(
+  selectedProduct: CalculatorParams["selectedProduct"],
+  isConstructionMaterial: boolean,
+  materialType: string,
+  tileFormat: string,
+  totalArea: number,
+  actualWastePercent: number
+): CalculatedMaterial {
+  if (selectedProduct && !isConstructionMaterial) {
+    const qtyUnit = selectedProduct.unit || "m²";
+    const isPaintProduct = qtyUnit === "galón" || qtyUnit === "galones" || materialType === "pintura";
+
+    if (isPaintProduct) {
+      const galones = Math.ceil(totalArea / 30);
+      return {
+        name: selectedProduct.name,
+        quantity: `${galones} ${qtyUnit}`,
+        note: `Cálculo exacto: 1 galón por cada 30m² (Incluye +${actualWastePercent}% de desperdicio)`,
+        icon: "🎨",
+        price: selectedProduct.price * galones,
+        productId: selectedProduct.id,
+      };
+    }
+
+    return {
+      name: selectedProduct.name,
+      quantity: `${totalArea} ${qtyUnit}`,
+      note: `Cálculo exacto con +${actualWastePercent}% de desperdicio`,
+      icon: "🏗️",
+      price: selectedProduct.price * totalArea,
+      productId: selectedProduct.id,
+    };
+  }
+
+  if (materialType === "pintura") {
+    const galones = Math.ceil(totalArea / COVERAGE.pintura);
+    return {
+      name: "Pintura Premium de Interior/Exterior",
+      quantity: `${galones} galón(es)`,
+      note: `Rendimiento aproximado de 30m² c/u con 2 manos (Incluye +${actualWastePercent}% desperdicio)`,
+      icon: "🎨",
+      price: PRICES.pintura * galones,
+      productId: null,
+    };
+  }
+
+  const matName = MATERIAL_NAMES[materialType] || "Cerámica";
+  const formatLabel = FORMAT_LABELS[tileFormat] || tileFormat;
+  const pricePerM2 = TILE_PRICES[materialType]?.[tileFormat] || TILE_PRICES.ceramica["60x60"];
+
+  return {
+    name: `${matName} ${formatLabel}`,
+    quantity: `${totalArea} m²`,
+    note: `+${actualWastePercent}% de desperdicio por colocación`,
+    icon: "🏗️",
+    price: pricePerM2 * totalArea,
+    productId: null,
+  };
+}
+
+function calculateTileSupplies(
+  netArea: number,
+  includeAdhesive: boolean,
+  includeGrout: boolean,
+  includeSpacers: boolean,
+  selectedProduct: CalculatorParams["selectedProduct"],
+  isPeganteProduct: boolean,
+  isBoquillaProduct: boolean
+): CalculatedMaterial[] {
+  const supplies: CalculatedMaterial[] = [];
+
+  if (includeAdhesive) {
+    if (isPeganteProduct && selectedProduct) {
+      const parsedWeight = parseWeightFromProductName(selectedProduct.name);
+      const weight = parsedWeight ?? 25;
+      const coverage = weight * 0.16;
+      const bultos = Math.ceil(netArea / coverage);
+      const formattedCoverage = Number(coverage.toFixed(2));
+      supplies.push({
+        name: selectedProduct.name,
+        quantity: `${bultos} ${selectedProduct.unit || "bultos"}`,
+        note: parsedWeight !== null
+          ? `Pegante real vinculado: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
+          : "Pegante real vinculado: 1 bulto por cada 4m²",
+        icon: "🧱",
+        price: selectedProduct.price * bultos,
+        productId: selectedProduct.id,
+      });
+    } else {
+      const bultos = Math.ceil(netArea / COVERAGE.pegante);
+      supplies.push({
+        name: "Pegante cerámico flexible 25kg",
+        quantity: `${bultos} bultos`,
+        note: "25kg c/u (Rendimiento: 4m²/bulto)",
+        icon: "🧱",
+        price: PRICES.pegante * bultos,
+        productId: null,
+      });
+    }
+  }
+
+  if (includeGrout) {
+    if (isBoquillaProduct && selectedProduct) {
+      const parsedWeight = parseWeightFromProductName(selectedProduct.name);
+      const weight = parsedWeight ?? 1;
+      const coverage = weight * 8;
+      const units = Math.ceil(netArea / coverage);
+      const formattedCoverage = Number(coverage.toFixed(2));
+      supplies.push({
+        name: selectedProduct.name,
+        quantity: `${units} ${selectedProduct.unit || "unidades"}`,
+        note: parsedWeight !== null
+          ? `Boquilla real vinculada: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
+          : "Boquilla real vinculada: 1 kg por cada 8m²",
+        icon: "🪣",
+        price: selectedProduct.price * units,
+        productId: selectedProduct.id,
+      });
+    } else {
+      const kgBoquilla = Math.ceil(netArea / COVERAGE.boquilla);
+      supplies.push({
+        name: "Boquilla",
+        quantity: `${kgBoquilla} kg`,
+        note: "Rendimiento: 8m²/kg",
+        icon: "🪣",
+        price: PRICES.boquilla * kgBoquilla,
+        productId: null,
+      });
+    }
+  }
+
+  if (includeSpacers) {
+    const bolsasCrucetas = Math.ceil(netArea / COVERAGE.crucetas);
+    supplies.push({
+      name: "Crucetas 2mm",
+      quantity: `${bolsasCrucetas} bolsas`,
+      note: "100 unidades c/u (Rendimiento: 15m²/bolsa)",
+      icon: "➕",
+      price: PRICES.crucetas * bolsasCrucetas,
+      productId: null,
+    });
+  }
+
+  return supplies;
+}
+
+function calculateTools(
+  materialType: string,
+  selectedProduct: CalculatorParams["selectedProduct"],
+  isTile: boolean
+): CalculatedMaterial[] {
+  if (materialType === "pintura" || (selectedProduct && selectedProduct.unit === "galón")) {
+    return [
+      {
+        name: "Kit Rodillo Antigoteo Profesional 23cm",
+        quantity: "1 unidad",
+        note: "Incluye bandeja y felpa de microfibra",
+        icon: "🖌️",
+        price: PRICES.rodillo,
+        productId: null,
+      },
+      {
+        name: "Brocha de cerda fina 2.5\"",
+        quantity: "1 unidad",
+        note: "Para retoques y esquinas",
+        icon: "🖌️",
+        price: PRICES.brocha,
+        productId: null,
+      },
+      {
+        name: "Cinta de enmascarar premium 1\"",
+        quantity: "2 rollos",
+        note: "Para protección de bordes y zócalos",
+        icon: "📏",
+        price: PRICES.enmascarar * 2,
+        productId: null,
+      },
+    ];
+  }
+
+  const toolList: CalculatedMaterial[] = [
+    {
+      name: "Nivel de burbuja profesional 60cm",
+      quantity: "1 unidad",
+      note: "Para alineación exacta de la superficie",
+      icon: "📏",
+      price: PRICES.nivel,
+      productId: null,
+    },
+  ];
+
+  if (isTile) {
+    toolList.push(
+      {
+        name: "Llana metálica dentada 10x10mm",
+        quantity: "1 unidad",
+        note: "Para distribución correcta del pegante",
+        icon: "🛠️",
+        price: PRICES.llana,
+        productId: null,
+      },
+      {
+        name: "Mazo de goma blanco anti-marca",
+        quantity: "1 unidad",
+        note: "Para asentamiento de baldosas sin fracturas",
+        icon: "🔨",
+        price: PRICES.mazo,
+        productId: null,
+      }
+    );
+  }
+
+  return toolList;
 }
 
 export function calculateMaterials({
@@ -160,285 +397,88 @@ export function calculateMaterials({
   const materials: CalculatedMaterial[] = [];
 
   // 1. Cálculo del Área Neta considerando deducciones
-  const doorsDeduction = deductDoors * 2.0; // 2 m² por puerta
-  const windowsDeduction = deductWindows * 1.5; // 1.5 m² por ventana
+  const doorsDeduction = deductDoors * 2.0;
+  const windowsDeduction = deductWindows * 1.5;
   const totalDeductions = doorsDeduction + windowsDeduction + customSubtractions;
-  
-  // El área neta no puede ser menor a 0.1 m²
   const netArea = Math.max(0.1, area - totalDeductions);
 
-  // 2. Cálculo de Desperdicio según selección o patrón
-  let actualWastePercent = wastePercent;
-  if (actualWastePercent === undefined || actualWastePercent === null) {
-    if (materialType === "pintura") {
-      actualWastePercent = 5; // pintura usualmente tiene 5% desperdicio
-    } else {
-      switch (layingPattern) {
-        case "diagonal":
-          actualWastePercent = 15;
-          break;
-        case "trabadura":
-          actualWastePercent = 12;
-          break;
-        case "directo":
-        default:
-          actualWastePercent = 10;
-          break;
-      }
-    }
-  }
-
+  // 2. Cálculo de Desperdicio
+  const actualWastePercent = getEffectiveWastePercent(wastePercent, materialType, layingPattern);
   const wasteMultiplier = 1 + (actualWastePercent / 100);
   const totalArea = Math.ceil(Number((netArea * wasteMultiplier).toFixed(4)));
 
-  // 3. Inclusión del material de revestimiento principal
+  // 3. Identificación de producto
   const nameLower = selectedProduct ? selectedProduct.name.toLowerCase() : "";
-  const isConstructionMaterial = selectedProduct && (
-    nameLower.includes("pegante") ||
-    nameLower.includes("cemento") ||
-    nameLower.includes("adhesivo") ||
-    nameLower.includes("mortero") ||
-    nameLower.includes("yeso") ||
-    nameLower.includes("cal") ||
-    nameLower.includes("boquilla")
+  const isConstructionMaterial = Boolean(
+    selectedProduct && (
+      nameLower.includes("pegante") ||
+      nameLower.includes("cemento") ||
+      nameLower.includes("adhesivo") ||
+      nameLower.includes("mortero") ||
+      nameLower.includes("yeso") ||
+      nameLower.includes("cal") ||
+      nameLower.includes("boquilla")
+    )
   );
 
-  const isPeganteProduct = selectedProduct && (
-    nameLower.includes("pegante") ||
-    nameLower.includes("cemento") ||
-    nameLower.includes("adhesivo") ||
-    nameLower.includes("mortero") ||
-    nameLower.includes("yeso") ||
-    nameLower.includes("cal")
+  const isPeganteProduct = Boolean(
+    selectedProduct && (
+      nameLower.includes("pegante") ||
+      nameLower.includes("cemento") ||
+      nameLower.includes("adhesivo") ||
+      nameLower.includes("mortero") ||
+      nameLower.includes("yeso") ||
+      nameLower.includes("cal")
+    )
   );
-  
-  const isBoquillaProduct = selectedProduct && nameLower.includes("boquilla");
 
-  if (selectedProduct && !isConstructionMaterial) {
-    // Si el usuario eligió un producto real del catálogo de revestimiento principal, calculamos con base en él
-    const qtyUnit = selectedProduct.unit || "m²";
-    const isPaintProduct = qtyUnit === "galón" || qtyUnit === "galones" || materialType === "pintura";
+  const isBoquillaProduct = Boolean(selectedProduct && nameLower.includes("boquilla"));
 
-    if (isPaintProduct) {
-      // Un galón rinde aproximadamente 30 m² con 2 manos (incluyendo desperdicio)
-      const galones = Math.ceil(totalArea / 30);
-      materials.push({
-        name: selectedProduct.name,
-        quantity: `${galones} ${qtyUnit}`,
-        note: `Cálculo exacto: 1 galón por cada 30m² (Incluye +${actualWastePercent}% de desperdicio)`,
-        icon: "🎨",
-        price: selectedProduct.price * galones,
-        productId: selectedProduct.id,
-      });
-    } else {
-      // Para recubrimientos sólidos en m² (Pisos, cerámicas, maderas, vinilos)
-      materials.push({
-        name: selectedProduct.name,
-        quantity: `${totalArea} ${qtyUnit}`,
-        note: `Cálculo exacto con +${actualWastePercent}% de desperdicio`,
-        icon: "🏗️",
-        price: selectedProduct.price * totalArea,
-        productId: selectedProduct.id,
-      });
-    }
-  } else if (materialType === "pintura") {
-    // Si eligió pintura genérica o tiene un producto de construcción vinculado, calculamos pintura genérica
-    const galones = Math.ceil(totalArea / COVERAGE.pintura);
-    materials.push({
-      name: "Pintura Premium de Interior/Exterior",
-      quantity: `${galones} galón(es)`,
-      note: `Rendimiento aproximado de 30m² c/u con 2 manos (Incluye +${actualWastePercent}% desperdicio)`,
-      icon: "🎨",
-      price: PRICES.pintura * galones,
-      productId: null,
-    });
-  } else {
-    // Cálculo genérico de baldosas/madera/vinilo si no hay producto específico de revestimiento
-    const matName = MATERIAL_NAMES[materialType] || "Cerámica";
-    const formatLabel = FORMAT_LABELS[tileFormat] || tileFormat;
-    const pricePerM2 = TILE_PRICES[materialType]?.[tileFormat] || TILE_PRICES.ceramica["60x60"];
+  // 4. Material de revestimiento principal
+  materials.push(
+    calculateMainCovering(selectedProduct, isConstructionMaterial, materialType, tileFormat, totalArea, actualWastePercent)
+  );
 
-    materials.push({
-      name: `${matName} ${formatLabel}`,
-      quantity: `${totalArea} m²`,
-      note: `+${actualWastePercent}% de desperdicio por colocación`,
-      icon: "🏗️",
-      price: pricePerM2 * totalArea,
-      productId: null,
-    });
-  }
-
-  // 4. Insumos para baldosas (cerámica y porcelanato)
+  // 5. Insumos para baldosas (cerámica y porcelanato)
   const isTile = materialType === "ceramica" || materialType === "porcelanato";
-  
   if (isTile) {
-    // Pegante
-    if (includeAdhesive) {
-      if (isPeganteProduct) {
-        const parsedWeight = parseWeightFromProductName(selectedProduct.name);
-        const weight = parsedWeight !== null ? parsedWeight : 25;
-        const coverage = weight * 0.16; // 25kg rinde 4m² -> 1kg rinde 0.16m²
-        const bultos = Math.ceil(netArea / coverage);
-        const formattedCoverage = Number(coverage.toFixed(2));
-        materials.push({
-          name: selectedProduct.name,
-          quantity: `${bultos} ${selectedProduct.unit || "bultos"}`,
-          note: parsedWeight !== null 
-            ? `Pegante real vinculado: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
-            : `Pegante real vinculado: 1 bulto por cada 4m²`,
-          icon: "🧱",
-          price: selectedProduct.price * bultos,
-          productId: selectedProduct.id,
-        });
-      } else {
-        const bultos = Math.ceil(netArea / COVERAGE.pegante);
-        materials.push({
-          name: "Pegante cerámico flexible 25kg",
-          quantity: `${bultos} bultos`,
-          note: "25kg c/u (Rendimiento: 4m²/bulto)",
-          icon: "🧱",
-          price: PRICES.pegante * bultos,
-          productId: null,
-        });
-      }
-    }
-
-    // Boquilla
-    if (includeGrout) {
-      if (isBoquillaProduct) {
-        const parsedWeight = parseWeightFromProductName(selectedProduct.name);
-        const weight = parsedWeight !== null ? parsedWeight : 1;
-        const coverage = weight * 8; // 1kg rinde 8m²
-        const units = Math.ceil(netArea / coverage);
-        const formattedCoverage = Number(coverage.toFixed(2));
-        materials.push({
-          name: selectedProduct.name,
-          quantity: `${units} ${selectedProduct.unit || "unidades"}`,
-          note: parsedWeight !== null
-            ? `Boquilla real vinculada: 1 unidad de ${weight}kg por cada ${formattedCoverage}m²`
-            : `Boquilla real vinculada: 1 kg por cada 8m²`,
-          icon: "🪣",
-          price: selectedProduct.price * units,
-          productId: selectedProduct.id,
-        });
-      } else {
-        const kgBoquilla = Math.ceil(netArea / COVERAGE.boquilla);
-        materials.push({
-          name: "Boquilla",
-          quantity: `${kgBoquilla} kg`,
-          note: "Rendimiento: 8m²/kg",
-          icon: "🪣",
-          price: PRICES.boquilla * kgBoquilla,
-          productId: null,
-        });
-      }
-    }
-
-    // Crucetas
-    if (includeSpacers) {
-      const bolsasCrucetas = Math.ceil(netArea / COVERAGE.crucetas);
-      materials.push({
-        name: "Crucetas 2mm",
-        quantity: `${bolsasCrucetas} bolsas`,
-        note: "100 unidades c/u (Rendimiento: 15m²/bolsa)",
-        icon: "➕",
-        price: PRICES.crucetas * bolsasCrucetas,
-        productId: null,
-      });
-    }
+    materials.push(
+      ...calculateTileSupplies(netArea, includeAdhesive, includeGrout, includeSpacers, selectedProduct, isPeganteProduct, isBoquillaProduct)
+    );
   }
 
-  // Insumos para Madera laminada
-  if (materialType === "madera" || (selectedProduct && selectedProduct.name.toLowerCase().includes("madera"))) {
-    if (includeAdhesive) { // Reutilizamos adhesive como el aislante subsuelo (underlayment)
-      const rollos = Math.ceil(netArea / 20);
-      materials.push({
-        name: "Cinta underlayment",
-        quantity: `${rollos} rollos`,
-        note: "20m² c/u (Aislamiento acústico y de humedad)",
-        icon: "📏",
-        price: PRICES.cinta * rollos,
-        productId: null,
-      });
-    }
+  // 6. Insumos para Madera laminada
+  if ((materialType === "madera" || (selectedProduct && selectedProduct.name.toLowerCase().includes("madera"))) && includeAdhesive) {
+    const rollos = Math.ceil(netArea / 20);
+    materials.push({
+      name: "Cinta underlayment",
+      quantity: `${rollos} rollos`,
+      note: "20m² c/u (Aislamiento acústico y de humedad)",
+      icon: "📏",
+      price: PRICES.cinta * rollos,
+      productId: null,
+    });
   }
 
-  // Insumos para Vinilo
-  if (materialType === "vinilo" || (selectedProduct && selectedProduct.name.toLowerCase().includes("vinilo"))) {
-    if (includeAdhesive) { // Reutilizamos adhesive como el primer adhesivo de vinilo
-      const galones = Math.ceil(netArea / 15);
-      materials.push({
-        name: "Primer para vinilo",
-        quantity: `${galones} galones`,
-        note: "15m² c/u (Adherencia óptima)",
-        icon: "🪣",
-        price: PRICES.primer * galones,
-        productId: null,
-      });
-    }
+  // 7. Insumos para Vinilo
+  if ((materialType === "vinilo" || (selectedProduct && selectedProduct.name.toLowerCase().includes("vinilo"))) && includeAdhesive) {
+    const galones = Math.ceil(netArea / 15);
+    materials.push({
+      name: "Primer para vinilo",
+      quantity: `${galones} galones`,
+      note: "15m² c/u (Adherencia óptima)",
+      icon: "🪣",
+      price: PRICES.primer * galones,
+      productId: null,
+    });
   }
 
-  // 5. Inclusión de Herramientas y Kits Profesionales
+  // 8. Herramientas
   if (includeTools) {
-    if (materialType === "pintura" || (selectedProduct && selectedProduct.unit === "galón")) {
-      // Insumos de pintura
-      materials.push({
-        name: "Kit Rodillo Antigoteo Profesional 23cm",
-        quantity: "1 unidad",
-        note: "Incluye bandeja y felpa de microfibra",
-        icon: "🖌️",
-        price: PRICES.rodillo,
-        productId: null,
-      });
-      materials.push({
-        name: "Brocha de cerda fina 2.5\"",
-        quantity: "1 unidad",
-        note: "Para retoques y esquinas",
-        icon: "🖌️",
-        price: PRICES.brocha,
-        productId: null,
-      });
-      materials.push({
-        name: "Cinta de enmascarar premium 1\"",
-        quantity: "2 rollos",
-        note: "Para protección de bordes y zócalos",
-        icon: "📏",
-        price: PRICES.enmascarar * 2,
-        productId: null,
-      });
-    } else {
-      // Insumos para instalación física de baldosas/revestimiento
-      materials.push({
-        name: "Nivel de burbuja profesional 60cm",
-        quantity: "1 unidad",
-        note: "Para alineación exacta de la superficie",
-        icon: "📏",
-        price: PRICES.nivel,
-        productId: null,
-      });
-      
-      if (isTile) {
-        materials.push({
-          name: "Llana metálica dentada 10x10mm",
-          quantity: "1 unidad",
-          note: "Para distribución correcta del pegante",
-          icon: "🛠️",
-          price: PRICES.llana,
-          productId: null,
-        });
-        materials.push({
-          name: "Mazo de goma blanco anti-marca",
-          quantity: "1 unidad",
-          note: "Para asentamiento de baldosas sin fracturas",
-          icon: "🔨",
-          price: PRICES.mazo,
-          productId: null,
-        });
-      }
-    }
+    materials.push(...calculateTools(materialType, selectedProduct, isTile));
   }
 
-  // Estimación de paredes si es de tipo integral y no es pintura pura
+  // 9. Estimación de paredes si es de tipo integral y no es pintura pura
   if (type.toLowerCase() === "integral" && materialType !== "pintura") {
     const wallArea = Math.ceil(Number((netArea * 0.6).toFixed(4)));
     const wallTotal = Math.ceil(Number((wallArea * wasteMultiplier).toFixed(4)));

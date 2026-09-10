@@ -9,8 +9,6 @@ const addCartItemUseCase = new AddCartItemUseCase(cartRepository);
 const updateCartItemQuantityUseCase = new UpdateCartItemQuantityUseCase(cartRepository);
 const removeCartItemUseCase = new RemoveCartItemUseCase(cartRepository);
 
-const DEMO_USER_ID = "demo-user-001";
-
 export class CartController {
   static async get(req: Request, res: Response, next: NextFunction) {
     try {

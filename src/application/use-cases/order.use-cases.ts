@@ -5,7 +5,6 @@
 import { IOrderRepository } from "../../domain/repositories/order-repository.interface.js";
 import { ICartRepository } from "../../domain/repositories/cart-repository.interface.js";
 import { IProductRepository } from "../../domain/repositories/product-repository.interface.js";
-import { Order, OrderItem } from "../../domain/entities/order.js";
 import { Product } from "../../domain/entities/product.js";
 import { AppError } from "../../shared/errors/AppError.js";
 
@@ -94,7 +93,7 @@ export class CreateOrderUseCase {
   ) {
     // 1. Obtener carrito del usuario
     const cart = await this.cartRepository.findByUserId(userId);
-    if (!cart || !cart.items || cart.items.length === 0) {
+    if (!cart?.items || cart.items.length === 0) {
       throw new AppError("El carrito está vacío", 400);
     }
 

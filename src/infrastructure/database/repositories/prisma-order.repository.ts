@@ -120,8 +120,9 @@ export class PrismaOrderRepository implements IOrderRepository {
       // B. Load products and active reservations by other users
       const productIds = data.items.map(item => item.productId);
       if (productIds.length > 0) {
+        const placeholders = productIds.map((_, i) => `$${i + 1}`).join(", ");
         await tx.$executeRawUnsafe(
-          `SELECT id FROM "Product" WHERE id IN (${productIds.map((_, i) => `$${i + 1}`).join(", ")}) FOR UPDATE`,
+          `SELECT id FROM "Product" WHERE id IN (${placeholders}) FOR UPDATE`,
           ...productIds
         );
       }

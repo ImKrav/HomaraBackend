@@ -17,6 +17,7 @@ import usersRouter from "./routes/users.js";
 import adminRouter from "./routes/admin.js";
 
 const app = express();
+app.disable("x-powered-by");
 
 // Middlewares globales
 app.use(express.json());
