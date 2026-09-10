@@ -77,6 +77,7 @@ Sigue los siguientes pasos para levantar y ejecutar el backend localmente con No
    PORT=5000
    DATABASE_URL="postgresql://postgres:postgres@localhost:51214/homara?schema=public"
    JWT_SECRET="tu_secreto_super_seguro_para_tokens"
+   CORS_ORIGINS="http://localhost:3000"
    ```
 
 3. **Sincronizar la Base de Datos:**
