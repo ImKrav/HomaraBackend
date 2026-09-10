@@ -461,7 +461,6 @@ test("UNIT-REPO-ORD-02", "PrismaOrderRepository create checkout transaccional y 
   is(txMock.cartItem.deleteMany.calls.length, 1);
   is(txMock.product.update.calls.length, 1);
 });
-
 // ============================================================================
 // PrismaProductRepository Tests
 // ============================================================================
