@@ -37,7 +37,7 @@ Act con un comentario, y el valor que se va a comprobar se captura ahí mismo
 ```bash
 npm install
 npx prisma generate                  # necesario: los repos importan el cliente generado
-npm test                             # corre los 194 casos
+npm test                             # corre los 254 casos
 npm run test:watch                   # modo watch de Vitest
 npm test -- tests/F-CHK-01.ts        # un archivo
 npm test -- -t CP-F-AUTH-01-02       # un caso por id (filtro por nombre)
@@ -45,8 +45,8 @@ npm test -- -t F-CHK                 # un módulo (subcadena del id)
 npm run test:coverage                # cobertura v8
 ```
 
-`npm test` es `vitest run`. Un run limpio hoy es `194 passed (194)` y sale con
-código 0: los 14 casos que documentan defectos abiertos están declarados con
+`npm test` es `vitest run`. Un run limpio hoy es `254 passed (254)` y sale con
+código 0: los 15 casos que documentan defectos abiertos están declarados con
 `test.fails(...)`, así que **se esperan fallidos** y no rompen CI (ver la tabla
 de defectos abajo).
 
@@ -118,19 +118,77 @@ costura. Ninguna prueba toca una base de datos real.
 
 | Módulo | Archivos | Casos |
 |---|---|---|
-| Autenticación (`F-AUTH`) | 3 | 17 |
+| Autenticación (`F-AUTH`) | 3 | 18 |
 | Catálogo (`F-CAT`) | 3 | 19 |
-| Carrito y pago (`F-CHK`) | 3 | 14 |
+| Carrito y pago (`F-CHK`) | 3 | 15 |
 | Proyectos (`F-PROY`) | 3 | 43 |
 | Administración (`F-ADM`) | 3 | 16 |
-| **Subtotal flujos** | **15** | **109** |
+| **Subtotal flujos** | **15** | **111** |
 | Unitarias (`unit-*`) | 8 | 85 |
-| **Total** | **23** | **194** |
+| Regresión (`regression/REG-*`) | 10 | 58 |
+| **Total** | **33** | **254** |
+
+## Pruebas de regresión
+
+`tests/regression/` es la suite que se vuelve a correr después de cada cambio
+para comprobar que **todas las funcionalidades** siguen funcionando. Hay un
+archivo por módulo que recorre la app Express real por HTTP (solo los
+repositorios Prisma son dobles, con JWT reales), más cuatro archivos que
+protegen correcciones puntuales y contratos con el frontend. Mismo harness,
+aserciones fluidas y AAA.
+
+```bash
+npm run test:regression        # solo tests/regression (también corren en npm test)
+npm run test:regression:demo   # demuestra que la suite detecta cambios que rompen algo
+```
+
+| Archivo | Funcionalidad / qué protege | Casos |
+|---|---|---|
+| `REG-AUTH.ts` | Registro (rol CUSTOMER, clave cifrada, correo normalizado), login, perfil sin contraseña, token de usuario dado de baja, edición de perfil sin escalar rol | 8 |
+| `REG-CAT.ts` | Listado con filtros, stock visible menos reservas de otros carritos (15 min), ficha 404, reseñas (promedio, una por usuario, rango 1..5), vitrina | 7 |
+| `REG-CART.ts` | Carrito de visitante, subtotal/envío/backorder, envío gratis > 500.000, agregar exige sesión y CUID, nadie toca ítems ajenos | 7 |
+| `REG-ORD.ts` | Checkout con carrito vacío, precios tomados del carrito, envío, listado del cliente, solo ADMIN cambia estados y solo a valores válidos | 7 |
+| `REG-PROY.ts` | Crear proyecto con materiales y costo en pesos enteros, validación, listado propio, 404, solo el dueño borra | 6 |
+| `REG-ADM.ts` | Acceso exclusivo de ADMIN, métricas (solo pedidos ENTREGADOS), inventario por umbrales, alta/edición/baja de productos, precios y stock no negativos | 5 |
+| `REG-SEG.ts` | `b4d9ad4`, `53729d7` — CORS por lista blanca: no refleja orígenes ajenos ni responde `*`; `CORS_ORIGINS` se recorta y en producción sin configurar no permite nada | 6 |
+| `REG-API.ts` | Reescritura `/api/*` → `/api/v1/*` y el sobre `{ success, data }` / `{ success: false, error }` que consume el frontend | 3 |
+| `REG-VAL.ts` | `aecb5e1` — `cuidValidator` acepta y rechaza los mismos IDs que `z.cuid()` y conserva los mensajes | 4 |
+| `REG-MAT.ts` | `b4d9ad4`, `da2b147` — ramas de respaldo de pegante/boquilla vinculados, `materialType` sin distinguir mayúsculas, y el vocabulario de nombres/notas que el frontend traduce por texto literal (contraparte: `HomaraFrontend/tests/regression/REG-I18N.test.mts`) | 5 |
+
+`tests/regression/soporte.ts` (excluido del `include`) levanta la app en un
+puerto libre (`pedir()`) y firma sesiones reales (`sesion()`).
+
+### Demostración: la suite detecta los cambios que rompen algo
+
+`npm run test:regression:demo` (`scripts/regression-demo.mjs`) introduce a
+propósito, de a uno, un error conocido en cada funcionalidad, corre la suite y
+restaura el archivo byte a byte (también si se interrumpe). Termina con código 1
+si algún error pasa inadvertido. Salida actual:
+
+```
+Línea base: 58/58 casos en verde
+✔ detectado  [Autenticación] El registro asigna rol ADMIN en vez de CUSTOMER → REG-AUTH-01
+✔ detectado  [Catálogo] El listado ignora las reservas de otros carritos → REG-CAT-02
+✔ detectado  [Carrito] Un usuario puede modificar ítems de otro carrito → REG-CART-06
+✔ detectado  [Carrito] Nunca se marca backorder → REG-CART-02
+✔ detectado  [Pedidos] Envío gratis desde 50.000 en vez de 500.000 → REG-ORD-02
+✔ detectado  [Proyectos] Cualquiera puede borrar un proyecto ajeno → REG-PROY-05
+✔ detectado  [Proyectos] Cambia una nota del calculador que el frontend traduce → REG-MAT-01
+✔ detectado  [Administración] Un cliente entra a las rutas de administrador → REG-ADM-01, REG-ORD-05
+✔ detectado  [Administración] El umbral de stock bajo pasa de 50 a 5 unidades → REG-ADM-03
+✔ detectado  [Seguridad] CORS refleja cualquier origen → REG-SEG-01, REG-SEG-03
+✔ detectado  [API] Se quita la compatibilidad /api/* → /api/v1/* → REG-API-01
+✔ detectado  [Validación] El validador CUID acepta guiones (UUID) → REG-VAL-02
+Resultado: 12/12 errores detectados por la suite. Código restaurado.
+```
+
+`REG-MAT` no compara la lista completa de materiales, para no fijar los
+defectos abiertos del calculador.
 
 ## Defectos localizados
 
 La suite mantiene aserciones estrictas que documentan la regla de negocio
-exigida frente al comportamiento actual. Estos 14 casos están declarados con
+exigida frente al comportamiento actual. Estos 15 casos están declarados con
 `test.fails(...)`: **se espera que fallen** hasta que se corrija el código, así
 que la suite queda en verde mientras el defecto siga abierto.
 
@@ -159,6 +217,7 @@ que la suite queda en verde mientras el defecto siga abierto.
 | 11 | `totalUnits` resta las existencias negativas del total de unidades en bodega | `AdminController.getInventoryReport` | `CP-F-ADM-03-01`, `CP-F-ADM-03-05` |
 | 12 | La API acepta publicar un producto con precio 0, que el panel prohíbe | `createProductSchema` | `CP-F-ADM-02-04` |
 | 13 | Al bajar las existencias a 0 con `PUT`, el producto sigue marcado como disponible | `UpdateProductUseCase` | `CP-F-ADM-02-05` |
+| 14 | Editar el perfil (`PUT /users/:id`) responde con la entidad completa, incluido el hash de la contraseña | `AuthController.update` | `REG-AUTH-08` |
 
 **Antes de "arreglar" un caso que parece mal, revisá esta tabla**: varios
 codifican un conflicto de especificación, no un bug para parchear en silencio.

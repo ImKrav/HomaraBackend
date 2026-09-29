@@ -8,7 +8,7 @@ export default defineConfig({
   },
   test: {
     include: ["tests/**/*.ts"],
-    exclude: ["tests/harness.ts", "tests/helpers.ts", "tests/mocks/**"],
+    exclude: ["tests/harness.ts", "tests/helpers.ts", "tests/mocks/**", "tests/regression/soporte.ts"],
     coverage: {
       provider: "v8",
       all: true,

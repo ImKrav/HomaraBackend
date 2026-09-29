@@ -11,7 +11,9 @@
     "build": "npm run prisma:generate && tsc",
     "test": "vitest run",
     "test:coverage": "npm run prisma:generate && vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:regression": "vitest run tests/regression",
+    "test:regression:demo": "node scripts/regression-demo.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -32,7 +32,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          npm run test:coverage || true
+          npm run test:coverage
           if [ ! -s coverage/lcov.info ]; then
             echo "::error::No se generó el reporte de cobertura en coverage/lcov.info"
             exit 1
