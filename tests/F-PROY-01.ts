@@ -60,7 +60,7 @@ test("CP-F-PROY-01-03", "Crea proyecto con materiales genéricos cuando no se vi
   expect(g.thumbnail).toBe("🏠");
   expect(g.wastePercent).toBe(10.0);
   expect(g.materials[0].name).toBe("Cerámica 60x60 cm");
-  expect(g.materials.every((m: any) => m.productId === null)).toBeTruthy();
+  expect(g.materials.filter((m: any) => m.productId !== null)).toStrictEqual([]);
   expect(g.estimatedCost).toBe(g.materials.reduce((s: number, m: any) => s + m.price, 0));
   expect(salida.id).toBe("proy_001");
 });

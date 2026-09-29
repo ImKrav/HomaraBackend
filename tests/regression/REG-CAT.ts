@@ -133,3 +133,17 @@ test("REG-CAT-07", "La vitrina devuelve recomendados, ofertas y más vendidos", 
   expect(Object.keys(res.body.data)).toStrictEqual(["recommended", "offers", "bestSellers"]);
   expect(res.body.data.offers[0].id).toBe("o1");
 });
+
+test("REG-CAT-08", "Las reseñas de un producto se listan desde el repositorio", async () => {
+  // Arrange
+  mockResenas.findByProductId.mockResolvedValue([resena({ productId: CUID.producto, rating: 4 })]);
+
+  // Act
+  const res = await pedir("GET", `/api/v1/products/${CUID.producto}/reviews`);
+
+  // Assert
+  expect(res.status).toBe(200);
+  expect(mockResenas.findByProductId).toHaveBeenCalledWith(CUID.producto);
+  expect(res.body.data).toHaveLength(1);
+  expect(res.body.data[0]).toMatchObject({ rating: 4, productId: CUID.producto });
+});

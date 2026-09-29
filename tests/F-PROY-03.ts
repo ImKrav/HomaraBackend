@@ -139,7 +139,7 @@ test.fails("CP-F-PROY-03-07", "Recalcula materiales genéricos al cambiar área"
   expect(productos.findById).not.toHaveBeenCalled();
   expect(a.materials[0].name).toBe("Cerámica 60x60 cm");
   expect(a.materials[0].quantity).toBe("33 m²");
-  expect(a.materials.every((m: any) => m.productId === null)).toBeTruthy();
+  expect(a.materials.filter((m: any) => m.productId !== null)).toStrictEqual([]);
   expect(a.estimatedCost).toBe(a.materials.reduce((s: number, m: any) => s + m.price, 0));
 
   const respetaLaListaManual = (guardadoTrasConflicto?.materials ?? []).some(

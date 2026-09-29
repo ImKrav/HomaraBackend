@@ -37,7 +37,7 @@ Act con un comentario, y el valor que se va a comprobar se captura ahí mismo
 ```bash
 npm install
 npx prisma generate                  # necesario: los repos importan el cliente generado
-npm test                             # corre los 254 casos
+npm test                             # corre los 258 casos
 npm run test:watch                   # modo watch de Vitest
 npm test -- tests/F-CHK-01.ts        # un archivo
 npm test -- -t CP-F-AUTH-01-02       # un caso por id (filtro por nombre)
@@ -45,7 +45,7 @@ npm test -- -t F-CHK                 # un módulo (subcadena del id)
 npm run test:coverage                # cobertura v8
 ```
 
-`npm test` es `vitest run`. Un run limpio hoy es `254 passed (254)` y sale con
+`npm test` es `vitest run`. Un run limpio hoy es `258 passed (258)` y sale con
 código 0: los 15 casos que documentan defectos abiertos están declarados con
 `test.fails(...)`, así que **se esperan fallidos** y no rompen CI (ver la tabla
 de defectos abajo).
@@ -125,8 +125,8 @@ costura. Ninguna prueba toca una base de datos real.
 | Administración (`F-ADM`) | 3 | 16 |
 | **Subtotal flujos** | **15** | **111** |
 | Unitarias (`unit-*`) | 8 | 85 |
-| Regresión (`regression/REG-*`) | 10 | 58 |
-| **Total** | **33** | **254** |
+| Regresión (`regression/REG-*`) | 10 | 62 |
+| **Total** | **33** | **258** |
 
 ## Pruebas de regresión
 
@@ -145,10 +145,10 @@ npm run test:regression:demo   # demuestra que la suite detecta cambios que romp
 | Archivo | Funcionalidad / qué protege | Casos |
 |---|---|---|
 | `REG-AUTH.ts` | Registro (rol CUSTOMER, clave cifrada, correo normalizado), login, perfil sin contraseña, token de usuario dado de baja, edición de perfil sin escalar rol | 8 |
-| `REG-CAT.ts` | Listado con filtros, stock visible menos reservas de otros carritos (15 min), ficha 404, reseñas (promedio, una por usuario, rango 1..5), vitrina | 7 |
+| `REG-CAT.ts` | Listado con filtros, stock visible menos reservas de otros carritos (15 min), ficha 404, reseñas (listado, promedio, una por usuario, rango 1..5), vitrina | 8 |
 | `REG-CART.ts` | Carrito de visitante, subtotal/envío/backorder, envío gratis > 500.000, agregar exige sesión y CUID, nadie toca ítems ajenos | 7 |
 | `REG-ORD.ts` | Checkout con carrito vacío, precios tomados del carrito, envío, listado del cliente, solo ADMIN cambia estados y solo a valores válidos | 7 |
-| `REG-PROY.ts` | Crear proyecto con materiales y costo en pesos enteros, validación, listado propio, 404, solo el dueño borra | 6 |
+| `REG-PROY.ts` | Crear proyecto con materiales y costo en pesos enteros, validación, listado propio, 404, editar recalcula (solo si cambian datos de cálculo), solo el dueño edita o borra | 9 |
 | `REG-ADM.ts` | Acceso exclusivo de ADMIN, métricas (solo pedidos ENTREGADOS), inventario por umbrales, alta/edición/baja de productos, precios y stock no negativos | 5 |
 | `REG-SEG.ts` | `b4d9ad4`, `53729d7` — CORS por lista blanca: no refleja orígenes ajenos ni responde `*`; `CORS_ORIGINS` se recorta y en producción sin configurar no permite nada | 6 |
 | `REG-API.ts` | Reescritura `/api/*` → `/api/v1/*` y el sobre `{ success, data }` / `{ success: false, error }` que consume el frontend | 3 |
@@ -166,20 +166,22 @@ restaura el archivo byte a byte (también si se interrumpe). Termina con código
 si algún error pasa inadvertido. Salida actual:
 
 ```
-Línea base: 58/58 casos en verde
+Línea base: 62/62 casos en verde
 ✔ detectado  [Autenticación] El registro asigna rol ADMIN en vez de CUSTOMER → REG-AUTH-01
 ✔ detectado  [Catálogo] El listado ignora las reservas de otros carritos → REG-CAT-02
+✔ detectado  [Catálogo] Las reseñas de un producto dejan de listarse → REG-CAT-08
 ✔ detectado  [Carrito] Un usuario puede modificar ítems de otro carrito → REG-CART-06
 ✔ detectado  [Carrito] Nunca se marca backorder → REG-CART-02
 ✔ detectado  [Pedidos] Envío gratis desde 50.000 en vez de 500.000 → REG-ORD-02
 ✔ detectado  [Proyectos] Cualquiera puede borrar un proyecto ajeno → REG-PROY-05
+✔ detectado  [Proyectos] Cualquiera puede editar un proyecto ajeno → REG-PROY-08
 ✔ detectado  [Proyectos] Cambia una nota del calculador que el frontend traduce → REG-MAT-01
 ✔ detectado  [Administración] Un cliente entra a las rutas de administrador → REG-ADM-01, REG-ORD-05
 ✔ detectado  [Administración] El umbral de stock bajo pasa de 50 a 5 unidades → REG-ADM-03
 ✔ detectado  [Seguridad] CORS refleja cualquier origen → REG-SEG-01, REG-SEG-03
 ✔ detectado  [API] Se quita la compatibilidad /api/* → /api/v1/* → REG-API-01
 ✔ detectado  [Validación] El validador CUID acepta guiones (UUID) → REG-VAL-02
-Resultado: 12/12 errores detectados por la suite. Código restaurado.
+Resultado: 14/14 errores detectados por la suite. Código restaurado.
 ```
 
 `REG-MAT` no compara la lista completa de materiales, para no fijar los

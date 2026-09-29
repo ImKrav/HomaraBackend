@@ -28,6 +28,13 @@ const MUTACIONES = [
     poner: "const dynamicStock = p.stockQuantity;",
   },
   {
+    modulo: "Catálogo",
+    cambio: "Las reseñas de un producto dejan de listarse",
+    archivo: "src/application/use-cases/catalog.use-cases.ts",
+    buscar: "return await this.reviewRepository.findByProductId(productId);",
+    poner: "return [];",
+  },
+  {
     modulo: "Carrito",
     cambio: "Un usuario puede modificar ítems de otro carrito",
     archivo: "src/application/use-cases/cart.use-cases.ts",
@@ -53,6 +60,13 @@ const MUTACIONES = [
     cambio: "Cualquiera puede borrar un proyecto ajeno",
     archivo: "src/application/use-cases/project.use-cases.ts",
     buscar: 'throw new AppError("No tienes permiso para eliminar este proyecto.", 403);',
+    poner: "/* sin control de dueño */",
+  },
+  {
+    modulo: "Proyectos",
+    cambio: "Cualquiera puede editar un proyecto ajeno",
+    archivo: "src/application/use-cases/project.use-cases.ts",
+    buscar: 'throw new AppError("No tienes permiso para modificar este proyecto.", 403);',
     poner: "/* sin control de dueño */",
   },
   {

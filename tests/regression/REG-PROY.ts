@@ -112,3 +112,46 @@ test("REG-PROY-06", "El dueño borra su proyecto", async () => {
   expect(res.body).toStrictEqual({ success: true, message: "Proyecto eliminado" });
   expect(mockProyectos.delete).toHaveBeenCalledWith(CUID.proyecto);
 });
+
+test("REG-PROY-07", "Editar el área de un proyecto propio recalcula materiales y costo", async () => {
+  // Arrange
+  const { token } = sesion();
+  mockProyectos.findById.mockResolvedValue(proyecto({ id: CUID.proyecto, userId: "usr_001", area: 20 }));
+
+  // Act
+  const res = await pedir("PUT", `/api/v1/projects/${CUID.proyecto}`, { token, body: { area: 40 } });
+
+  // Assert
+  expect(res.status).toBe(200);
+  const [id, cambios] = mockProyectos.update.mock.calls[0];
+  expect(id).toBe(CUID.proyecto);
+  expect(cambios.materials.length).toBeGreaterThan(0);
+  expect(cambios.estimatedCost).toBe(cambios.materials.reduce((s: number, m: any) => s + m.price, 0));
+});
+
+test("REG-PROY-08", "Nadie edita un proyecto ajeno", async () => {
+  // Arrange
+  const { token } = sesion();
+  mockProyectos.findById.mockResolvedValue(proyecto({ id: CUID.proyecto, userId: "usr_otro" }));
+
+  // Act
+  const res = await pedir("PUT", `/api/v1/projects/${CUID.proyecto}`, { token, body: { name: "Robado" } });
+
+  // Assert
+  expect(res.status).toBe(403);
+  expect(res.body.error).toBe("No tienes permiso para modificar este proyecto.");
+  expect(mockProyectos.update).not.toHaveBeenCalled();
+});
+
+test("REG-PROY-09", "Cambiar solo el estado no recalcula los materiales", async () => {
+  // Arrange
+  const { token } = sesion();
+  mockProyectos.findById.mockResolvedValue(proyecto({ id: CUID.proyecto, userId: "usr_001" }));
+
+  // Act
+  const res = await pedir("PUT", `/api/v1/projects/${CUID.proyecto}`, { token, body: { status: "COMPLETADO" } });
+
+  // Assert
+  expect(res.status).toBe(200);
+  expect(mockProyectos.update.mock.calls[0][1]).toStrictEqual({ status: "COMPLETADO" });
+});
