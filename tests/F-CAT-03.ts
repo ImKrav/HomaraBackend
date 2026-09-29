@@ -1,7 +1,7 @@
 // F-CAT-03 · Publicar una reseña
 // Unidad: CreateProductReviewUseCase.execute()  (POST /api/v1/products/:id/reviews)
 
-import { test, is, ok, grab, expect } from "./harness.js";
+import { test, grab, expect } from "./harness.js";
 import { fakeProductos, fakeResenas, producto, resena, datosResena } from "./helpers.js";
 import { CreateProductReviewUseCase } from "../src/application/use-cases/catalog.use-cases.js";
 import { createReviewSchema } from "../src/infrastructure/http/validators/catalog.validator.js";
@@ -24,12 +24,12 @@ test("CP-F-CAT-03-01", "Rechaza calificación fuera del rango 1-5 o con decimale
   const decimal = createReviewSchema.safeParse(datosResena({ rating: 4.5 }));
 
   // Assert
-  is(cero.success, false);
-  is(seis.success, false);
-  is(decimal.success, false);
-  if (!cero.success) is(cero.error.issues[0].message, "La calificación mínima es 1 estrella.");
-  if (!seis.success) is(seis.error.issues[0].message, "La calificación máxima es 5 estrellas.");
-  if (!decimal.success) is(decimal.error.issues[0].message, "La calificación debe ser un número entero.");
+  expect(cero.success).toBe(false);
+  expect(seis.success).toBe(false);
+  expect(decimal.success).toBe(false);
+  if (!cero.success) expect(cero.error.issues[0].message).toBe("La calificación mínima es 1 estrella.");
+  if (!seis.success) expect(seis.error.issues[0].message).toBe("La calificación máxima es 5 estrellas.");
+  if (!decimal.success) expect(decimal.error.issues[0].message).toBe("La calificación debe ser un número entero.");
   expect(productos.findById).not.toHaveBeenCalled();
   expect(resenas.create).not.toHaveBeenCalled();
 });
@@ -43,9 +43,9 @@ test("CP-F-CAT-03-02", "Retorna 404 si el producto a calificar no existe", async
   const error = await grab(caso.execute("usr_001", "prd_inexistente", 5, "Muy bueno"));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.statusCode, 404);
-  is(error.message, "Producto no encontrado");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(404);
+  expect(error.message).toBe("Producto no encontrado");
   expect(resenas.findByUserAndProduct).not.toHaveBeenCalled();
   expect(resenas.create).not.toHaveBeenCalled();
   expect(productos.updateProductRating).not.toHaveBeenCalled();
@@ -61,9 +61,9 @@ test("CP-F-CAT-03-03", "Rechaza si el usuario ya había publicado una reseña pr
   const error = await grab(caso.execute("usr_001", "prd_001", 4, "Otra opinión"));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.statusCode, 400);
-  is(error.message, "Ya has calificado este producto");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(400);
+  expect(error.message).toBe("Ya has calificado este producto");
   expect(resenas.findByUserAndProduct).toHaveBeenCalledWith("usr_001", "prd_001");
   expect(resenas.create).not.toHaveBeenCalled();
   expect(resenas.getAverageRatingAndCount).not.toHaveBeenCalled();
@@ -90,8 +90,8 @@ test("CP-F-CAT-03-04", "Guarda la reseña y actualiza el promedio de calificaci�
     });
   expect(resenas.getAverageRatingAndCount).toHaveBeenCalledWith("prd_001");
   expect(productos.updateProductRating).toHaveBeenCalledWith("prd_001", 4.6, 13);
-  is(salida.id, "rev_nueva");
-  is(salida.rating, 5);
+  expect(salida.id).toBe("rev_nueva");
+  expect(salida.rating).toBe(5);
 });
 
 test("CP-F-CAT-03-04b", "Valida límites de calificación (1 y 5) y longitud máxima de comentario (500)", async () => {
@@ -111,14 +111,14 @@ test("CP-F-CAT-03-04b", "Valida límites de calificación (1 y 5) y longitud má
   const creada = resenas.create.mock.calls[0][0];
 
   // Assert
-  is(minimo.success, true);
-  is(maximo.success, true);
-  is(comentarioEnElLimite.success, true);
-  is(comentarioExcedido.success, false);
+  expect(minimo.success).toBe(true);
+  expect(maximo.success).toBe(true);
+  expect(comentarioEnElLimite.success).toBe(true);
+  expect(comentarioExcedido.success).toBe(false);
   if (!comentarioExcedido.success) {
-    is(comentarioExcedido.error.issues[0].message, "El comentario no puede exceder los 500 caracteres.");
+    expect(comentarioExcedido.error.issues[0].message).toBe("El comentario no puede exceder los 500 caracteres.");
   }
-  is(creada.comment, undefined);
+  expect(creada.comment).toBe(undefined);
   expect(productos.updateProductRating).toHaveBeenCalledWith("prd_001", 1, 1);
 });
 
@@ -136,8 +136,8 @@ test.fails("CP-F-CAT-03-04c", "Rechaza calificación fuera de rango directamente
 
   // Assert
   // DEFECTO: CreateProductReviewUseCase.execute() no valida el rango de rating y acepta 99
-  ok(error instanceof AppError);
-  is(error.statusCode, 400);
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(400);
   // DEFECTO: la reseña fuera de rango se persiste en lugar de rechazarse
   expect(resenas.create).not.toHaveBeenCalled();
   // DEFECTO: el promedio del producto queda contaminado con la calificación 99

@@ -1,4 +1,4 @@
-import { test, is, eq } from "./harness.js";
+import { test, expect } from "./harness.js";
 import { errorHandler } from "../src/infrastructure/http/middlewares/errorHandler.js";
 import { AppError } from "../src/shared/errors/AppError.js";
 import { Prisma } from "../src/generated/prisma/client.js";
@@ -34,8 +34,8 @@ test("UNIT-ERR-01", "Maneja AppError devolviendo el statusCode y el mensaje", ()
   errorHandler(error, req, res, next);
 
   // Assert
-  is(res.statusCode, 404);
-  eq(res.payload, { success: false, error: "Recurso no disponible" });
+  expect(res.statusCode).toBe(404);
+  expect(res.payload).toStrictEqual({ success: false, error: "Recurso no disponible" });
 });
 
 test("UNIT-ERR-02", "Maneja Prisma P2002 como 409 conflicto con campos duplicados", () => {
@@ -51,9 +51,9 @@ test("UNIT-ERR-02", "Maneja Prisma P2002 como 409 conflicto con campos duplicado
   errorHandler(prismaErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 409);
-  is(res.payload.success, false);
-  eq(res.payload.error, "El registro ya existe. Campo duplicado: email");
+  expect(res.statusCode).toBe(409);
+  expect(res.payload.success).toBe(false);
+  expect(res.payload.error).toBe("El registro ya existe. Campo duplicado: email");
 });
 
 test("UNIT-ERR-03", "Maneja Prisma P2025 como 404 no encontrado", () => {
@@ -68,9 +68,9 @@ test("UNIT-ERR-03", "Maneja Prisma P2025 como 404 no encontrado", () => {
   errorHandler(prismaErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 404);
-  is(res.payload.success, false);
-  eq(res.payload.error, "El recurso solicitado no fue encontrado o no tienes permisos para acceder a él.");
+  expect(res.statusCode).toBe(404);
+  expect(res.payload.success).toBe(false);
+  expect(res.payload.error).toBe("El recurso solicitado no fue encontrado o no tienes permisos para acceder a él.");
 });
 
 test("UNIT-ERR-04", "Maneja Prisma P2003 como 400 error de integridad", () => {
@@ -85,9 +85,9 @@ test("UNIT-ERR-04", "Maneja Prisma P2003 como 400 error de integridad", () => {
   errorHandler(prismaErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 400);
-  is(res.payload.success, false);
-  eq(res.payload.error, "Error de integridad de datos. La entidad referenciada no existe.");
+  expect(res.statusCode).toBe(400);
+  expect(res.payload.success).toBe(false);
+  expect(res.payload.error).toBe("Error de integridad de datos. La entidad referenciada no existe.");
 });
 
 test("UNIT-ERR-05", "Maneja PrismaClientValidationError como 400", () => {
@@ -101,8 +101,8 @@ test("UNIT-ERR-05", "Maneja PrismaClientValidationError como 400", () => {
   errorHandler(prismaErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 400);
-  eq(res.payload.error, "Los datos proporcionados no coinciden con la estructura requerida.");
+  expect(res.statusCode).toBe(400);
+  expect(res.payload.error).toBe("Los datos proporcionados no coinciden con la estructura requerida.");
 });
 
 test("UNIT-ERR-06", "Maneja TokenExpiredError como 401", () => {
@@ -114,8 +114,8 @@ test("UNIT-ERR-06", "Maneja TokenExpiredError como 401", () => {
   errorHandler(jwtErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 401);
-  eq(res.payload.error, "Token expirado. Por favor, inicia sesión nuevamente.");
+  expect(res.statusCode).toBe(401);
+  expect(res.payload.error).toBe("Token expirado. Por favor, inicia sesión nuevamente.");
 });
 
 test("UNIT-ERR-07", "Maneja JsonWebTokenError como 401", () => {
@@ -127,8 +127,8 @@ test("UNIT-ERR-07", "Maneja JsonWebTokenError como 401", () => {
   errorHandler(jwtErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 401);
-  eq(res.payload.error, "Token inválido o malformado.");
+  expect(res.statusCode).toBe(401);
+  expect(res.payload.error).toBe("Token inválido o malformado.");
 });
 
 test("UNIT-ERR-08", "Maneja error inesperado como 500", () => {
@@ -140,8 +140,8 @@ test("UNIT-ERR-08", "Maneja error inesperado como 500", () => {
   errorHandler(genericErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 500);
-  eq(res.payload.error, "Fallo imprevisto");
+  expect(res.statusCode).toBe(500);
+  expect(res.payload.error).toBe("Fallo imprevisto");
 });
 
 test("UNIT-ERR-09", "Maneja código Prisma desconocido como 400 genérico", () => {
@@ -156,7 +156,7 @@ test("UNIT-ERR-09", "Maneja código Prisma desconocido como 400 genérico", () =
   errorHandler(prismaErr, req, res, next);
 
   // Assert
-  is(res.statusCode, 400);
-  is(res.payload.success, false);
-  is(res.payload.error.includes("P9999"), true);
+  expect(res.statusCode).toBe(400);
+  expect(res.payload.success).toBe(false);
+  expect(res.payload.error.includes("P9999")).toBe(true);
 });

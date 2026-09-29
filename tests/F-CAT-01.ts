@@ -1,7 +1,7 @@
 // F-CAT-01 · Listar y filtrar el catálogo
 // Unidad: ListProductsUseCase.execute() + PrismaProductRepository.findAll()  (GET /api/v1/products)
 
-import { test, is, eq, expect, vi } from "./harness.js";
+import { test, expect, vi } from "./harness.js";
 import { fakeCarritos, filaProductoPrisma, carrito, spy } from "./helpers.js";
 import { PrismaProductRepository } from "../src/infrastructure/database/repositories/prisma-product.repository.js";
 import { ListProductsUseCase } from "../src/application/use-cases/catalog.use-cases.js";
@@ -25,13 +25,13 @@ test("CP-F-CAT-01-01", "Filtra por categoría, término de búsqueda y etiqueta 
   const salida = await caso.execute({ categorySlug: "cementos", query: "gris", tag: "oferta" }, undefined);
 
   // Assert
-  eq(where().category, { slug: "cementos" });
-  eq(where().OR, [
+  expect(where().category).toStrictEqual({ slug: "cementos" });
+  expect(where().OR).toStrictEqual([
     { name: { contains: "gris", mode: "insensitive" } },
     { description: { contains: "gris", mode: "insensitive" } },
   ]);
-  eq(where().tags, { some: { name: "oferta" } });
-  eq(salida, []);
+  expect(where().tags).toStrictEqual({ some: { name: "oferta" } });
+  expect(salida).toStrictEqual([]);
   expect(carritos.getReservedQuantities).not.toHaveBeenCalled();
   expect(carritos.findByUserId).not.toHaveBeenCalled();
 });
@@ -45,10 +45,10 @@ test("CP-F-CAT-01-02", "Filtra por texto y etiqueta sin categoría", async () =>
   const salida = await caso.execute({ query: "estuco", tag: "oferta" });
 
   // Assert
-  is(where().category, undefined);
-  is(where().OR.length, 2);
-  eq(where().tags, { some: { name: "oferta" } });
-  eq(salida, []);
+  expect(where().category).toBe(undefined);
+  expect(where().OR.length).toBe(2);
+  expect(where().tags).toStrictEqual({ some: { name: "oferta" } });
+  expect(salida).toStrictEqual([]);
   expect(carritos.getReservedQuantities).not.toHaveBeenCalled();
 });
 
@@ -61,10 +61,10 @@ test("CP-F-CAT-01-03", "Filtra únicamente por etiqueta", async () => {
   const salida = await caso.execute({ tag: "inexistente" });
 
   // Assert
-  is(where().category, undefined);
-  is(where().OR, undefined);
-  eq(where().tags, { some: { name: "inexistente" } });
-  eq(salida, []);
+  expect(where().category).toBe(undefined);
+  expect(where().OR).toBe(undefined);
+  expect(where().tags).toStrictEqual({ some: { name: "inexistente" } });
+  expect(salida).toStrictEqual([]);
 });
 
 test("CP-F-CAT-01-04", "Lista catálogo sin filtros aplicados", async () => {
@@ -76,8 +76,8 @@ test("CP-F-CAT-01-04", "Lista catálogo sin filtros aplicados", async () => {
   const salida = await caso.execute();
 
   // Assert
-  eq(where(), {});
-  eq(salida, []);
+  expect(where()).toStrictEqual({});
+  expect(salida).toStrictEqual([]);
   expect(carritos.getReservedQuantities).not.toHaveBeenCalled();
 });
 
@@ -97,11 +97,11 @@ test("CP-F-CAT-01-05", "Excluye reservas del propio carrito para usuario autenti
   // Assert
   expect(carritos.findByUserId).toHaveBeenCalledWith("usr_001");
   expect(carritos.getReservedQuantities).toHaveBeenCalledWith("cart_001", ["prd_001", "prd_002"]);
-  is(salida.length, 2);
-  is(salida[0].stockQuantity, 7);
-  is(salida[0].inStock, true);
-  is(salida[1].stockQuantity, 0);
-  is(salida[1].inStock, false);
+  expect(salida.length).toBe(2);
+  expect(salida[0].stockQuantity).toBe(7);
+  expect(salida[0].inStock).toBe(true);
+  expect(salida[1].stockQuantity).toBe(0);
+  expect(salida[1].inStock).toBe(false);
 });
 
 test("CP-F-CAT-01-06", "Descuenta todas las reservas activas para visitante anónimo", async () => {
@@ -116,8 +116,8 @@ test("CP-F-CAT-01-06", "Descuenta todas las reservas activas para visitante anó
   // Assert
   expect(carritos.findByUserId).not.toHaveBeenCalled();
   expect(carritos.getReservedQuantities).toHaveBeenCalledWith("", ["prd_001"]);
-  is(salida[0].stockQuantity, 6);
-  is(salida[0].inStock, true);
+  expect(salida[0].stockQuantity).toBe(6);
+  expect(salida[0].inStock).toBe(true);
 });
 
 test("CP-F-CAT-01-05b", "Evita stock negativo cuando las reservas superan el inventario físico", async () => {
@@ -130,8 +130,8 @@ test("CP-F-CAT-01-05b", "Evita stock negativo cuando las reservas superan el inv
   const salida = await caso.execute();
 
   // Assert
-  is(salida[0].stockQuantity, 0);
-  is(salida[0].inStock, false);
+  expect(salida[0].stockQuantity).toBe(0);
+  expect(salida[0].inStock).toBe(false);
 });
 
 test("CP-F-CAT-01-06c", "Trata filtros con cadenas vacías como filtros ausentes", async () => {
@@ -143,5 +143,5 @@ test("CP-F-CAT-01-06c", "Trata filtros con cadenas vacías como filtros ausentes
   await caso.execute({ categorySlug: "", query: "", tag: "" });
 
   // Assert
-  eq(where(), {});
+  expect(where()).toStrictEqual({});
 });

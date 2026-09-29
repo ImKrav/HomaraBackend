@@ -2,7 +2,7 @@
 // Unidad: CreateProductUseCase.execute() y UpdateProductUseCase.execute()  (POST y PUT /api/v1/products)
 
 import { vi, beforeEach } from "vitest";
-import { test, is, eq, ok, subset, grab, expect } from "./harness.js";
+import { test, grab, expect } from "./harness.js";
 import { fakeProductos, producto, datosProducto, contextoExpress, errorDeNext, usuario } from "./helpers.js";
 import { mockUsuarios, reiniciarRepositorios } from "./mocks/repositorios.js";
 import jwt from "jsonwebtoken";
@@ -43,9 +43,9 @@ test("CP-F-ADM-02-01", "Rechaza con 403 a usuarios con rol CUSTOMER antes de mod
 
   // Assert
   const error = errorDeNext(next);
-  ok(error instanceof AppError);
-  is(error.statusCode, 403);
-  is(error.message, "Acceso denegado. Se requieren permisos de administrador.");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(403);
+  expect(error.message).toBe("Acceso denegado. Se requieren permisos de administrador.");
   expect(repo.create).not.toHaveBeenCalled();
   expect(repo.update).not.toHaveBeenCalled();
 });
@@ -61,13 +61,13 @@ test("CP-F-ADM-02-02", "Rechaza campos inválidos (precio negativo, stock negati
   const parcheConPrecioNegativo = updateProductSchema.safeParse({ price: -1 });
 
   // Assert
-  is(precioNegativo.success, false);
-  if (!precioNegativo.success) is(precioNegativo.error.issues[0].message, "El precio no puede ser negativo.");
-  is(stockNegativo.success, false);
-  if (!stockNegativo.success) is(stockNegativo.error.issues[0].message, "El stock no puede ser negativo.");
-  is(sinNombre.success, false);
-  if (!sinNombre.success) is(sinNombre.error.issues[0].message, "El nombre es obligatorio y no puede estar vacío.");
-  is(parcheConPrecioNegativo.success, false);
+  expect(precioNegativo.success).toBe(false);
+  if (!precioNegativo.success) expect(precioNegativo.error.issues[0].message).toBe("El precio no puede ser negativo.");
+  expect(stockNegativo.success).toBe(false);
+  if (!stockNegativo.success) expect(stockNegativo.error.issues[0].message).toBe("El stock no puede ser negativo.");
+  expect(sinNombre.success).toBe(false);
+  if (!sinNombre.success) expect(sinNombre.error.issues[0].message).toBe("El nombre es obligatorio y no puede estar vacío.");
+  expect(parcheConPrecioNegativo.success).toBe(false);
   expect(repo.create).not.toHaveBeenCalled();
   expect(repo.update).not.toHaveBeenCalled();
 });
@@ -81,8 +81,8 @@ test("CP-F-ADM-02-03", "Retorna 404 al intentar actualizar un producto que no ex
   const error = await grab(actualizar.execute("prd_borrado", { price: 45000 }));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.message, "Producto no encontrado");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.message).toBe("Producto no encontrado");
   expect(repo.findById).toHaveBeenCalledWith("prd_borrado");
   expect(repo.update).not.toHaveBeenCalled();
 });
@@ -107,19 +107,19 @@ test.fails("CP-F-ADM-02-04", "Crea producto nuevo con valores derivados y valida
   const precioCero = createProductSchema.safeParse(datosProducto({ price: 0 }));
 
   // Assert
-  is(guardado.inStock, true);
-  is(guardado.image, "/products/placeholder.jpg");
-  is(guardado.rating, 0);
-  is(guardado.reviewCount, 0);
-  is(guardado.originalPrice, null);
-  eq(guardado.tags, []);
-  is(salida.id, "prd_nuevo");
-  is(salida.name, "Cemento Gris 50 kg");
-  is(validacionSinExistencias.success, true);
-  is(guardadoSinExistencias.stockQuantity, 0);
-  is(guardadoSinExistencias.inStock, false);
+  expect(guardado.inStock).toBe(true);
+  expect(guardado.image).toBe("/products/placeholder.jpg");
+  expect(guardado.rating).toBe(0);
+  expect(guardado.reviewCount).toBe(0);
+  expect(guardado.originalPrice).toBe(null);
+  expect(guardado.tags).toStrictEqual([]);
+  expect(salida.id).toBe("prd_nuevo");
+  expect(salida.name).toBe("Cemento Gris 50 kg");
+  expect(validacionSinExistencias.success).toBe(true);
+  expect(guardadoSinExistencias.stockQuantity).toBe(0);
+  expect(guardadoSinExistencias.inStock).toBe(false);
   // DEFECTO: el esquema del servidor acepta precio 0 cuando debería exigir precio > 0 (RF32)
-  is(precioCero.success, false);
+  expect(precioCero.success).toBe(false);
 });
 
 // Defecto abierto #13 (ver la tabla en tests/README.md): se espera que falle.
@@ -139,13 +139,13 @@ test.fails("CP-F-ADM-02-05", "Aplica parche parcial en actualización y actualiz
   const parcheSinExistencias = repo.update.mock.calls[0][1];
 
   // Assert
-  is(parche.price, 45000);
-  is(parche.stockQuantity, 30);
-  ok(!("name" in parche));
-  ok(!("description" in parche));
-  ok(!("categoryId" in parche));
-  is(salida.price, 45000);
-  is(salida.name, "Piso Ceramico Beige 60x60");
+  expect(parche.price).toBe(45000);
+  expect(parche.stockQuantity).toBe(30);
+  expect(parche).not.toHaveProperty("name");
+  expect(parche).not.toHaveProperty("description");
+  expect(parche).not.toHaveProperty("categoryId");
+  expect(salida.price).toBe(45000);
+  expect(salida.name).toBe("Piso Ceramico Beige 60x60");
   // DEFECTO: reducir existencias a 0 en PUT debería marcar inStock = false
-  subset(parcheSinExistencias, { stockQuantity: 0, inStock: false });
+  expect(parcheSinExistencias).toMatchObject({ stockQuantity: 0, inStock: false });
 });

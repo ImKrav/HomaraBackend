@@ -1,7 +1,7 @@
 // F-PROY-03 · Asignar un producto al proyecto
 // Unidad: UpdateProjectUseCase.execute()  (PUT /api/v1/projects/:id)
 
-import { test, is, eq, ok, isNot, grab, expect } from "./harness.js";
+import { test, grab, expect } from "./harness.js";
 import { fakeProyectos, fakeProductos, producto, proyecto, materialManual } from "./helpers.js";
 import { UpdateProjectUseCase } from "../src/application/use-cases/project.use-cases.js";
 import { AppError } from "../src/shared/errors/AppError.js";
@@ -22,9 +22,9 @@ test("CP-F-PROY-03-01", "Rechaza materialType no soportado", async () => {
   const error = await grab(caso.execute("proy_001", "usr_001", { materialType: "marmol" } as any));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.message, "Tipo de material no soportado.");
-  is(error.statusCode, 400);
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.message).toBe("Tipo de material no soportado.");
+  expect(error.statusCode).toBe(400);
   expect(proyectos.findById).not.toHaveBeenCalled();
   expect(proyectos.update).not.toHaveBeenCalled();
 });
@@ -38,9 +38,9 @@ test("CP-F-PROY-03-02", "Retorna 404 si el proyecto no existe", async () => {
   const error = await grab(caso.execute("proy_fantasma", "usr_001", { name: "Cocina" } as any));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.message, "Proyecto no encontrado");
-  is(error.statusCode, 404);
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.message).toBe("Proyecto no encontrado");
+  expect(error.statusCode).toBe(404);
   expect(proyectos.findById).toHaveBeenCalledWith("proy_fantasma");
   expect(proyectos.update).not.toHaveBeenCalled();
 });
@@ -54,9 +54,9 @@ test("CP-F-PROY-03-03", "Retorna 403 si el proyecto pertenece a otro usuario", a
   const error = await grab(caso.execute("proy_001", "usr_001", { name: "Cocina ajena" } as any));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.message, "No tienes permiso para modificar este proyecto.");
-  is(error.statusCode, 403);
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.message).toBe("No tienes permiso para modificar este proyecto.");
+  expect(error.statusCode).toBe(403);
   expect(proyectos.update).not.toHaveBeenCalled();
 });
 
@@ -72,12 +72,9 @@ test("CP-F-PROY-03-04", "Rechaza vincular producto incompatible con el tipo de p
   const error = await grab(caso.execute("proy_001", "usr_001", { selectedProductId: "prd_pin" } as any));
 
   // Assert
-  ok(error instanceof AppError);
-  is(
-    error.message,
-    "Para proyectos de revestimiento físico, el producto seleccionado debe ser de la categoría de pisos y cerámicas.",
-  );
-  is(error.statusCode, 400);
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.message).toBe("Para proyectos de revestimiento físico, el producto seleccionado debe ser de la categoría de pisos y cerámicas.");
+  expect(error.statusCode).toBe(400);
   expect(proyectos.update).not.toHaveBeenCalled();
 });
 
@@ -94,11 +91,11 @@ test("CP-F-PROY-03-05", "Guarda lista manual de materiales enviada por el client
 
   // Assert
   const a = actualizado();
-  is(a.materials.length, 2);
-  is(a.materials[0].note, null);
-  is(a.materials[0].productId, null);
-  is(a.estimatedCost, 120000);
-  is(a.name, "Cocina con lista propia");
+  expect(a.materials.length).toBe(2);
+  expect(a.materials[0].note).toBe(null);
+  expect(a.materials[0].productId).toBe(null);
+  expect(a.estimatedCost).toBe(120000);
+  expect(a.name).toBe("Cocina con lista propia");
   expect(productos.findById).not.toHaveBeenCalled();
 });
 
@@ -112,9 +109,9 @@ test("CP-F-PROY-03-06", "Actualiza únicamente campos descriptivos sin alterar m
 
   // Assert
   const a = actualizado();
-  eq(a, { name: "Cocina terminada", status: "COMPLETADO" });
-  is(a.materials, undefined);
-  is(a.estimatedCost, undefined);
+  expect(a).toStrictEqual({ name: "Cocina terminada", status: "COMPLETADO" });
+  expect(a.materials).toBe(undefined);
+  expect(a.estimatedCost).toBe(undefined);
   expect(productos.findById).not.toHaveBeenCalled();
 });
 
@@ -140,10 +137,10 @@ test.fails("CP-F-PROY-03-07", "Recalcula materiales genéricos al cambiar área"
 
   // Assert
   expect(productos.findById).not.toHaveBeenCalled();
-  is(a.materials[0].name, "Cerámica 60x60 cm");
-  is(a.materials[0].quantity, "33 m²");
-  ok(a.materials.every((m: any) => m.productId === null));
-  is(a.estimatedCost, a.materials.reduce((s: number, m: any) => s + m.price, 0));
+  expect(a.materials[0].name).toBe("Cerámica 60x60 cm");
+  expect(a.materials[0].quantity).toBe("33 m²");
+  expect(a.materials.every((m: any) => m.productId === null)).toBeTruthy();
+  expect(a.estimatedCost).toBe(a.materials.reduce((s: number, m: any) => s + m.price, 0));
 
   const respetaLaListaManual = (guardadoTrasConflicto?.materials ?? []).some(
     (m: any) => m.name === "Lista manual del cliente",
@@ -156,7 +153,7 @@ test.fails("CP-F-PROY-03-07", "Recalcula materiales genéricos al cambiar área"
       : "descarta la lista manual en silencio";
 
   // DEFECTO: la lista manual enviada junto a un campo de recálculo se descarta en silencio
-  isNot(comportamiento, "descarta la lista manual en silencio");
+  expect(comportamiento).not.toBe("descarta la lista manual en silencio");
 });
 
 test("CP-F-PROY-03-08", "Vincula producto compatible y recalcula materiales y presupuesto", async () => {
@@ -171,10 +168,10 @@ test("CP-F-PROY-03-08", "Vincula producto compatible y recalcula materiales y pr
   // Assert
   expect(productos.findById).toHaveBeenCalledWith("prd_piso");
   const a = actualizado();
-  is(a.materials[0].name, "Piso Ceramico Beige 60x60");
-  is(a.materials[0].quantity, "22 m²");
-  is(a.materials[0].price, 855800);
-  is(a.materials[0].productId, "prd_piso");
-  is(a.selectedProductId, "prd_piso");
-  is(a.estimatedCost, a.materials.reduce((s: number, m: any) => s + m.price, 0));
+  expect(a.materials[0].name).toBe("Piso Ceramico Beige 60x60");
+  expect(a.materials[0].quantity).toBe("22 m²");
+  expect(a.materials[0].price).toBe(855800);
+  expect(a.materials[0].productId).toBe("prd_piso");
+  expect(a.selectedProductId).toBe("prd_piso");
+  expect(a.estimatedCost).toBe(a.materials.reduce((s: number, m: any) => s + m.price, 0));
 });

@@ -1,7 +1,7 @@
 // F-CHK-02 · Ver y modificar el carrito
 // Unidad: GetCartUseCase.execute()  (GET /api/v1/cart)
 
-import { test, is, eq, subset, expect, vi } from "./harness.js";
+import { test, expect, vi } from "./harness.js";
 import { conRelojFijo } from "./helpers.js";
 import { GetCartUseCase } from "../src/application/use-cases/cart.use-cases.js";
 import { PrismaCartRepository } from "../src/infrastructure/database/repositories/prisma-cart.repository.js";
@@ -79,15 +79,15 @@ test("CP-F-CHK-02-01", "Crea un carrito vacío cuando el usuario no tenía uno p
   const salida = await caso.execute(ID_USUARIO);
 
   // Assert
-  is(db.cart.create.mock.calls.length, 1);
-  eq(db.cart.create.mock.calls[0][0].data, { userId: ID_USUARIO });
-  is(salida.id, "cart_nuevo");
+  expect(db.cart.create.mock.calls.length).toBe(1);
+  expect(db.cart.create.mock.calls[0][0].data).toStrictEqual({ userId: ID_USUARIO });
+  expect(salida.id).toBe("cart_nuevo");
   expect(db.cartItem.findMany).not.toHaveBeenCalled();
-  eq(salida.items, []);
-  is(salida.itemCount, 0);
-  is(salida.subtotal, 0);
-  is(salida.shipping, 25000);
-  is(salida.total, 25000);
+  expect(salida.items).toStrictEqual([]);
+  expect(salida.itemCount).toBe(0);
+  expect(salida.subtotal).toBe(0);
+  expect(salida.shipping).toBe(25000);
+  expect(salida.total).toBe(25000);
 });
 
 test("CP-F-CHK-02-02", "Retorna estructura de carrito existente sin productos", async () => {
@@ -100,9 +100,9 @@ test("CP-F-CHK-02-02", "Retorna estructura de carrito existente sin productos", 
 
   // Assert
   expect(db.cart.create).not.toHaveBeenCalled();
-  eq(db.cart.findUnique.mock.calls[0][0].where, { userId: ID_USUARIO });
+  expect(db.cart.findUnique.mock.calls[0][0].where).toStrictEqual({ userId: ID_USUARIO });
   expect(db.cartItem.findMany).not.toHaveBeenCalled();
-  subset(salida as any, { subtotal: 0, shipping: 25000, total: 25000, itemCount: 0 });
+  expect(salida as any).toMatchObject({ subtotal: 0, shipping: 25000, total: 25000, itemCount: 0 });
 });
 
 test("CP-F-CHK-02-03", "Calcula backorder y aplica envío gratuito cuando subtotal supera 500000", async () => {
@@ -118,16 +118,16 @@ test("CP-F-CHK-02-03", "Calcula backorder y aplica envío gratuito cuando subtot
 
   // Assert
   const filtro = db.cartItem.findMany.mock.calls[0][0].where;
-  eq(filtro.productId, { in: [ID_A] });
-  eq(filtro.cartId, { not: "cart_001" });
-  eq(filtro.updatedAt.gte, new Date("2026-08-25T11:45:00.000Z"));
-  is(salida.items[0].availableStock, 2);
-  is(salida.items[0].isBackorder, true);
-  is(salida.items[0].backorderQuantity, 1);
-  is(salida.subtotal, 600000);
-  is(salida.shipping, 0);
-  is(salida.total, 600000);
-  is(salida.itemCount, 1);
+  expect(filtro.productId).toStrictEqual({ in: [ID_A] });
+  expect(filtro.cartId).toStrictEqual({ not: "cart_001" });
+  expect(filtro.updatedAt.gte).toStrictEqual(new Date("2026-08-25T11:45:00.000Z"));
+  expect(salida.items[0].availableStock).toBe(2);
+  expect(salida.items[0].isBackorder).toBe(true);
+  expect(salida.items[0].backorderQuantity).toBe(1);
+  expect(salida.subtotal).toBe(600000);
+  expect(salida.shipping).toBe(0);
+  expect(salida.total).toBe(600000);
+  expect(salida.itemCount).toBe(1);
 });
 
 test("CP-F-CHK-02-04", "Muestra disponibilidad total sin backorder con stock suficiente", async () => {
@@ -142,13 +142,13 @@ test("CP-F-CHK-02-04", "Muestra disponibilidad total sin backorder con stock suf
   const salida = await caso.execute(ID_USUARIO);
 
   // Assert
-  is(salida.items[0].availableStock, 10);
-  is(salida.items[0].isBackorder, false);
-  is(salida.items[0].backorderQuantity, 0);
-  is(salida.subtotal, 500001);
-  is(salida.shipping, 0);
-  is(salida.total, 500001);
-  is(db.cartItem.findMany.mock.calls.length, 1);
+  expect(salida.items[0].availableStock).toBe(10);
+  expect(salida.items[0].isBackorder).toBe(false);
+  expect(salida.items[0].backorderQuantity).toBe(0);
+  expect(salida.subtotal).toBe(500001);
+  expect(salida.shipping).toBe(0);
+  expect(salida.total).toBe(500001);
+  expect(db.cartItem.findMany.mock.calls.length).toBe(1);
 });
 
 test("CP-F-CHK-02-05", "Itera múltiples líneas combinando disponibles y pedidos pendientes", async () => {
@@ -166,17 +166,17 @@ test("CP-F-CHK-02-05", "Itera múltiples líneas combinando disponibles y pedido
   const salida = await caso.execute(ID_USUARIO);
 
   // Assert
-  eq(db.cartItem.findMany.mock.calls[0][0].where.productId, { in: [ID_A, ID_B] });
-  is(salida.items[0].availableStock, 2);
-  is(salida.items[0].isBackorder, true);
-  is(salida.items[0].backorderQuantity, 3);
-  is(salida.items[1].availableStock, 50);
-  is(salida.items[1].isBackorder, false);
-  is(salida.items[1].backorderQuantity, 0);
-  is(salida.subtotal, 800000);
-  is(salida.shipping, 0);
-  is(salida.total, 800000);
-  is(salida.itemCount, 2);
+  expect(db.cartItem.findMany.mock.calls[0][0].where.productId).toStrictEqual({ in: [ID_A, ID_B] });
+  expect(salida.items[0].availableStock).toBe(2);
+  expect(salida.items[0].isBackorder).toBe(true);
+  expect(salida.items[0].backorderQuantity).toBe(3);
+  expect(salida.items[1].availableStock).toBe(50);
+  expect(salida.items[1].isBackorder).toBe(false);
+  expect(salida.items[1].backorderQuantity).toBe(0);
+  expect(salida.subtotal).toBe(800000);
+  expect(salida.shipping).toBe(0);
+  expect(salida.total).toBe(800000);
+  expect(salida.itemCount).toBe(2);
 });
 
 // Defecto abierto #10 (ver la tabla en tests/README.md): se espera que falle.
@@ -195,11 +195,11 @@ test.fails("CP-F-CHK-02-06", "Cobra tarifa de envío con subtotal inferior al um
   const limite = await caso.execute(ID_USUARIO);
 
   // Assert
-  is(vacio.subtotal, 0);
-  is(vacio.shipping, 25000);
-  is(vacio.total, 25000);
-  is(limite.subtotal, 500000);
+  expect(vacio.subtotal).toBe(0);
+  expect(vacio.shipping).toBe(25000);
+  expect(vacio.total).toBe(25000);
+  expect(limite.subtotal).toBe(500000);
   // DEFECTO: con 500.000 exactos el envío no es gratuito según HU19 (RF16 vs HU19)
-  is(limite.shipping, 0);
-  is(limite.total, 500000);
+  expect(limite.shipping).toBe(0);
+  expect(limite.total).toBe(500000);
 });

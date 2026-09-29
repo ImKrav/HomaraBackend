@@ -1,5 +1,5 @@
 import { vi, beforeEach } from "vitest";
-import { test, is, ok } from "./harness.js";
+import { test, expect } from "./harness.js";
 import { usuario, contextoExpress, errorDeNext } from "./helpers.js";
 import { mockUsuarios, reiniciarRepositorios } from "./mocks/repositorios.js";
 import jwt from "jsonwebtoken";
@@ -27,9 +27,9 @@ test("UNIT-AUTH-01", "optionalAuth pasa de largo si no hay cabecera Authorizatio
   await optionalAuth(req, res, next);
 
   // Assert
-  is(req.user, undefined);
-  is(next.mock.calls.length, 1);
-  is(next.mock.calls[0][0], undefined);
+  expect(req.user).toBe(undefined);
+  expect(next.mock.calls.length).toBe(1);
+  expect(next.mock.calls[0][0]).toBe(undefined);
 });
 
 test("UNIT-AUTH-02", "optionalAuth ignora cabeceras que no comienzan con Bearer", async () => {
@@ -40,8 +40,8 @@ test("UNIT-AUTH-02", "optionalAuth ignora cabeceras que no comienzan con Bearer"
   await optionalAuth(req, res, next);
 
   // Assert
-  is(req.user, undefined);
-  is(next.mock.calls.length, 1);
+  expect(req.user).toBe(undefined);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-AUTH-03", "optionalAuth autentica al usuario cuando el token es válido y existe", async () => {
@@ -55,12 +55,12 @@ test("UNIT-AUTH-03", "optionalAuth autentica al usuario cuando el token es váli
   await optionalAuth(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
-  is(req.user?.id, "usr_opt");
-  is(req.user?.email, u.email);
-  is(req.user?.role, "CUSTOMER");
-  is(req.user?.firstName, "Maria");
-  is(req.user?.lastName, "Gomez");
+  expect(next.mock.calls.length).toBe(1);
+  expect(req.user?.id).toBe("usr_opt");
+  expect(req.user?.email).toBe(u.email);
+  expect(req.user?.role).toBe("CUSTOMER");
+  expect(req.user?.firstName).toBe("Maria");
+  expect(req.user?.lastName).toBe("Gomez");
 });
 
 test("UNIT-AUTH-04", "optionalAuth traga silenciosamente errores de JWT inválido o expirado", async () => {
@@ -72,9 +72,9 @@ test("UNIT-AUTH-04", "optionalAuth traga silenciosamente errores de JWT inválid
   await optionalAuth(req, res, next);
 
   // Assert
-  is(req.user, undefined);
-  is(next.mock.calls.length, 1);
-  is(next.mock.calls[0][0], undefined);
+  expect(req.user).toBe(undefined);
+  expect(next.mock.calls.length).toBe(1);
+  expect(next.mock.calls[0][0]).toBe(undefined);
 });
 
 test("UNIT-AUTH-05", "optionalAuth no asigna usuario si findById devuelve null", async () => {
@@ -87,8 +87,8 @@ test("UNIT-AUTH-05", "optionalAuth no asigna usuario si findById devuelve null",
   await optionalAuth(req, res, next);
 
   // Assert
-  is(req.user, undefined);
-  is(next.mock.calls.length, 1);
+  expect(req.user).toBe(undefined);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-AUTH-06", "forwardAuthError mapea errores inesperados a 500", async () => {
@@ -102,7 +102,7 @@ test("UNIT-AUTH-06", "forwardAuthError mapea errores inesperados a 500", async (
 
   // Assert
   const error = errorDeNext(next);
-  ok(error instanceof AppError);
-  is(error.statusCode, 500);
-  is(error.message, "Error durante la autenticación.");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(500);
+  expect(error.message).toBe("Error durante la autenticación.");
 });

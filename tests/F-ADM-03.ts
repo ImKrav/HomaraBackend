@@ -2,7 +2,7 @@
 // Unidad: AdminController.getInventoryReport()  (GET /api/v1/admin/inventory)
 
 import { vi, beforeEach } from "vitest";
-import { test, is, eq, subset, expect } from "./harness.js";
+import { test, expect } from "./harness.js";
 import { contextoExpress, filaProductoPrisma } from "./helpers.js";
 import { mockPrisma, reiniciarRepositorios } from "./mocks/repositorios.js";
 import { AdminController } from "../src/infrastructure/http/controllers/admin.controller.js";
@@ -34,18 +34,18 @@ test.fails("CP-F-ADM-03-01", "Clasifica productos con existencias menores a cero
 
   // Assert
   expect(next).not.toHaveBeenCalled();
-  is(cuerpo.success, true);
-  is(cuerpo.data.products[0].stockStatus, "stock_negativo");
-  is(cuerpo.data.products[0].stockValue, -5000);
-  is(cuerpo.data.products[0].category, "Pisos y Ceramicas");
-  subset(cuerpo.data.stats, {
+  expect(cuerpo.success).toBe(true);
+  expect(cuerpo.data.products[0].stockStatus).toBe("stock_negativo");
+  expect(cuerpo.data.products[0].stockValue).toBe(-5000);
+  expect(cuerpo.data.products[0].category).toBe("Pisos y Ceramicas");
+  expect(cuerpo.data.stats).toMatchObject({
     totalProducts: 1,
     lowStockCount: 0,
     outOfStockCount: 0,
     negativeStockCount: 1,
   });
   // DEFECTO: totalUnits debería sumar solo existencias positivas (no restar stock negativo)
-  is(cuerpo.data.stats.totalUnits, 0);
+  expect(cuerpo.data.stats.totalUnits).toBe(0);
 });
 
 test("CP-F-ADM-03-02", "Clasifica productos con existencias en 0 como sin_stock", async () => {
@@ -58,12 +58,12 @@ test("CP-F-ADM-03-02", "Clasifica productos con existencias en 0 como sin_stock"
   const { cuerpo } = await reporteCon(filas);
 
   // Assert
-  is(cuerpo.data.products[0].stockStatus, "sin_stock");
-  is(cuerpo.data.products[0].stockValue, 0);
-  is(cuerpo.data.stats.outOfStockCount, 1);
-  is(cuerpo.data.stats.lowStockCount, 0);
-  is(cuerpo.data.stats.negativeStockCount, 0);
-  is(cuerpo.data.stats.totalUnits, 0);
+  expect(cuerpo.data.products[0].stockStatus).toBe("sin_stock");
+  expect(cuerpo.data.products[0].stockValue).toBe(0);
+  expect(cuerpo.data.stats.outOfStockCount).toBe(1);
+  expect(cuerpo.data.stats.lowStockCount).toBe(0);
+  expect(cuerpo.data.stats.negativeStockCount).toBe(0);
+  expect(cuerpo.data.stats.totalUnits).toBe(0);
 });
 
 test("CP-F-ADM-03-03", "Marca 49 unidades como límite superior de alerta stock_bajo", async () => {
@@ -76,13 +76,13 @@ test("CP-F-ADM-03-03", "Marca 49 unidades como límite superior de alerta stock_
   const { cuerpo } = await reporteCon(filas);
 
   // Assert
-  is(cuerpo.data.products[0].stockStatus, "stock_bajo");
-  is(cuerpo.data.products[0].stockValue, 98000);
-  is(cuerpo.data.products[0].stockQuantity, 49);
-  is(cuerpo.data.stats.lowStockCount, 1);
-  is(cuerpo.data.stats.outOfStockCount, 0);
-  is(cuerpo.data.stats.negativeStockCount, 0);
-  is(cuerpo.data.stats.totalUnits, 49);
+  expect(cuerpo.data.products[0].stockStatus).toBe("stock_bajo");
+  expect(cuerpo.data.products[0].stockValue).toBe(98000);
+  expect(cuerpo.data.products[0].stockQuantity).toBe(49);
+  expect(cuerpo.data.stats.lowStockCount).toBe(1);
+  expect(cuerpo.data.stats.outOfStockCount).toBe(0);
+  expect(cuerpo.data.stats.negativeStockCount).toBe(0);
+  expect(cuerpo.data.stats.totalUnits).toBe(49);
 });
 
 test("CP-F-ADM-03-04", "Marca 50 unidades como límite inferior de inventario normal", async () => {
@@ -95,9 +95,9 @@ test("CP-F-ADM-03-04", "Marca 50 unidades como límite inferior de inventario no
   const { cuerpo } = await reporteCon(filas);
 
   // Assert
-  is(cuerpo.data.products[0].stockStatus, "normal");
-  is(cuerpo.data.products[0].stockValue, 100000);
-  eq(cuerpo.data.stats, {
+  expect(cuerpo.data.products[0].stockStatus).toBe("normal");
+  expect(cuerpo.data.products[0].stockValue).toBe(100000);
+  expect(cuerpo.data.stats).toStrictEqual({
     totalProducts: 1,
     totalUnits: 50,
     lowStockCount: 0,
@@ -118,17 +118,17 @@ test.fails("CP-F-ADM-03-05", "Procesa múltiples productos combinando estados en
   const { cuerpo } = await reporteCon(filas);
 
   // Assert
-  eq(cuerpo.data.products.map((p: any) => p.id), ["prd_neg", "prd_cero"]);
-  is(cuerpo.data.products[0].stockStatus, "stock_negativo");
-  is(cuerpo.data.products[1].stockStatus, "sin_stock");
-  is(cuerpo.data.products[0].stockValue, -15000);
-  is(cuerpo.data.products[1].stockValue, 0);
-  subset(cuerpo.data.stats, {
+  expect(cuerpo.data.products.map((p: any) => p.id)).toStrictEqual(["prd_neg", "prd_cero"]);
+  expect(cuerpo.data.products[0].stockStatus).toBe("stock_negativo");
+  expect(cuerpo.data.products[1].stockStatus).toBe("sin_stock");
+  expect(cuerpo.data.products[0].stockValue).toBe(-15000);
+  expect(cuerpo.data.products[1].stockValue).toBe(0);
+  expect(cuerpo.data.stats).toMatchObject({
     totalProducts: 2,
     lowStockCount: 0,
     outOfStockCount: 1,
     negativeStockCount: 1,
   });
   // DEFECTO: totalUnits no debería restar existencias negativas
-  is(cuerpo.data.stats.totalUnits, 0);
+  expect(cuerpo.data.stats.totalUnits).toBe(0);
 });

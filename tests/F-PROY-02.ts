@@ -1,10 +1,10 @@
 // F-PROY-02 · Calcular los materiales
 // Unidad: calculateMaterials()  (src/domain/services/materialCalculator.ts)
 //
-// Función pura, sin dobles. Las aserciones de defecto usan `soft()` para que
+// Función pura, sin dobles. Las aserciones de defecto usan `expect.soft()` para que
 // el caso siga corriendo y reporte todos los incumplimientos juntos.
 
-import { test, is, eq, ok, has, hasNot, soft } from "./harness.js";
+import { test, expect } from "./harness.js";
 import { calculateMaterials } from "../src/domain/services/materialCalculator.js";
 
 type Material = ReturnType<typeof calculateMaterials>[number];
@@ -27,12 +27,12 @@ test("CP-F-PROY-02-01", "Aplica 5% de desperdicio por defecto para proyectos de 
 
   // Assert
   const pintura = buscar(materiales, "Pintura Premium")!;
-  has(pintura.note!, "+5% desperdicio");
-  is(pintura.quantity, "4 galón(es)");
-  is(pintura.price, 500_000);
-  is(pintura.productId, null);
-  hasNot(nombres(materiales), "Crucetas 2mm");
-  is(materiales.length, 4);
+  expect(pintura.note!).toContain("+5% desperdicio");
+  expect(pintura.quantity).toBe("4 galón(es)");
+  expect(pintura.price).toBe(500_000);
+  expect(pintura.productId).toBe(null);
+  expect(nombres(materiales)).not.toContain("Crucetas 2mm");
+  expect(materiales.length).toBe(4);
 });
 
 // Defecto abierto #2 (ver la tabla en tests/README.md): se espera que falle.
@@ -55,26 +55,26 @@ test.fails("CP-F-PROY-02-02", "Prioriza porcentaje explícito de desperdicio sob
 
   // Assert
   const esmalte = buscar(materiales, "Esmalte Sintético Blanco Galón")!;
-  has(esmalte.note!, "+20% de desperdicio");
-  is(esmalte.quantity, "4 galón");
-  is(esmalte.price, 356_000);
-  is(esmalte.productId, "prd-esmalte");
+  expect(esmalte.note!).toContain("+20% de desperdicio");
+  expect(esmalte.quantity).toBe("4 galón");
+  expect(esmalte.price).toBe(356_000);
+  expect(esmalte.productId).toBe("prd-esmalte");
 
   // DEFECTO 4: el desperdicio no se propaga al pegante, la boquilla ni las crucetas
-  soft(() => is(cantidad(materiales, "Pegante cerámico flexible"), 29));
-  soft(() => is(cantidad(materiales, "Boquilla"), 15));
-  soft(() => is(cantidad(materiales, "Crucetas"), 8));
+  expect.soft(cantidad(materiales, "Pegante cerámico flexible")).toBe(29);
+  expect.soft(cantidad(materiales, "Boquilla")).toBe(15);
+  expect.soft(cantidad(materiales, "Crucetas")).toBe(8);
 
   const pared = buscar(materiales, "Pared")!;
-  is(pared.name, "Esmalte Sintético Blanco Galón Pared");
+  expect(pared.name).toBe("Esmalte Sintético Blanco Galón Pared");
   // DEFECTO 2: la pared cotiza precio_galón × m²
-  soft(() => is(pared.quantity, "3 galón"));
-  soft(() => is(pared.price, 267_000));
-  soft(() => ok(pared.price <= esmalte.price * 2));
+  expect.soft(pared.quantity).toBe("3 galón");
+  expect.soft(pared.price).toBe(267_000);
+  expect.soft(pared.price).toBeLessThanOrEqual(esmalte.price * 2);
 
   // DEFECTO 6: entrega herramientas de pintura en un proyecto de baldosa
-  soft(() => has(nombres(materiales), "Llana metálica dentada 10x10mm"));
-  soft(() => has(nombres(materiales), "Mazo de goma blanco anti-marca"));
+  expect.soft(nombres(materiales)).toContain("Llana metálica dentada 10x10mm");
+  expect.soft(nombres(materiales)).toContain("Mazo de goma blanco anti-marca");
 });
 
 test("CP-F-PROY-02-02b", "Respeta cota mínima de 0.1 m² cuando los descuentos superan el área", () => {
@@ -91,11 +91,11 @@ test("CP-F-PROY-02-02b", "Respeta cota mínima de 0.1 m² cuando los descuentos 
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  is(buscar(materiales, "Cerámica")!.quantity, "1 m²");
-  is(buscar(materiales, "Cerámica")!.price, 38_900);
-  is(cantidad(materiales, "Pegante cerámico flexible"), 1);
-  is(cantidad(materiales, "Boquilla"), 1);
-  is(cantidad(materiales, "Crucetas"), 1);
+  expect(buscar(materiales, "Cerámica")!.quantity).toBe("1 m²");
+  expect(buscar(materiales, "Cerámica")!.price).toBe(38_900);
+  expect(cantidad(materiales, "Pegante cerámico flexible")).toBe(1);
+  expect(cantidad(materiales, "Boquilla")).toBe(1);
+  expect(cantidad(materiales, "Crucetas")).toBe(1);
 });
 
 test("CP-F-PROY-02-03", "Asigna 15% de desperdicio para colocación en diagonal", () => {
@@ -112,10 +112,10 @@ test("CP-F-PROY-02-03", "Asigna 15% de desperdicio para colocación en diagonal"
 
   // Assert
   const porcelanato = buscar(materiales, "Porcelanato")!;
-  is(porcelanato.note, "+15% de desperdicio por colocación");
-  is(porcelanato.quantity, "58 m²");
-  is(porcelanato.price, 2_662_200);
-  is(cantidad(materiales, "Pegante cerámico flexible"), 13);
+  expect(porcelanato.note).toBe("+15% de desperdicio por colocación");
+  expect(porcelanato.quantity).toBe("58 m²");
+  expect(porcelanato.price).toBe(2_662_200);
+  expect(cantidad(materiales, "Pegante cerámico flexible")).toBe(13);
 });
 
 test("CP-F-PROY-02-04", "Asigna 12% de desperdicio para colocación en trabadura", () => {
@@ -132,9 +132,9 @@ test("CP-F-PROY-02-04", "Asigna 12% de desperdicio para colocación en trabadura
 
   // Assert
   const porcelanato = buscar(materiales, "Porcelanato")!;
-  is(porcelanato.note, "+12% de desperdicio por colocación");
-  is(porcelanato.quantity, "56 m²");
-  is(porcelanato.price, 2_570_400);
+  expect(porcelanato.note).toBe("+12% de desperdicio por colocación");
+  expect(porcelanato.quantity).toBe("56 m²");
+  expect(porcelanato.price).toBe(2_570_400);
 });
 
 test("CP-F-PROY-02-05", "Asigna 10% de desperdicio para colocación directa o por defecto", () => {
@@ -147,10 +147,10 @@ test("CP-F-PROY-02-05", "Asigna 10% de desperdicio para colocación directa o po
 
   // Assert
   const porcelanato = buscar(directo, "Porcelanato")!;
-  is(porcelanato.note, "+10% de desperdicio por colocación");
-  is(porcelanato.quantity, "55 m²");
-  is(porcelanato.price, 2_524_500);
-  is(buscar(desconocido, "Porcelanato")!.quantity, "55 m²");
+  expect(porcelanato.note).toBe("+10% de desperdicio por colocación");
+  expect(porcelanato.quantity).toBe("55 m²");
+  expect(porcelanato.price).toBe(2_524_500);
+  expect(buscar(desconocido, "Porcelanato")!.quantity).toBe("55 m²");
 });
 
 // --- Revestimiento principal ------------------------------------------
@@ -172,14 +172,14 @@ test.fails("CP-F-PROY-02-06", "Mantiene pintura genérica si el producto vincula
 
   // Assert
   const pintura = buscar(materiales, "Pintura Premium de Interior/Exterior")!;
-  is(pintura.quantity, "4 galón(es)");
-  is(pintura.price, 500_000);
-  has(pintura.note!, "+8% desperdicio");
-  is(pintura.productId, null);
+  expect(pintura.quantity).toBe("4 galón(es)");
+  expect(pintura.price).toBe(500_000);
+  expect(pintura.note!).toContain("+8% desperdicio");
+  expect(pintura.productId).toBe(null);
 
   // DEFECTO 5: el producto vinculado se pierde entre clasificaciones
-  soft(() => has(nombres(materiales), "Pegante Cerámico Extrafuerte 25kg"));
-  soft(() => is(buscar(materiales, "Pegante Cerámico Extrafuerte 25kg")?.productId, "prd-peg"));
+  expect.soft(nombres(materiales)).toContain("Pegante Cerámico Extrafuerte 25kg");
+  expect.soft(buscar(materiales, "Pegante Cerámico Extrafuerte 25kg")?.productId).toBe("prd-peg");
 });
 
 test("CP-F-PROY-02-07", "Cotiza producto del catálogo por m² con desperdicio aplicado", () => {
@@ -197,14 +197,14 @@ test("CP-F-PROY-02-07", "Cotiza producto del catálogo por m² con desperdicio a
 
   // Assert
   const porcelanato = buscar(materiales, "Porcelanato Marfil Pulido 60x60")!;
-  is(porcelanato.quantity, "71 m²");
-  is(porcelanato.price, 3_755_900);
-  is(porcelanato.note, "Cálculo exacto con +10% de desperdicio");
-  is(porcelanato.productId, "prd-porc");
-  is(cantidad(materiales, "Pegante cerámico flexible"), 17);
-  is(cantidad(materiales, "Boquilla"), 9);
-  is(cantidad(materiales, "Crucetas"), 5);
-  is(materiales.length, 7);
+  expect(porcelanato.quantity).toBe("71 m²");
+  expect(porcelanato.price).toBe(3_755_900);
+  expect(porcelanato.note).toBe("Cálculo exacto con +10% de desperdicio");
+  expect(porcelanato.productId).toBe("prd-porc");
+  expect(cantidad(materiales, "Pegante cerámico flexible")).toBe(17);
+  expect(cantidad(materiales, "Boquilla")).toBe(9);
+  expect(cantidad(materiales, "Crucetas")).toBe(5);
+  expect(materiales.length).toBe(7);
 });
 
 // Defecto abierto #1 (ver la tabla en tests/README.md): se espera que falle.
@@ -228,25 +228,25 @@ test.fails("CP-F-PROY-02-08", "Asigna baldosa genérica y calcula pegante vincul
 
   // Assert
   const ceramica = buscar(materiales, "Cerámica 30x30 cm")!;
-  is(ceramica.quantity, "44 m²");
-  is(ceramica.price, 1_276_000);
-  is(ceramica.productId, null);
+  expect(ceramica.quantity).toBe("44 m²");
+  expect(ceramica.price).toBe(1_276_000);
+  expect(ceramica.productId).toBe(null);
 
   const pegante = buscar(materiales, "Pegante Blanco Porcelanato 10kg")!;
-  is(pegante.quantity, "25 bultos");
-  is(pegante.price, 537_500);
-  is(pegante.note, "Pegante real vinculado: 1 unidad de 10kg por cada 1.6m²");
-  is(pegante.productId, "prd-peg-10");
+  expect(pegante.quantity).toBe("25 bultos");
+  expect(pegante.price).toBe(537_500);
+  expect(pegante.note).toBe("Pegante real vinculado: 1 unidad de 10kg por cada 1.6m²");
+  expect(pegante.productId).toBe("prd-peg-10");
 
   const acabado = buscar(calacatta, "Porcelanato Calacatta Gold 60x60")!;
   // DEFECTO 1: la subcadena 'cal' clasifica revestimiento legítimo como pegante
-  soft(() => hasNot(acabado.note!, "Pegante"));
-  soft(() => is(acabado.note, "Cálculo exacto con +10% de desperdicio"));
-  soft(() => is(acabado.quantity, "44 m²"));
-  soft(() => is(acabado.price, 3_124_000));
-  soft(() => is(acabado.icon, "🏗️"));
-  soft(() => is(buscar(calacatta, "Cerámica 30x30 cm"), undefined));
-  soft(() => has(nombres(calacatta), "Pegante cerámico flexible 25kg"));
+  expect.soft(acabado.note!).not.toContain("Pegante");
+  expect.soft(acabado.note).toBe("Cálculo exacto con +10% de desperdicio");
+  expect.soft(acabado.quantity).toBe("44 m²");
+  expect.soft(acabado.price).toBe(3_124_000);
+  expect.soft(acabado.icon).toBe("🏗️");
+  expect.soft(buscar(calacatta, "Cerámica 30x30 cm")).toBe(undefined);
+  expect.soft(nombres(calacatta)).toContain("Pegante cerámico flexible 25kg");
 });
 
 // --- Insumos de baldosa ----------------------------------------------
@@ -259,14 +259,14 @@ test("CP-F-PROY-02-09", "Excluye insumos de baldosa (pegante, boquilla, crucetas
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  is(buscar(materiales, "Madera laminada 60x60 cm")!.quantity, "33 m²");
-  is(buscar(materiales, "Madera laminada 60x60 cm")!.price, 1_716_000);
+  expect(buscar(materiales, "Madera laminada 60x60 cm")!.quantity).toBe("33 m²");
+  expect(buscar(materiales, "Madera laminada 60x60 cm")!.price).toBe(1_716_000);
   const lista = nombres(materiales);
-  hasNot(lista, "Pegante cerámico flexible 25kg");
-  hasNot(lista, "Boquilla");
-  hasNot(lista, "Crucetas 2mm");
-  hasNot(lista, "Llana metálica dentada 10x10mm");
-  is(materiales.length, 3);
+  expect(lista).not.toContain("Pegante cerámico flexible 25kg");
+  expect(lista).not.toContain("Boquilla");
+  expect(lista).not.toContain("Crucetas 2mm");
+  expect(lista).not.toContain("Llana metálica dentada 10x10mm");
+  expect(materiales.length).toBe(3);
 });
 
 test("CP-F-PROY-02-10", "Cotiza boquilla real vinculada y omite pegante si se desactiva includeAdhesive", () => {
@@ -284,13 +284,13 @@ test("CP-F-PROY-02-10", "Cotiza boquilla real vinculada y omite pegante si se de
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  hasNot(nombres(materiales), "Pegante cerámico flexible 25kg");
+  expect(nombres(materiales)).not.toContain("Pegante cerámico flexible 25kg");
   const boquilla = buscar(materiales, "Boquilla Premium Antihongos 2kg")!;
-  is(boquilla.quantity, "4 unidades");
-  is(boquilla.price, 75_600);
-  is(boquilla.note, "Boquilla real vinculada: 1 unidad de 2kg por cada 16m²");
-  is(cantidad(materiales, "Crucetas"), 4);
-  is(materiales.length, 6);
+  expect(boquilla.quantity).toBe("4 unidades");
+  expect(boquilla.price).toBe(75_600);
+  expect(boquilla.note).toBe("Boquilla real vinculada: 1 unidad de 2kg por cada 16m²");
+  expect(cantidad(materiales, "Crucetas")).toBe(4);
+  expect(materiales.length).toBe(6);
 });
 
 test("CP-F-PROY-02-11", "Asigna pegante genérico de 25kg cuando el producto vinculado no es adhesivo", () => {
@@ -308,12 +308,12 @@ test("CP-F-PROY-02-11", "Asigna pegante genérico de 25kg cuando el producto vin
 
   // Assert
   const pegante = buscar(materiales, "Pegante cerámico flexible 25kg")!;
-  is(pegante.quantity, "10 bultos");
-  is(pegante.price, 285_000);
-  is(pegante.note, "25kg c/u (Rendimiento: 4m²/bulto)");
-  is(pegante.productId, null);
-  is(buscar(materiales, "Impermeabilizante")!.quantity, "2 galón");
-  is(buscar(materiales, "Impermeabilizante")!.price, 156_000);
+  expect(pegante.quantity).toBe("10 bultos");
+  expect(pegante.price).toBe(285_000);
+  expect(pegante.note).toBe("25kg c/u (Rendimiento: 4m²/bulto)");
+  expect(pegante.productId).toBe(null);
+  expect(buscar(materiales, "Impermeabilizante")!.quantity).toBe("2 galón");
+  expect(buscar(materiales, "Impermeabilizante")!.price).toBe(156_000);
 });
 
 test("CP-F-PROY-02-12", "Mantiene crucetas cuando se omiten pegante y boquilla", () => {
@@ -332,12 +332,12 @@ test("CP-F-PROY-02-12", "Mantiene crucetas cuando se omiten pegante y boquilla",
 
   // Assert
   const lista = nombres(materiales);
-  hasNot(lista, "Pegante cerámico flexible 25kg");
-  hasNot(lista, "Boquilla");
-  is(buscar(materiales, "Crucetas 2mm")!.quantity, "3 bolsas");
-  is(buscar(materiales, "Crucetas 2mm")!.price, 25_500);
-  is(buscar(materiales, "Cerámica 60x60 cm")!.quantity, "50 m²");
-  is(materiales.length, 5);
+  expect(lista).not.toContain("Pegante cerámico flexible 25kg");
+  expect(lista).not.toContain("Boquilla");
+  expect(buscar(materiales, "Crucetas 2mm")!.quantity).toBe("3 bolsas");
+  expect(buscar(materiales, "Crucetas 2mm")!.price).toBe(25_500);
+  expect(buscar(materiales, "Cerámica 60x60 cm")!.quantity).toBe("50 m²");
+  expect(materiales.length).toBe(5);
 });
 
 test("CP-F-PROY-02-13", "Calcula boquilla genérica a rendimiento de 8 m² por kilo", () => {
@@ -355,12 +355,12 @@ test("CP-F-PROY-02-13", "Calcula boquilla genérica a rendimiento de 8 m² por k
 
   // Assert
   const boquilla = buscar(materiales, "Boquilla")!;
-  is(boquilla.quantity, "6 kg");
-  is(boquilla.price, 72_000);
-  is(boquilla.note, "Rendimiento: 8m²/kg");
-  is(boquilla.productId, null);
-  is(buscar(materiales, "Porcelanato 60x60 cm")!.price, 2_295_000);
-  is(materiales.length, 6);
+  expect(boquilla.quantity).toBe("6 kg");
+  expect(boquilla.price).toBe(72_000);
+  expect(boquilla.note).toBe("Rendimiento: 8m²/kg");
+  expect(boquilla.productId).toBe(null);
+  expect(buscar(materiales, "Porcelanato 60x60 cm")!.price).toBe(2_295_000);
+  expect(materiales.length).toBe(6);
 });
 
 test("CP-F-PROY-02-14", "Excluye insumos de baldosa pero preserva herramientas correspondientes", () => {
@@ -379,10 +379,10 @@ test("CP-F-PROY-02-14", "Excluye insumos de baldosa pero preserva herramientas c
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  hasNot(nombres(materiales), "Crucetas 2mm");
-  is(buscar(materiales, "Cerámica 60x60 cm")!.quantity, "50 m²");
-  is(buscar(materiales, "Cerámica 60x60 cm")!.price, 1_945_000);
-  eq(nombres(materiales), [
+  expect(nombres(materiales)).not.toContain("Crucetas 2mm");
+  expect(buscar(materiales, "Cerámica 60x60 cm")!.quantity).toBe("50 m²");
+  expect(buscar(materiales, "Cerámica 60x60 cm")!.price).toBe(1_945_000);
+  expect(nombres(materiales)).toStrictEqual([
     "Cerámica 60x60 cm",
     "Nivel de burbuja profesional 60cm",
     "Llana metálica dentada 10x10mm",
@@ -406,13 +406,13 @@ test("CP-F-PROY-02-15", "Calcula primer para vinilo y excluye cinta underlayment
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  hasNot(nombres(materiales), "Cinta underlayment");
-  is(buscar(materiales, "Vinilo 45x45 cm")!.quantity, "31 m²");
-  is(buscar(materiales, "Vinilo 45x45 cm")!.price, 775_000);
+  expect(nombres(materiales)).not.toContain("Cinta underlayment");
+  expect(buscar(materiales, "Vinilo 45x45 cm")!.quantity).toBe("31 m²");
+  expect(buscar(materiales, "Vinilo 45x45 cm")!.price).toBe(775_000);
   const primer = buscar(materiales, "Primer para vinilo")!;
-  is(primer.quantity, "2 galones");
-  is(primer.price, 90_000);
-  is(materiales.length, 3);
+  expect(primer.quantity).toBe("2 galones");
+  expect(primer.price).toBe(90_000);
+  expect(materiales.length).toBe(3);
 });
 
 test("CP-F-PROY-02-16", "Omite cinta underlayment para madera cuando includeAdhesive es false", () => {
@@ -429,10 +429,10 @@ test("CP-F-PROY-02-16", "Omite cinta underlayment para madera cuando includeAdhe
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  hasNot(nombres(materiales), "Cinta underlayment");
-  is(buscar(materiales, "Madera laminada 60x60 cm")!.quantity, "33 m²");
-  is(buscar(materiales, "Madera laminada 60x60 cm")!.price, 1_716_000);
-  eq(nombres(materiales), ["Madera laminada 60x60 cm", "Nivel de burbuja profesional 60cm"]);
+  expect(nombres(materiales)).not.toContain("Cinta underlayment");
+  expect(buscar(materiales, "Madera laminada 60x60 cm")!.quantity).toBe("33 m²");
+  expect(buscar(materiales, "Madera laminada 60x60 cm")!.price).toBe(1_716_000);
+  expect(nombres(materiales)).toStrictEqual(["Madera laminada 60x60 cm", "Nivel de burbuja profesional 60cm"]);
 });
 
 test("CP-F-PROY-02-17", "Omite insumos específicos ante materialType desconocido cotizando producto galón", () => {
@@ -451,12 +451,12 @@ test("CP-F-PROY-02-17", "Omite insumos específicos ante materialType desconocid
 
   // Assert
   const lista = nombres(materiales);
-  hasNot(lista, "Primer para vinilo");
-  hasNot(lista, "Cinta underlayment");
-  hasNot(lista, "Nivel de burbuja profesional 60cm");
-  is(buscar(materiales, "Sellador Poliuretano Transparente")!.quantity, "2 galón");
-  is(buscar(materiales, "Sellador Poliuretano Transparente")!.price, 192_000);
-  is(materiales.length, 4);
+  expect(lista).not.toContain("Primer para vinilo");
+  expect(lista).not.toContain("Cinta underlayment");
+  expect(lista).not.toContain("Nivel de burbuja profesional 60cm");
+  expect(buscar(materiales, "Sellador Poliuretano Transparente")!.quantity).toBe("2 galón");
+  expect(buscar(materiales, "Sellador Poliuretano Transparente")!.price).toBe(192_000);
+  expect(materiales.length).toBe(4);
 });
 
 test("CP-F-PROY-02-18", "Omite primer para vinilo si includeAdhesive está desactivado", () => {
@@ -474,10 +474,10 @@ test("CP-F-PROY-02-18", "Omite primer para vinilo si includeAdhesive está desac
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  hasNot(nombres(materiales), "Primer para vinilo");
-  is(buscar(materiales, "Vinilo 45x45 cm")!.quantity, "31 m²");
-  is(buscar(materiales, "Vinilo 45x45 cm")!.price, 775_000);
-  eq(nombres(materiales), ["Vinilo 45x45 cm", "Nivel de burbuja profesional 60cm"]);
+  expect(nombres(materiales)).not.toContain("Primer para vinilo");
+  expect(buscar(materiales, "Vinilo 45x45 cm")!.quantity).toBe("31 m²");
+  expect(buscar(materiales, "Vinilo 45x45 cm")!.price).toBe(775_000);
+  expect(nombres(materiales)).toStrictEqual(["Vinilo 45x45 cm", "Nivel de burbuja profesional 60cm"]);
 });
 
 // --- Herramientas y paredes ---------------------------------------
@@ -498,17 +498,17 @@ test.fails("CP-F-PROY-02-19", "Cotiza paredes en proyecto integral aunque includ
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  is(materiales.length, 2);
+  expect(materiales.length).toBe(2);
   const pared = buscar(materiales, "Pared")!;
-  is(pared.name, "Cerámica Pared 80x80 cm");
-  is(pared.quantity, "14 m²");
-  is(pared.note, "Paredes estimadas (+10% desperdicio)");
+  expect(pared.name).toBe("Cerámica Pared 80x80 cm");
+  expect(pared.quantity).toBe("14 m²");
+  expect(pared.note).toBe("Paredes estimadas (+10% desperdicio)");
 
   const piso = buscar(materiales, "Cerámica 80x80 cm")!;
-  is(piso.quantity, "22 m²");
+  expect(piso.quantity).toBe("22 m²");
   // DEFECTO 3: etiqueta 80x80 cotizada al precio del formato 60x60
-  soft(() => is(piso.price, 924_000));
-  soft(() => is(pared.price, 588_000));
+  expect.soft(piso.price).toBe(924_000);
+  expect.soft(pared.price).toBe(588_000);
 });
 
 test("CP-F-PROY-02-20", "Incluye kit de herramientas de baldosa (nivel, llana y mazo)", () => {
@@ -530,13 +530,13 @@ test("CP-F-PROY-02-20", "Incluye kit de herramientas de baldosa (nivel, llana y 
   const nivel = buscar(materiales, "Nivel de burbuja profesional 60cm")!;
   const llana = buscar(materiales, "Llana metálica dentada 10x10mm")!;
   const mazo = buscar(materiales, "Mazo de goma blanco anti-marca")!;
-  is(nivel.price, 35_000);
-  is(llana.price, 18_500);
-  is(mazo.price, 14_500);
-  ok([nivel, llana, mazo].every((m) => m.quantity === "1 unidad"));
-  hasNot(nombres(materiales), "Kit Rodillo Antigoteo Profesional 23cm");
-  is(buscar(materiales, "Cerámica 60x60 cm")!.quantity, "14 m²");
-  is(materiales.length, 4);
+  expect(nivel.price).toBe(35_000);
+  expect(llana.price).toBe(18_500);
+  expect(mazo.price).toBe(14_500);
+  expect([nivel, llana, mazo].map((m) => m.quantity)).toStrictEqual(["1 unidad", "1 unidad", "1 unidad"]);
+  expect(nombres(materiales)).not.toContain("Kit Rodillo Antigoteo Profesional 23cm");
+  expect(buscar(materiales, "Cerámica 60x60 cm")!.quantity).toBe("14 m²");
+  expect(materiales.length).toBe(4);
 });
 
 test("CP-F-PROY-02-21", "Incluye solo nivel en herramientas para proyectos sin baldosa", () => {
@@ -553,10 +553,10 @@ test("CP-F-PROY-02-21", "Incluye solo nivel en herramientas para proyectos sin b
   const materiales = calculateMaterials(entrada);
 
   // Assert
-  eq(nombres(materiales), ["Madera laminada 60x60 cm", "Nivel de burbuja profesional 60cm"]);
-  is(buscar(materiales, "Nivel de burbuja")!.price, 35_000);
-  is(buscar(materiales, "Madera laminada 60x60 cm")!.quantity, "14 m²");
-  is(buscar(materiales, "Madera laminada 60x60 cm")!.price, 728_000);
+  expect(nombres(materiales)).toStrictEqual(["Madera laminada 60x60 cm", "Nivel de burbuja profesional 60cm"]);
+  expect(buscar(materiales, "Nivel de burbuja")!.price).toBe(35_000);
+  expect(buscar(materiales, "Madera laminada 60x60 cm")!.quantity).toBe("14 m²");
+  expect(buscar(materiales, "Madera laminada 60x60 cm")!.price).toBe(728_000);
 });
 
 test("CP-F-PROY-02-22", "Omite estimación de paredes para pintura o cuando el tipo no es integral", () => {
@@ -569,13 +569,13 @@ test("CP-F-PROY-02-22", "Omite estimación de paredes para pintura o cuando el t
   const soloPiso = calculateMaterials(residencialDeCeramica);
 
   // Assert
-  is(integralPintura.some((m) => m.name.includes("Pared")), false);
-  is(buscar(integralPintura, "Pintura Premium")!.quantity, "3 galón(es)");
-  is(buscar(integralPintura, "Pintura Premium")!.price, 375_000);
-  is(integralPintura.length, 4);
+  expect(integralPintura.some((m) => m.name.includes("Pared"))).toBe(false);
+  expect(buscar(integralPintura, "Pintura Premium")!.quantity).toBe("3 galón(es)");
+  expect(buscar(integralPintura, "Pintura Premium")!.price).toBe(375_000);
+  expect(integralPintura.length).toBe(4);
 
-  is(soloPiso.some((m) => m.name.includes("Pared")), false);
-  is(buscar(soloPiso, "Cerámica 60x60 cm")!.quantity, "88 m²");
-  is(buscar(soloPiso, "Cerámica 60x60 cm")!.price, 3_423_200);
-  is(soloPiso.length, 7);
+  expect(soloPiso.some((m) => m.name.includes("Pared"))).toBe(false);
+  expect(buscar(soloPiso, "Cerámica 60x60 cm")!.quantity).toBe("88 m²");
+  expect(buscar(soloPiso, "Cerámica 60x60 cm")!.price).toBe(3_423_200);
+  expect(soloPiso.length).toBe(7);
 });

@@ -1,7 +1,7 @@
 // F-CAT-02 · Ver el detalle de un producto
 // Unidad: GetProductDetailUseCase.execute()  (GET /api/v1/products/:id)
 
-import { test, is, ok, grab, expect } from "./harness.js";
+import { test, grab, expect } from "./harness.js";
 import { fakeProductos, fakeCarritos, producto, carrito } from "./helpers.js";
 import { GetProductDetailUseCase } from "../src/application/use-cases/catalog.use-cases.js";
 import { AppError } from "../src/shared/errors/AppError.js";
@@ -22,9 +22,9 @@ test("CP-F-CAT-02-01", "Retorna 404 si el producto no existe", async () => {
   const error = await grab(caso.execute("prd_inexistente"));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.statusCode, 404);
-  is(error.message, "Producto no encontrado");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(404);
+  expect(error.message).toBe("Producto no encontrado");
   expect(carritos.findByUserId).not.toHaveBeenCalled();
   expect(carritos.getReservedQuantities).not.toHaveBeenCalled();
 });
@@ -42,12 +42,12 @@ test("CP-F-CAT-02-02", "Excluye la reserva propia del usuario autenticado al cal
   // Assert
   expect(carritos.findByUserId).toHaveBeenCalledWith("usr_001");
   expect(carritos.getReservedQuantities).toHaveBeenCalledWith("cart_001", ["prd_001"]);
-  is(ficha.stockQuantity, 6);
-  is(ficha.inStock, true);
-  is(ficha.price, 38900);
-  is(ficha.originalPrice, null);
-  is(ficha.unit, "m²");
-  is(ficha.category, "Pisos y Ceramicas");
+  expect(ficha.stockQuantity).toBe(6);
+  expect(ficha.inStock).toBe(true);
+  expect(ficha.price).toBe(38900);
+  expect(ficha.originalPrice).toBe(null);
+  expect(ficha.unit).toBe("m²");
+  expect(ficha.category).toBe("Pisos y Ceramicas");
 });
 
 test("CP-F-CAT-02-03", "Descuenta todas las reservas activas para usuario anónimo", async () => {
@@ -62,8 +62,8 @@ test("CP-F-CAT-02-03", "Descuenta todas las reservas activas para usuario anóni
   // Assert
   expect(carritos.findByUserId).not.toHaveBeenCalled();
   expect(carritos.getReservedQuantities).toHaveBeenCalledWith("", ["prd_001"]);
-  is(ficha.stockQuantity, 6);
-  is(ficha.inStock, true);
+  expect(ficha.stockQuantity).toBe(6);
+  expect(ficha.inStock).toBe(true);
 });
 
 test("CP-F-CAT-02-03b", "Marca producto como agotado si las reservas consumen todo el stock", async () => {
@@ -76,8 +76,8 @@ test("CP-F-CAT-02-03b", "Marca producto como agotado si las reservas consumen to
   const ficha = await caso.execute("prd_001");
 
   // Assert
-  is(ficha.stockQuantity, 0);
-  is(ficha.inStock, false);
+  expect(ficha.stockQuantity).toBe(0);
+  expect(ficha.inStock).toBe(false);
 });
 
 test("CP-F-CAT-02-03c", "Mantiene stock físico intacto cuando no hay reservas activas", async () => {
@@ -90,6 +90,6 @@ test("CP-F-CAT-02-03c", "Mantiene stock físico intacto cuando no hay reservas a
   const ficha = await caso.execute("prd_001");
 
   // Assert
-  is(ficha.stockQuantity, 7);
-  is(ficha.inStock, true);
+  expect(ficha.stockQuantity).toBe(7);
+  expect(ficha.inStock).toBe(true);
 });

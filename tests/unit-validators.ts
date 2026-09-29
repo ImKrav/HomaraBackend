@@ -1,4 +1,4 @@
-﻿import { test, is } from "./harness.js";
+﻿import { test, expect } from "./harness.js";
 import { cuidParamSchema, itemIdParamSchema, listProjectsQuerySchema, listOrdersQuerySchema } from "../src/infrastructure/http/validators/common.validator.js";
 import { createOrderSchema, updateOrderStatusSchema } from "../src/infrastructure/http/validators/order.validator.js";
 import { createProjectSchema, updateProjectSchema } from "../src/infrastructure/http/validators/project.validator.js";
@@ -14,10 +14,10 @@ test("UNIT-VAL-01", "Valida cuidParamSchema y itemIdParamSchema con CUID válido
   const itemInvalido = itemIdParamSchema.safeParse({ itemId: "invalid" });
 
   // Assert
-  is(cuidValido.success, true);
-  is(cuidInvalido.success, false);
-  is(itemValido.success, true);
-  is(itemInvalido.success, false);
+  expect(cuidValido.success).toBe(true);
+  expect(cuidInvalido.success).toBe(false);
+  expect(itemValido.success).toBe(true);
+  expect(itemInvalido.success).toBe(false);
 });
 
 test("UNIT-VAL-02", "Valida listOrdersQuerySchema y transformación de admin boolean", () => {
@@ -31,15 +31,15 @@ test("UNIT-VAL-02", "Valida listOrdersQuerySchema y transformación de admin boo
   const proyectosSinFiltro = listProjectsQuerySchema.safeParse({});
 
   // Assert
-  is(parsed.success, true);
+  expect(parsed.success).toBe(true);
   if (parsed.success) {
-    is(parsed.data.admin, true);
+    expect(parsed.data.admin).toBe(true);
   }
-  is(parsedFalse.success, true);
+  expect(parsedFalse.success).toBe(true);
   if (parsedFalse.success) {
-    is(parsedFalse.data.admin, false);
+    expect(parsedFalse.data.admin).toBe(false);
   }
-  is(proyectosSinFiltro.success, true);
+  expect(proyectosSinFiltro.success).toBe(true);
 });
 
 test("UNIT-VAL-03", "Valida createOrderSchema y updateOrderStatusSchema", () => {
@@ -57,10 +57,10 @@ test("UNIT-VAL-03", "Valida createOrderSchema y updateOrderStatusSchema", () => 
   const estadoDesconocido = updateOrderStatusSchema.safeParse({ status: "DESCONOCIDO" });
 
   // Assert
-  is(pedidoValido.success, true);
-  is(pedidoVacio.success, false);
-  is(estadoValido.success, true);
-  is(estadoDesconocido.success, false);
+  expect(pedidoValido.success).toBe(true);
+  expect(pedidoVacio.success).toBe(false);
+  expect(estadoValido.success).toBe(true);
+  expect(estadoDesconocido.success).toBe(false);
 });
 
 test("UNIT-VAL-04", "Valida createProjectSchema y updateProjectSchema", () => {
@@ -83,8 +83,8 @@ test("UNIT-VAL-04", "Valida createProjectSchema y updateProjectSchema", () => {
   const areaNegativa = updateProjectSchema.safeParse({ area: -5 });
 
   // Assert
-  is(proyectoValido.success, true);
-  is(proyectoSinNombre.success, false);
-  is(cambioValido.success, true);
-  is(areaNegativa.success, false);
+  expect(proyectoValido.success).toBe(true);
+  expect(proyectoSinNombre.success).toBe(false);
+  expect(cambioValido.success).toBe(true);
+  expect(areaNegativa.success).toBe(false);
 });

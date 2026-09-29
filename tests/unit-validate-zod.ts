@@ -1,4 +1,4 @@
-﻿import { test, is, eq, has } from "./harness.js";
+﻿import { test, expect } from "./harness.js";
 import { validateZod } from "../src/infrastructure/http/middlewares/validateZod.js";
 import { z } from "zod";
 import { AppError } from "../src/shared/errors/AppError.js";
@@ -16,8 +16,8 @@ test("UNIT-ZOD-01", "Valida body correcto y llama a next", () => {
   middleware(req, res, next);
 
   // Assert
-  is(nextCalled, true);
-  eq(req.body, { name: "Juan", age: 30 });
+  expect(nextCalled).toBe(true);
+  expect(req.body).toStrictEqual({ name: "Juan", age: 30 });
 });
 
 test("UNIT-ZOD-02", "Lanza AppError 400 cuando el body no cumple el esquema", () => {
@@ -37,9 +37,9 @@ test("UNIT-ZOD-02", "Lanza AppError 400 cuando el body no cumple el esquema", ()
   }
 
   // Assert
-  is(errorLanzado instanceof AppError, true);
-  is(errorLanzado.statusCode, 400);
-  has(errorLanzado.message, "Validación fallida");
+  expect(errorLanzado instanceof AppError).toBe(true);
+  expect(errorLanzado.statusCode).toBe(400);
+  expect(errorLanzado.message).toContain("Validación fallida");
 });
 
 test("UNIT-ZOD-03", "Mutan in-place req.query preservando conversión de tipos de Zod", () => {
@@ -55,9 +55,9 @@ test("UNIT-ZOD-03", "Mutan in-place req.query preservando conversión de tipos d
   middleware(req, res, next);
 
   // Assert
-  is(nextCalled, true);
-  is(req.query.limit, 25);
-  is(req.query.extra, undefined);
+  expect(nextCalled).toBe(true);
+  expect(req.query.limit).toBe(25);
+  expect(req.query.extra).toBe(undefined);
 });
 
 test("UNIT-ZOD-04", "Mutan in-place req.params con tipos validados", () => {
@@ -73,6 +73,6 @@ test("UNIT-ZOD-04", "Mutan in-place req.params con tipos validados", () => {
   middleware(req, res, next);
 
   // Assert
-  is(nextCalled, true);
-  is(req.params.id, "abc");
+  expect(nextCalled).toBe(true);
+  expect(req.params.id).toBe("abc");
 });

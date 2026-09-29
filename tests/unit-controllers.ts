@@ -1,5 +1,5 @@
 import { vi, beforeEach } from "vitest";
-import { test, is, eq, ok } from "./harness.js";
+import { test, expect } from "./harness.js";
 import { contextoExpress } from "./helpers.js";
 import {
   mockCarritos,
@@ -81,10 +81,10 @@ test("UNIT-CTRL-CART-01", "CartController.get retorna carrito vacío si no hay u
   await CartController.get(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.id, "guest");
-  is(res.body.data.itemCount, 0);
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.id).toBe("guest");
+  expect(res.body.data.itemCount).toBe(0);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-CART-02", "CartController.get obtiene carrito si hay usuario autenticado", async () => {
@@ -97,9 +97,9 @@ test("UNIT-CTRL-CART-02", "CartController.get obtiene carrito si hay usuario aut
   await CartController.get(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.id, "cart-1");
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.id).toBe("cart-1");
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-CART-03", "CartController.get delega errores a next", async () => {
@@ -112,8 +112,8 @@ test("UNIT-CTRL-CART-03", "CartController.get delega errores a next", async () =
   await CartController.get(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
-  is(next.mock.calls[0][0].message, "DB Down");
+  expect(next.mock.calls.length).toBe(1);
+  expect(next.mock.calls[0][0].message).toBe("DB Down");
 });
 
 test("UNIT-CTRL-CART-04", "CartController.addItem agrega producto y responde 201", async () => {
@@ -128,9 +128,9 @@ test("UNIT-CTRL-CART-04", "CartController.addItem agrega producto y responde 201
   await CartController.addItem(req, res, next);
 
   // Assert
-  is(res.statusCode, 201);
-  is(res.body.success, true);
-  is(next.mock.calls.length, 0);
+  expect(res.statusCode).toBe(201);
+  expect(res.body.success).toBe(true);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-CART-05", "CartController.addItem delega errores a next", async () => {
@@ -144,8 +144,8 @@ test("UNIT-CTRL-CART-05", "CartController.addItem delega errores a next", async 
   await CartController.addItem(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
-  is(next.mock.calls[0][0].message, "Error agregando");
+  expect(next.mock.calls.length).toBe(1);
+  expect(next.mock.calls[0][0].message).toBe("Error agregando");
 });
 
 test("UNIT-CTRL-CART-06", "CartController.updateItemQuantity actualiza cantidad y responde 200", async () => {
@@ -161,8 +161,8 @@ test("UNIT-CTRL-CART-06", "CartController.updateItemQuantity actualiza cantidad 
   await CartController.updateItemQuantity(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-CART-07", "CartController.updateItemQuantity delega error a next", async () => {
@@ -177,7 +177,7 @@ test("UNIT-CTRL-CART-07", "CartController.updateItemQuantity delega error a next
   await CartController.updateItemQuantity(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-CART-08", "CartController.removeItem remueve item y responde 200", async () => {
@@ -192,8 +192,8 @@ test("UNIT-CTRL-CART-08", "CartController.removeItem remueve item y responde 200
   await CartController.removeItem(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-CART-09", "CartController.removeItem delega error a next", async () => {
@@ -207,7 +207,7 @@ test("UNIT-CTRL-CART-09", "CartController.removeItem delega error a next", async
   await CartController.removeItem(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 // ============================================================================
@@ -224,9 +224,9 @@ test("UNIT-CTRL-ORD-01", "OrderController.list retorna vacío si no hay userId",
   await OrderController.list(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  eq(res.body.data, []);
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data).toStrictEqual([]);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-ORD-02", "OrderController.list lista pedidos para usuario autenticado", async () => {
@@ -240,9 +240,9 @@ test("UNIT-CTRL-ORD-02", "OrderController.list lista pedidos para usuario autent
   await OrderController.list(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.length, 1);
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.length).toBe(1);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-ORD-03", "OrderController.list delega errores a next", async () => {
@@ -256,7 +256,7 @@ test("UNIT-CTRL-ORD-03", "OrderController.list delega errores a next", async () 
   await OrderController.list(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-ORD-04", "OrderController.getDetail retorna detalle de pedido", async () => {
@@ -283,9 +283,9 @@ test("UNIT-CTRL-ORD-04", "OrderController.getDetail retorna detalle de pedido", 
   await OrderController.getDetail(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.id, "ORD-2026-001");
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.id).toBe("ORD-2026-001");
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-ORD-05", "OrderController.getDetail delega error a next", async () => {
@@ -298,7 +298,7 @@ test("UNIT-CTRL-ORD-05", "OrderController.getDetail delega error a next", async 
   await OrderController.getDetail(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-ORD-06", "OrderController.create crea orden y responde 201", async () => {
@@ -325,9 +325,9 @@ test("UNIT-CTRL-ORD-06", "OrderController.create crea orden y responde 201", asy
   await OrderController.create(req, res, next);
 
   // Assert
-  is(res.statusCode, 201);
-  is(res.body.success, true);
-  is(next.mock.calls.length, 0);
+  expect(res.statusCode).toBe(201);
+  expect(res.body.success).toBe(true);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-ORD-07", "OrderController.create delega error a next", async () => {
@@ -341,7 +341,7 @@ test("UNIT-CTRL-ORD-07", "OrderController.create delega error a next", async () 
   await OrderController.create(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-ORD-08", "OrderController.updateStatus actualiza estado y responde 200", async () => {
@@ -355,9 +355,9 @@ test("UNIT-CTRL-ORD-08", "OrderController.updateStatus actualiza estado y respon
   await OrderController.updateStatus(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.status, "ENVIADO");
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.status).toBe("ENVIADO");
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-ORD-09", "OrderController.updateStatus delega error a next", async () => {
@@ -371,7 +371,7 @@ test("UNIT-CTRL-ORD-09", "OrderController.updateStatus delega error a next", asy
   await OrderController.updateStatus(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 // ============================================================================
@@ -388,9 +388,9 @@ test("UNIT-CTRL-PROY-01", "ProjectController.list retorna vacío si no hay userI
   await ProjectController.list(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  eq(res.body.data, []);
-  is(next.mock.calls.length, 0);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data).toStrictEqual([]);
+  expect(next.mock.calls.length).toBe(0);
 });
 
 test("UNIT-CTRL-PROY-02", "ProjectController.list lista proyectos de usuario", async () => {
@@ -403,8 +403,8 @@ test("UNIT-CTRL-PROY-02", "ProjectController.list lista proyectos de usuario", a
   await ProjectController.list(req, res, next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.length, 1);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.length).toBe(1);
 });
 
 test("UNIT-CTRL-PROY-03", "ProjectController.list delega error a next", async () => {
@@ -417,7 +417,7 @@ test("UNIT-CTRL-PROY-03", "ProjectController.list delega error a next", async ()
   await ProjectController.list(req, res, next);
 
   // Assert
-  is(next.mock.calls.length, 1);
+  expect(next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-PROY-04", "ProjectController.getDetail retorna proyecto y maneja error", async () => {
@@ -437,9 +437,9 @@ test("UNIT-CTRL-PROY-04", "ProjectController.getDetail retorna proyecto y maneja
   await ProjectController.getDetail(ctxErr.req, ctxErr.res, ctxErr.next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.id, "p-1");
-  is(ctxErr.next.mock.calls.length, 1);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.id).toBe("p-1");
+  expect(ctxErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-PROY-05", "ProjectController.create crea proyecto y responde 201", async () => {
@@ -461,9 +461,9 @@ test("UNIT-CTRL-PROY-05", "ProjectController.create crea proyecto y responde 201
   await ProjectController.create(ctxErr.req, ctxErr.res, ctxErr.next);
 
   // Assert
-  is(res.statusCode, 201);
-  is(res.body.success, true);
-  is(ctxErr.next.mock.calls.length, 1);
+  expect(res.statusCode).toBe(201);
+  expect(res.body.success).toBe(true);
+  expect(ctxErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-PROY-06", "ProjectController.update actualiza proyecto y delega error", async () => {
@@ -488,9 +488,9 @@ test("UNIT-CTRL-PROY-06", "ProjectController.update actualiza proyecto y delega 
   await ProjectController.update(ctxErr.req, ctxErr.res, ctxErr.next);
 
   // Assert
-  is(res.body.success, true);
-  is(res.body.data.name, "Sala Grande");
-  is(ctxErr.next.mock.calls.length, 1);
+  expect(res.body.success).toBe(true);
+  expect(res.body.data.name).toBe("Sala Grande");
+  expect(ctxErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-PROY-07", "ProjectController.delete borra proyecto y delega error", async () => {
@@ -513,8 +513,8 @@ test("UNIT-CTRL-PROY-07", "ProjectController.delete borra proyecto y delega erro
   await ProjectController.delete(ctxErr.req, ctxErr.res, ctxErr.next);
 
   // Assert
-  is(res.body.success, true);
-  is(ctxErr.next.mock.calls.length, 1);
+  expect(res.body.success).toBe(true);
+  expect(ctxErr.next.mock.calls.length).toBe(1);
 });
 
 // ============================================================================
@@ -551,12 +551,12 @@ test("UNIT-CTRL-CAT-01", "CatalogController.listCategories y listProducts funcio
   await CatalogController.listProducts(ctxProdErr.req, ctxProdErr.res, ctxProdErr.next);
 
   // Assert
-  is(ctxCat.res.body.success, true);
-  is(ctxCat.res.body.data.length, 1);
-  is(ctxCatErr.next.mock.calls.length, 1);
-  is(ctxProd.res.body.success, true);
-  is(ctxProd.res.body.data.length, 1);
-  is(ctxProdErr.next.mock.calls.length, 1);
+  expect(ctxCat.res.body.success).toBe(true);
+  expect(ctxCat.res.body.data.length).toBe(1);
+  expect(ctxCatErr.next.mock.calls.length).toBe(1);
+  expect(ctxProd.res.body.success).toBe(true);
+  expect(ctxProd.res.body.data.length).toBe(1);
+  expect(ctxProdErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-CAT-02", "CatalogController.getProductDetail y getStorefrontProducts", async () => {
@@ -590,12 +590,12 @@ test("UNIT-CTRL-CAT-02", "CatalogController.getProductDetail y getStorefrontProd
   await CatalogController.getStorefrontProducts(ctxStoreErr.req, ctxStoreErr.res, ctxStoreErr.next);
 
   // Assert
-  is(ctxDet.res.body.success, true);
-  is(ctxDet.res.body.data.id, "prd-1");
-  is(ctxDetErr.next.mock.calls.length, 1);
-  is(ctxStore.res.body.success, true);
-  is(ctxStore.res.body.data.recommended.length, 1);
-  is(ctxStoreErr.next.mock.calls.length, 1);
+  expect(ctxDet.res.body.success).toBe(true);
+  expect(ctxDet.res.body.data.id).toBe("prd-1");
+  expect(ctxDetErr.next.mock.calls.length).toBe(1);
+  expect(ctxStore.res.body.success).toBe(true);
+  expect(ctxStore.res.body.data.recommended.length).toBe(1);
+  expect(ctxStoreErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-CAT-03", "CatalogController CRUD productos y reseñas de catálogo", async () => {
@@ -675,16 +675,16 @@ test("UNIT-CTRL-CAT-03", "CatalogController CRUD productos y reseñas de catálo
   await CatalogController.updateProduct(ctxProdUpdErr.req, ctxProdUpdErr.res, ctxProdUpdErr.next);
 
   // Assert
-  is(ctxRevList.res.body.success, true);
-  is(ctxRevCreate.res.statusCode, 201);
-  is(ctxProdCreate.res.statusCode, 201);
-  is(ctxProdUpd.res.body.success, true);
-  is(ctxProdDel.res.body.success, true);
-  is(ctxDelErr.next.mock.calls.length, 1);
-  is(ctxRevErr.next.mock.calls.length, 1);
-  is(ctxRevListErr.next.mock.calls.length, 1);
-  is(ctxProdCreateErr.next.mock.calls.length, 1);
-  is(ctxProdUpdErr.next.mock.calls.length, 1);
+  expect(ctxRevList.res.body.success).toBe(true);
+  expect(ctxRevCreate.res.statusCode).toBe(201);
+  expect(ctxProdCreate.res.statusCode).toBe(201);
+  expect(ctxProdUpd.res.body.success).toBe(true);
+  expect(ctxProdDel.res.body.success).toBe(true);
+  expect(ctxDelErr.next.mock.calls.length).toBe(1);
+  expect(ctxRevErr.next.mock.calls.length).toBe(1);
+  expect(ctxRevListErr.next.mock.calls.length).toBe(1);
+  expect(ctxProdCreateErr.next.mock.calls.length).toBe(1);
+  expect(ctxProdUpdErr.next.mock.calls.length).toBe(1);
 });
 
 // ============================================================================
@@ -710,9 +710,9 @@ test("UNIT-CTRL-AUTH-01", "AuthController.register y login exitosos", async () =
   await AuthController.register(ctxRegErr.req, ctxRegErr.res, ctxRegErr.next);
 
   // Assert
-  is(ctxReg.res.statusCode, 201);
-  is(ctxReg.res.body.success, true);
-  is(ctxRegErr.next.mock.calls.length, 1);
+  expect(ctxReg.res.statusCode).toBe(201);
+  expect(ctxReg.res.body.success).toBe(true);
+  expect(ctxRegErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-AUTH-02", "AuthController.getMe y getById formatean perfil", async () => {
@@ -755,13 +755,13 @@ test("UNIT-CTRL-AUTH-02", "AuthController.getMe y getById formatean perfil", asy
   await AuthController.getById(ctxErr.req, ctxErr.res, ctxErr.next);
 
   // Assert
-  is(ctxMe.res.body.success, true);
-  is(ctxMe.res.body.data.projectCount, 3);
-  is(ctxMe.res.body.data.orderCount, 5);
-  is(ctxByIdMe.res.body.success, true);
-  is(ctxByIdMe.res.body.data.id, "usr-1");
-  is(ctxByIdOther.res.body.success, true);
-  is(ctxErr.next.mock.calls.length, 1);
+  expect(ctxMe.res.body.success).toBe(true);
+  expect(ctxMe.res.body.data.projectCount).toBe(3);
+  expect(ctxMe.res.body.data.orderCount).toBe(5);
+  expect(ctxByIdMe.res.body.success).toBe(true);
+  expect(ctxByIdMe.res.body.data.id).toBe("usr-1");
+  expect(ctxByIdOther.res.body.success).toBe(true);
+  expect(ctxErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-AUTH-03", "AuthController.update restringe acceso y actualiza campos permitidos", async () => {
@@ -792,13 +792,13 @@ test("UNIT-CTRL-AUTH-03", "AuthController.update restringe acceso y actualiza ca
   await AuthController.update(ctxPass.req, ctxPass.res, ctxPass.next);
 
   // Assert
-  is(ctxForbidden.next.mock.calls.length, 1);
+  expect(ctxForbidden.next.mock.calls.length).toBe(1);
   const err = ctxForbidden.next.mock.calls[0][0];
-  ok(err instanceof AppError);
-  is(err.statusCode, 403);
-  is(ctxOk.res.body.success, true);
-  is(ctxOk.res.body.data.firstName, "NuevoNombre");
-  is(ctxPass.res.body.success, true);
+  expect(err).toBeInstanceOf(AppError);
+  expect(err.statusCode).toBe(403);
+  expect(ctxOk.res.body.success).toBe(true);
+  expect(ctxOk.res.body.data.firstName).toBe("NuevoNombre");
+  expect(ctxPass.res.body.success).toBe(true);
 });
 
 // ============================================================================
@@ -830,14 +830,14 @@ test("UNIT-CTRL-ADM-01", "AdminController.getMetrics calcula métricas y delega 
   await AdminController.getMetrics(ctxErr.req, ctxErr.res, ctxErr.next);
 
   // Assert
-  is(ctx.res.body.success, true);
-  is(Array.isArray(ctx.res.body.data), true);
-  is(ctx.res.body.data[0].label, "Ventas del Mes");
-  is(ctx.res.body.data[1].label, "Pedidos Activos");
-  is(ctx.res.body.charts.topCategories.length, 1);
-  is(ctx.next.mock.calls.length, 0);
-  is(ctxErr.next.mock.calls.length, 1);
-  is(ctxErr.next.mock.calls[0][0].message, "Metrics DB Err");
+  expect(ctx.res.body.success).toBe(true);
+  expect(Array.isArray(ctx.res.body.data)).toBe(true);
+  expect(ctx.res.body.data[0].label).toBe("Ventas del Mes");
+  expect(ctx.res.body.data[1].label).toBe("Pedidos Activos");
+  expect(ctx.res.body.charts.topCategories.length).toBe(1);
+  expect(ctx.next.mock.calls.length).toBe(0);
+  expect(ctxErr.next.mock.calls.length).toBe(1);
+  expect(ctxErr.next.mock.calls[0][0].message).toBe("Metrics DB Err");
 });
 
 test("UNIT-CTRL-ADM-02", "AdminController.getInventoryReport genera estadísticas de inventario y delega errores", async () => {
@@ -861,14 +861,14 @@ test("UNIT-CTRL-ADM-02", "AdminController.getInventoryReport genera estadística
   await AdminController.getInventoryReport(ctxErr.req, ctxErr.res, ctxErr.next);
 
   // Assert
-  is(ctx.res.body.success, true);
+  expect(ctx.res.body.success).toBe(true);
   const stats = ctx.res.body.data.stats;
-  is(stats.totalProducts, 4);
-  is(stats.totalUnits, 78);
-  is(stats.lowStockCount, 1);
-  is(stats.outOfStockCount, 1);
-  is(stats.negativeStockCount, 1);
-  is(ctx.next.mock.calls.length, 0);
-  is(ctxErr.next.mock.calls.length, 1);
-  is(ctxErr.next.mock.calls[0][0].message, "Inventory DB Err");
+  expect(stats.totalProducts).toBe(4);
+  expect(stats.totalUnits).toBe(78);
+  expect(stats.lowStockCount).toBe(1);
+  expect(stats.outOfStockCount).toBe(1);
+  expect(stats.negativeStockCount).toBe(1);
+  expect(ctx.next.mock.calls.length).toBe(0);
+  expect(ctxErr.next.mock.calls.length).toBe(1);
+  expect(ctxErr.next.mock.calls[0][0].message).toBe("Inventory DB Err");
 });

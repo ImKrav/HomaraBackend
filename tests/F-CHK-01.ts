@@ -1,7 +1,7 @@
 // F-CHK-01 · Agregar un producto al carrito
 // Unidad: AddCartItemUseCase.execute()  (POST /api/v1/cart/items)
 
-import { test, is, eq, ok, has, expect, vi } from "./harness.js";
+import { test, expect, vi } from "./harness.js";
 import { contextoExpress, errorDeNext } from "./helpers.js";
 import { AddCartItemUseCase } from "../src/application/use-cases/cart.use-cases.js";
 import { PrismaCartRepository } from "../src/infrastructure/database/repositories/prisma-cart.repository.js";
@@ -72,9 +72,9 @@ test("CP-F-CHK-01-01", "Retorna 401 sin sesión autenticada antes de modificar e
 
   // Assert
   const error = errorDeNext(next);
-  ok(error instanceof AppError);
-  is(error.statusCode, 401);
-  is(req.user, undefined);
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(401);
+  expect(req.user).toBe(undefined);
   expect(db.cart.findUnique).not.toHaveBeenCalled();
   expect(db.cartItem.create).not.toHaveBeenCalled();
 });
@@ -93,16 +93,16 @@ test("CP-F-CHK-01-02", "Valida esquema para cantidades (1..9999, enteros) y form
   const cantidadPorDefecto = addItemSchema.parse({ productId: ID_PRODUCTO }).quantity;
 
   // Assert
-  is(cero.success, false);
-  if (!cero.success) has(cero.error.issues[0].message, "al menos 1");
-  is(sobreTope.success, false);
-  is(decimal.success, false);
-  if (!decimal.success) has(decimal.error.issues[0].message, "entero");
-  is(idMalo.success, false);
-  if (!idMalo.success) is(idMalo.error.issues[0].message, "ID de producto inválido");
-  is(minimo.success, true);
-  is(maximo.success, true);
-  is(cantidadPorDefecto, 1);
+  expect(cero.success).toBe(false);
+  if (!cero.success) expect(cero.error.issues[0].message).toContain("al menos 1");
+  expect(sobreTope.success).toBe(false);
+  expect(decimal.success).toBe(false);
+  if (!decimal.success) expect(decimal.error.issues[0].message).toContain("entero");
+  expect(idMalo.success).toBe(false);
+  if (!idMalo.success) expect(idMalo.error.issues[0].message).toBe("ID de producto inválido");
+  expect(minimo.success).toBe(true);
+  expect(maximo.success).toBe(true);
+  expect(cantidadPorDefecto).toBe(1);
   expect(db.cart.findUnique).not.toHaveBeenCalled();
 });
 
@@ -118,13 +118,13 @@ test("CP-F-CHK-01-03", "Crea carrito si no existía y acumula cantidad si la lí
   const item = await caso.execute(ID_USUARIO, ID_PRODUCTO, 3);
 
   // Assert
-  is(db.cart.create.mock.calls.length, 1);
-  eq(db.cart.create.mock.calls[0][0].data, { userId: ID_USUARIO });
+  expect(db.cart.create.mock.calls.length).toBe(1);
+  expect(db.cart.create.mock.calls[0][0].data).toStrictEqual({ userId: ID_USUARIO });
   expect(db.cartItem.create).not.toHaveBeenCalled();
-  is(db.cartItem.update.mock.calls.length, 1);
-  eq(db.cartItem.update.mock.calls[0][0].data, { quantity: 5 });
-  is(item.quantity, 5);
-  is(item.productId, ID_PRODUCTO);
+  expect(db.cartItem.update.mock.calls.length).toBe(1);
+  expect(db.cartItem.update.mock.calls[0][0].data).toStrictEqual({ quantity: 5 });
+  expect(item.quantity).toBe(5);
+  expect(item.productId).toBe(ID_PRODUCTO);
 });
 
 // Defecto abierto #9 (ver la tabla en tests/README.md): se espera que falle.
@@ -146,13 +146,13 @@ test.fails("CP-F-CHK-01-04", "Acumula cantidades de producto existente en el car
 
   // Assert
   expect(db.cart.create).not.toHaveBeenCalled();
-  eq(busqueda.where, {
+  expect(busqueda.where).toStrictEqual({
     cartId_productId: { cartId: "cart_001", productId: ID_PRODUCTO },
   });
-  eq(actualizacion.data, { quantity: 9999 });
-  is(item.quantity, 9999);
+  expect(actualizacion.data).toStrictEqual({ quantity: 9999 });
+  expect(item.quantity).toBe(9999);
   // DEFECTO: la acumulación supera el máximo de 9999 sin validación adicional
-  ok(excedido.quantity <= 9999, `quantity=${excedido.quantity} supera el tope de 9999`);
+  expect(excedido.quantity, `quantity=${excedido.quantity} supera el tope de 9999`).toBeLessThanOrEqual(9999);
 });
 
 test("CP-F-CHK-01-05", "Agrega una nueva línea de producto cuando no estaba en el carrito", async () => {
@@ -167,19 +167,19 @@ test("CP-F-CHK-01-05", "Agrega una nueva línea de producto cuando no estaba en 
 
   // Assert
   expect(db.cartItem.update).not.toHaveBeenCalled();
-  is(db.cartItem.create.mock.calls.length, 1);
-  eq(db.cartItem.create.mock.calls[0][0].data, {
+  expect(db.cartItem.create.mock.calls.length).toBe(1);
+  expect(db.cartItem.create.mock.calls[0][0].data).toStrictEqual({
     cartId: "cart_001",
     productId: ID_PRODUCTO,
     quantity: 1,
   });
-  is(item.id, "ci_nuevo");
-  is(item.quantity, 1);
-  is(item.product?.id, ID_PRODUCTO);
+  expect(item.id).toBe("ci_nuevo");
+  expect(item.quantity).toBe(1);
+  expect(item.product?.id).toBe(ID_PRODUCTO);
 });
 
 
-test("CP-F-CHK-01-06", "Enviar materiales carrito (RF24): Permite iterar la adici�n para trasladar una lista de materiales al carrito", async () => {
+test("CP-F-CHK-01-06", "Enviar materiales carrito (RF24): Permite iterar la adici�n para trasladar una lista de materiales al carrito", async () => {
   // Arrange
   const { db, caso } = montar();
   db.cart.findUnique.mockResolvedValue(filaCarrito());
@@ -197,8 +197,8 @@ test("CP-F-CHK-01-06", "Enviar materiales carrito (RF24): Permite iterar la adic
   }
 
   // Assert
-  is(db.cartItem.create.mock.calls.length, 2);
-  is(db.cartItem.create.mock.calls[0][0].data.productId, "prd_1");
-  is(db.cartItem.create.mock.calls[1][0].data.productId, "prd_2");
+  expect(db.cartItem.create.mock.calls.length).toBe(2);
+  expect(db.cartItem.create.mock.calls[0][0].data.productId).toBe("prd_1");
+  expect(db.cartItem.create.mock.calls[1][0].data.productId).toBe("prd_2");
 });
 

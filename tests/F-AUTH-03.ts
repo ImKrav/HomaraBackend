@@ -4,7 +4,7 @@
 // Patr贸n AAA en cada caso: Arrange / Act / Assert.
 
 import { vi, beforeEach } from "vitest";
-import { test, is, eq, ok, has, subset, expect } from "./harness.js";
+import { test, expect } from "./harness.js";
 import { usuario, contextoExpress, errorDeNext } from "./helpers.js";
 import { mockUsuarios, reiniciarRepositorios } from "./mocks/repositorios.js";
 import jwt from "jsonwebtoken";
@@ -33,9 +33,9 @@ test("CP-F-AUTH-03-01", "Retorna 401 si no se provee cabecera Authorization", as
 
   // Assert
   const error = errorDeNext(next);
-  ok(error instanceof AppError);
-  is(error.statusCode, 401);
-  is(error.message, "Token no provisto.");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(401);
+  expect(error.message).toBe("Token no provisto.");
   expect(mockUsuarios.findById).not.toHaveBeenCalled();
 });
 
@@ -48,7 +48,7 @@ test("CP-F-AUTH-03-02", "Retorna error cuando el token JWT ha caducado", async (
   await requireAuth(req, res, next);
 
   // Assert
-  ok(errorDeNext(next) instanceof jwt.TokenExpiredError);
+  expect(errorDeNext(next)).toBeInstanceOf(jwt.TokenExpiredError);
   expect(mockUsuarios.findById).not.toHaveBeenCalled();
 });
 
@@ -64,9 +64,9 @@ test("CP-F-AUTH-03-03", "Retorna 401 si el usuario asociado al token no existe e
 
   // Assert
   const error = errorDeNext(next);
-  is(error.statusCode, 401);
-  is(error.message, "Usuario no encontrado o dado de baja.");
-  is(req.user, undefined);
+  expect(error.statusCode).toBe(401);
+  expect(error.message).toBe("Usuario no encontrado o dado de baja.");
+  expect(req.user).toBe(undefined);
 });
 
 test("CP-F-AUTH-03-04", "Retorna 403 cuando un usuario cliente intenta acceder a rutas de administraci贸n", async () => {
@@ -81,8 +81,8 @@ test("CP-F-AUTH-03-04", "Retorna 403 cuando un usuario cliente intenta acceder a
 
   // Assert
   const error = errorDeNext(next);
-  is(error.statusCode, 403);
-  has(error.message, "permisos de administrador");
+  expect(error.statusCode).toBe(403);
+  expect(error.message).toContain("permisos de administrador");
 });
 
 test("CP-F-AUTH-03-05", "Permite el acceso cuando el usuario tiene rol ADMIN en base de datos", async () => {
@@ -96,8 +96,8 @@ test("CP-F-AUTH-03-05", "Permite el acceso cuando el usuario tiene rol ADMIN en 
   await requireAdmin(req, res, next);
 
   // Assert
-  eq(next.mock.calls[0], []); // next() sin argumentos
-  subset(req.user, { id: "usr_001", role: "ADMIN" });
+  expect(next.mock.calls[0]).toStrictEqual([]); // next() sin argumentos
+  expect(req.user).toMatchObject({ id: "usr_001", role: "ADMIN" });
 });
 
 test("CP-F-AUTH-03-06", "Traduce fallos internos no controlados a error 500", async () => {
@@ -112,9 +112,9 @@ test("CP-F-AUTH-03-06", "Traduce fallos internos no controlados a error 500", as
 
   // Assert
   const error = errorDeNext(next);
-  ok(error instanceof AppError);
-  is(error.statusCode, 500);
-  is(error.message, "Error durante la autenticaci贸n.");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.statusCode).toBe(500);
+  expect(error.message).toBe("Error durante la autenticaci贸n.");
 });
 
 test("CP-F-AUTH-03-04b", "Valida el rol real de base de datos ignorando el payload del token", async () => {
@@ -128,11 +128,11 @@ test("CP-F-AUTH-03-04b", "Valida el rol real de base de datos ignorando el paylo
   await requireAdmin(req, res, next);
 
   // Assert
-  is(errorDeNext(next).statusCode, 403);
+  expect(errorDeNext(next).statusCode).toBe(403);
 });
 
 
-test("CP-F-AUTH-03-07", "Cerrar sesi髇 (RF03): La API deniega el acceso si el cliente elimina su token localmente (simulado por ausencia de header)", async () => {
+test("CP-F-AUTH-03-07", "Cerrar sesi锟絥 (RF03): La API deniega el acceso si el cliente elimina su token localmente (simulado por ausencia de header)", async () => {
   // Arrange - el cliente hizo logout borrando el token de localStorage
   const { req, res, next } = contextoExpress();
   delete req.headers.authorization;
@@ -142,6 +142,6 @@ test("CP-F-AUTH-03-07", "Cerrar sesi髇 (RF03): La API deniega el acceso si el cl
 
   // Assert
   const error = errorDeNext(next);
-  is(error.statusCode, 401);
-  is(error.message, "Token no provisto.");
+  expect(error.statusCode).toBe(401);
+  expect(error.message).toBe("Token no provisto.");
 });

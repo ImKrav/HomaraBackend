@@ -20,8 +20,8 @@ test("CP-F-AUTH-01-02", "Rechaza registro si el correo ya existe", async () => {
   const error = await grab(caso.execute(datosRegistro() as any));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.message, "El correo electrónico ya está registrado.");
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.message).toBe("El correo electrónico ya está registrado.");
   expect(repo.create).not.toHaveBeenCalled();
 });
 ```
@@ -55,7 +55,7 @@ de defectos abajo).
 | Archivo | Qué contiene |
 |---|---|
 | `vitest.config.ts` | `include: tests/**/*.ts` (menos `harness`/`helpers`), cobertura v8 y el alias que traduce los imports `"./x.js"` de ESM NodeNext a los `.ts` reales. |
-| `tests/harness.ts` | `test(id, desc, fn)` → `it()` de Vitest, aserciones cortas sobre `node:assert/strict` (`is`, `eq`, `ok`, `has`, `subset`, `grab`…), `soft()` para aserciones no abortivas, y re-export de `expect` / `vi` para casos nuevos (salvo `vi.mock()`, que exige importar `vi` de `"vitest"`). |
+| `tests/harness.ts` | `test(id, desc, fn)` → `it()` de Vitest, `grab`/`grabSync` para capturar errores en el Act, y re-export de `expect` / `vi` (salvo para `vi.mock()`, que exige importar `vi` de `"vitest"`). Todas las aserciones son fluidas: `expect(x).toBe(y)`, y `expect.soft(...)` para las no abortivas. |
 | `tests/helpers.ts` | Repositorios falsos como objetos de `vi.fn()` (`fakeUsuarios()`, `fakeCarritos()`…), fábricas de datos en español (`producto()`, `proyecto()`, `carrito()`…), `contextoExpress()` y `conRelojFijo()`. |
 | `tests/mocks/repositorios.ts` | Instancias de mock compartidas entre la prueba y el código bajo prueba, más `reiniciarRepositorios()`. Excluido del `include` de Vitest. |
 | `tests/F-<MODULO>-<NN>.ts` | Un archivo por unidad / grafo de flujo. |

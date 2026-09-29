@@ -5,7 +5,7 @@
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { vi, beforeEach } from "vitest";
-import { test, is, ok } from "./harness.js";
+import { test, expect } from "./harness.js";
 import { mockCategorias, reiniciarRepositorios } from "./mocks/repositorios.js";
 import app from "../src/infrastructure/http/express-server.js";
 
@@ -57,9 +57,9 @@ test("UNIT-SRV-01", "Express App está inicializado con middlewares y rutas base
   const stack = obtenerServerStack();
 
   // Assert
-  ok(typeof app === "function");
-  is(app.get("x-powered-by"), false);
-  ok(stack.length > 5, "La pila de middleware del servidor debe tener registradas las rutas y middlewares");
+  expect(typeof app).toBe("function");
+  expect(app.get("x-powered-by")).toBe(false);
+  expect(stack.length, "La pila de middleware del servidor debe tener registradas las rutas y middlewares").toBeGreaterThan(5);
 });
 
 test("UNIT-SRV-02", "Middleware de reescritura /api -> /api/v1 funciona correctamente", () => {
@@ -81,10 +81,10 @@ test("UNIT-SRV-02", "Middleware de reescritura /api -> /api/v1 funciona correcta
   middleware(req2, {} as any, () => { nextCalled2 = true; });
 
   // Assert
-  is(req1.url, "/v1/categories"); // se antepone /v1
-  is(nextCalled1, true);
-  is(req2.url, "/v1/products");   // no se duplica
-  is(nextCalled2, true);
+  expect(req1.url).toBe("/v1/categories"); // se antepone /v1
+  expect(nextCalled1).toBe(true);
+  expect(req2.url).toBe("/v1/products");   // no se duplica
+  expect(nextCalled2).toBe(true);
 });
 
 test("UNIT-SRV-03", "Servidor Express responde a GET / con metadatos de la API", async () => {
@@ -99,12 +99,12 @@ test("UNIT-SRV-03", "Servidor Express responde a GET / con metadatos de la API",
     const body: any = await res.json();
 
     // Assert
-    is(res.status, 200);
-    is(body.message, "Homara API — Backend");
-    is(body.version, "1.0.0");
-    ok(body.endpoints.categories !== undefined);
-    ok(body.endpoints.products !== undefined);
-    ok(body.endpoints.cart !== undefined);
+    expect(res.status).toBe(200);
+    expect(body.message).toBe("Homara API — Backend");
+    expect(body.version).toBe("1.0.0");
+    expect(body.endpoints.categories).not.toBe(undefined);
+    expect(body.endpoints.products).not.toBe(undefined);
+    expect(body.endpoints.cart).not.toBe(undefined);
   } finally {
     server.close();
   }
@@ -127,7 +127,7 @@ test("UNIT-SRV-04", "Servidor Express maneja peticiones OPTIONS y CORS", async (
     });
 
     // Assert
-    is(res.status, 204);
+    expect(res.status).toBe(204);
   } finally {
     server.close();
   }
@@ -144,7 +144,7 @@ test("UNIT-ROUTES-CAT-01", "categoriesRouter define GET /", () => {
   const rutas = obtenerRutas(categoriesRouter);
 
   // Assert
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("get")));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["get"]) }));
 });
 
 test("UNIT-ROUTES-PRD-01", "productsRouter define endpoints de catálogo y administración", () => {
@@ -154,14 +154,14 @@ test("UNIT-ROUTES-PRD-01", "productsRouter define endpoints de catálogo y admin
   const rutas = obtenerRutas(productsRouter);
 
   // Assert
-  ok(rutas.some((r) => r.path === "/storefront" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/:id/reviews" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/:id/reviews" && r.methods.includes("post")));
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("post")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("put")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("delete")));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/storefront", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id/reviews", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id/reviews", methods: expect.arrayContaining(["post"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["post"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["put"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["delete"]) }));
 });
 
 test("UNIT-ROUTES-PROY-01", "projectsRouter define CRUD de proyectos", () => {
@@ -171,11 +171,11 @@ test("UNIT-ROUTES-PROY-01", "projectsRouter define CRUD de proyectos", () => {
   const rutas = obtenerRutas(projectsRouter);
 
   // Assert
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("post")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("put")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("delete")));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["post"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["put"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["delete"]) }));
 });
 
 test("UNIT-ROUTES-CART-01", "cartRouter define endpoints de carrito", () => {
@@ -185,10 +185,10 @@ test("UNIT-ROUTES-CART-01", "cartRouter define endpoints de carrito", () => {
   const rutas = obtenerRutas(cartRouter);
 
   // Assert
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/items" && r.methods.includes("post")));
-  ok(rutas.some((r) => r.path === "/items/:itemId" && r.methods.includes("put")));
-  ok(rutas.some((r) => r.path === "/items/:itemId" && r.methods.includes("delete")));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/items", methods: expect.arrayContaining(["post"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/items/:itemId", methods: expect.arrayContaining(["put"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/items/:itemId", methods: expect.arrayContaining(["delete"]) }));
 });
 
 test("UNIT-ROUTES-ORD-01", "ordersRouter define endpoints de pedidos", () => {
@@ -198,10 +198,10 @@ test("UNIT-ROUTES-ORD-01", "ordersRouter define endpoints de pedidos", () => {
   const rutas = obtenerRutas(ordersRouter);
 
   // Assert
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/" && r.methods.includes("post")));
-  ok(rutas.some((r) => r.path === "/:id/status" && r.methods.includes("put")));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/", methods: expect.arrayContaining(["post"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id/status", methods: expect.arrayContaining(["put"]) }));
 });
 
 test("UNIT-ROUTES-USR-01", "usersRouter define endpoints de autenticación y perfil", () => {
@@ -211,11 +211,11 @@ test("UNIT-ROUTES-USR-01", "usersRouter define endpoints de autenticación y per
   const rutas = obtenerRutas(usersRouter);
 
   // Assert
-  ok(rutas.some((r) => r.path === "/register" && r.methods.includes("post")));
-  ok(rutas.some((r) => r.path === "/login" && r.methods.includes("post")));
-  ok(rutas.some((r) => r.path === "/me" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/:id" && r.methods.includes("put")));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/register", methods: expect.arrayContaining(["post"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/login", methods: expect.arrayContaining(["post"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/me", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/:id", methods: expect.arrayContaining(["put"]) }));
 });
 
 test("UNIT-ROUTES-ADM-01", "adminRouter define métricas e inventario", () => {
@@ -225,8 +225,8 @@ test("UNIT-ROUTES-ADM-01", "adminRouter define métricas e inventario", () => {
   const rutas = obtenerRutas(adminRouter);
 
   // Assert
-  ok(rutas.some((r) => r.path === "/metrics" && r.methods.includes("get")));
-  ok(rutas.some((r) => r.path === "/inventory" && r.methods.includes("get")));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/metrics", methods: expect.arrayContaining(["get"]) }));
+  expect(rutas).toContainEqual(expect.objectContaining({ path: "/inventory", methods: expect.arrayContaining(["get"]) }));
 });
 
 // ============================================================================
@@ -249,10 +249,10 @@ test("UNIT-SRV-05", "Petición HTTP a /api/v1/categories devuelve listado de cat
     const json: any = await res.json();
 
     // Assert
-    is(res.status, 200);
-    is(json.success, true);
-    is(json.data.length, 1);
-    is(json.data[0].name, "Pisos");
+    expect(res.status).toBe(200);
+    expect(json.success).toBe(true);
+    expect(json.data.length).toBe(1);
+    expect(json.data[0].name).toBe("Pisos");
   } finally {
     server.close();
   }
@@ -274,9 +274,9 @@ test("UNIT-SRV-06", "Petición HTTP con reescritura /api/categories funciona id�
     const json: any = await res.json();
 
     // Assert
-    is(res.status, 200);
-    is(json.success, true);
-    is(json.data.length, 1);
+    expect(res.status).toBe(200);
+    expect(json.success).toBe(true);
+    expect(json.data.length).toBe(1);
   } finally {
     server.close();
   }
@@ -293,7 +293,7 @@ test("UNIT-SRV-07", "Ruta no existente retorna 404 a través del manejador globa
     const res = await fetch(`http://127.0.0.1:${port}/api/v1/ruta-inexistente-xyz`);
 
     // Assert
-    is(res.status, 404);
+    expect(res.status).toBe(404);
   } finally {
     server.close();
   }

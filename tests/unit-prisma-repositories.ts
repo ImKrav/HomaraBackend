@@ -1,4 +1,4 @@
-import { test, is, ok, vi } from "./harness.js";
+import { test, expect, vi } from "./harness.js";
 import { PrismaCategoryRepository } from "../src/infrastructure/database/repositories/prisma-category.repository.js";
 import { PrismaUserRepository } from "../src/infrastructure/database/repositories/prisma-user.repository.js";
 import { PrismaReviewRepository } from "../src/infrastructure/database/repositories/prisma-review.repository.js";
@@ -34,10 +34,10 @@ test("UNIT-REPO-CAT-01", "PrismaCategoryRepository.findAll mapea categorias", as
   const result = await repo.findAll();
 
   // Assert
-  is(result.length, 1);
-  is(result[0].id, "cat-1");
-  is(result[0].name, "Pisos");
-  is(result[0].icon, "pisos.jpg");
+  expect(result.length).toBe(1);
+  expect(result[0].id).toBe("cat-1");
+  expect(result[0].name).toBe("Pisos");
+  expect(result[0].icon).toBe("pisos.jpg");
 });
 
 test("UNIT-REPO-CAT-02", "PrismaCategoryRepository findBySlug y create retornan entidad o null", async () => {
@@ -81,11 +81,11 @@ test("UNIT-REPO-CAT-02", "PrismaCategoryRepository findBySlug y create retornan 
   });
 
   // Assert
-  ok(bySlug !== null);
-  is(bySlug?.id, "cat-1");
-  is(none, null);
-  is(created.id, "cat-new");
-  is(created.slug, "pinturas");
+  expect(bySlug).not.toBe(null);
+  expect(bySlug?.id).toBe("cat-1");
+  expect(none).toBe(null);
+  expect(created.id).toBe("cat-new");
+  expect(created.slug).toBe("pinturas");
 });
 
 // ============================================================================
@@ -148,14 +148,14 @@ test("UNIT-REPO-USR-01", "PrismaUserRepository CRUD y mapeo a User entity", asyn
   const updated = await repo.update("usr-1", { firstName: "Laura Modificada" });
 
   // Assert
-  ok(byId !== null);
-  is(byId?.firstName, "Laura");
-  ok(byEmail !== null);
-  is(byEmail?.id, "usr-1");
-  is(byIdNone, null);
-  is(created.id, "usr-new");
-  is(created.firstName, "Nuevo");
-  is(updated.firstName, "Laura Modificada");
+  expect(byId).not.toBe(null);
+  expect(byId?.firstName).toBe("Laura");
+  expect(byEmail).not.toBe(null);
+  expect(byEmail?.id).toBe("usr-1");
+  expect(byIdNone).toBe(null);
+  expect(created.id).toBe("usr-new");
+  expect(created.firstName).toBe("Nuevo");
+  expect(updated.firstName).toBe("Laura Modificada");
 });
 
 // ============================================================================
@@ -211,15 +211,15 @@ test("UNIT-REPO-REV-01", "PrismaReviewRepository create, find y calculo de prome
   const emptyStats = await repo.getAverageRatingAndCount("prd-no-revs");
 
   // Assert
-  is(created.id, "rev-new");
-  is(created.userFirstName, "Laura");
-  ok(byUserAndProd !== null);
-  is(byUserAndProd?.rating, 5);
-  is(list.length, 1);
-  is(stats.avg, 4.8);
-  is(stats.count, 12);
-  is(emptyStats.avg, 0);
-  is(emptyStats.count, 0);
+  expect(created.id).toBe("rev-new");
+  expect(created.userFirstName).toBe("Laura");
+  expect(byUserAndProd).not.toBe(null);
+  expect(byUserAndProd?.rating).toBe(5);
+  expect(list.length).toBe(1);
+  expect(stats.avg).toBe(4.8);
+  expect(stats.count).toBe(12);
+  expect(emptyStats.avg).toBe(0);
+  expect(emptyStats.count).toBe(0);
 });
 
 // ============================================================================
@@ -313,15 +313,15 @@ test("UNIT-REPO-PROY-01", "PrismaProjectRepository CRUD con mapeo de materiales"
   await repo.delete("proy-1");
 
   // Assert
-  is(list.length, 1);
-  is(list[0].id, "proy-1");
-  is(list[0].materials?.length, 1);
-  ok(byId !== null);
-  is(byId?.name, "Remodelacion Baño");
-  is(byIdNone, null);
-  is(created.id, "proy-created");
-  is(updated.name, "Baño Renovado");
-  is(db.project.delete.mock.calls.length, 1);
+  expect(list.length).toBe(1);
+  expect(list[0].id).toBe("proy-1");
+  expect(list[0].materials?.length).toBe(1);
+  expect(byId).not.toBe(null);
+  expect(byId?.name).toBe("Remodelacion Baño");
+  expect(byIdNone).toBe(null);
+  expect(created.id).toBe("proy-created");
+  expect(updated.name).toBe("Baño Renovado");
+  expect(db.project.delete.mock.calls.length).toBe(1);
 });
 
 test("UNIT-REPO-PROY-02", "PrismaProjectRepository create y update con lista de materiales", async () => {
@@ -409,12 +409,12 @@ test("UNIT-REPO-PROY-02", "PrismaProjectRepository create y update con lista de 
   });
 
   // Assert
-  is(created.id, "proy-created-mats");
-  is(created.materials?.length, 1);
-  is(created.materials?.[0].name, "Pegante Gris");
-  is(db.projectMaterial.deleteMany.mock.calls.length, 1);
-  is(updated.materials?.length, 1);
-  is(updated.materials?.[0].name, "Boquilla Blanca");
+  expect(created.id).toBe("proy-created-mats");
+  expect(created.materials?.length).toBe(1);
+  expect(created.materials?.[0].name).toBe("Pegante Gris");
+  expect(db.projectMaterial.deleteMany.mock.calls.length).toBe(1);
+  expect(updated.materials?.length).toBe(1);
+  expect(updated.materials?.[0].name).toBe("Boquilla Blanca");
 });
 
 // ============================================================================
@@ -504,16 +504,16 @@ test("UNIT-REPO-ORD-01", "PrismaOrderRepository findAll, findByIdOrNumber, updat
   const count = await repo.countByYear(2026);
 
   // Assert
-  is(orders.length, 1);
-  is(orders[0].orderNumber, "ORD-2026-001");
-  is(orders[0].total, 125000);
-  ok(byId !== null);
-  is(byId?.orderNumber, "ORD-2026-001");
-  is(byId?.items?.[0].product?.name, "Piso");
-  ok(byNum !== null);
-  is(none, null);
-  is(updated.status, "ENVIADO");
-  is(count, 8);
+  expect(orders.length).toBe(1);
+  expect(orders[0].orderNumber).toBe("ORD-2026-001");
+  expect(orders[0].total).toBe(125000);
+  expect(byId).not.toBe(null);
+  expect(byId?.orderNumber).toBe("ORD-2026-001");
+  expect(byId?.items?.[0].product?.name).toBe("Piso");
+  expect(byNum).not.toBe(null);
+  expect(none).toBe(null);
+  expect(updated.status).toBe("ENVIADO");
+  expect(count).toBe(8);
 });
 
 test("UNIT-REPO-ORD-02", "PrismaOrderRepository create checkout transaccional y backorder", async () => {
@@ -574,10 +574,10 @@ test("UNIT-REPO-ORD-02", "PrismaOrderRepository create checkout transaccional y 
   });
 
   // Assert
-  is(created.id, "ord-new");
-  is(created.orderNumber, "ORD-2026-006");
-  is(txMock.cartItem.deleteMany.mock.calls.length, 1);
-  is(txMock.product.update.mock.calls.length, 1);
+  expect(created.id).toBe("ord-new");
+  expect(created.orderNumber).toBe("ORD-2026-006");
+  expect(txMock.cartItem.deleteMany.mock.calls.length).toBe(1);
+  expect(txMock.product.update.mock.calls.length).toBe(1);
 });
 // ============================================================================
 // PrismaProductRepository Tests
@@ -656,15 +656,15 @@ test("UNIT-REPO-PRD-01", "PrismaProductRepository findAll, findById, create y up
   await repo.updateStock("prd-none", 5);
 
   // Assert
-  is(list.length, 1);
-  is(list[0].id, "prd-1");
-  is(list[0].tags?.[0], "nuevo");
-  is(list[0].category, "Pisos");
-  ok(found !== null);
-  is(found?.name, "Porcelanato Gris 60x60");
-  is(notFound, null);
-  is(created.id, "prd-new");
-  is(db.product.update.mock.calls.length, 1);
+  expect(list.length).toBe(1);
+  expect(list[0].id).toBe("prd-1");
+  expect(list[0].tags?.[0]).toBe("nuevo");
+  expect(list[0].category).toBe("Pisos");
+  expect(found).not.toBe(null);
+  expect(found?.name).toBe("Porcelanato Gris 60x60");
+  expect(notFound).toBe(null);
+  expect(created.id).toBe("prd-new");
+  expect(db.product.update.mock.calls.length).toBe(1);
 });
 
 test("UNIT-REPO-PRD-02", "PrismaProductRepository storefronts, update y delete", async () => {
@@ -742,12 +742,12 @@ test("UNIT-REPO-PRD-02", "PrismaProductRepository storefronts, update y delete",
   await repo.delete("prd-1");
 
   // Assert
-  is(recs.length, 1);
-  is(offers.length, 1);
-  is(best.length, 2);
-  is(db.product.update.mock.calls.length, 1);
-  is(updated.id, "prd-1");
-  is(txMock.product.delete.mock.calls.length, 1);
+  expect(recs.length).toBe(1);
+  expect(offers.length).toBe(1);
+  expect(best.length).toBe(2);
+  expect(db.product.update.mock.calls.length).toBe(1);
+  expect(updated.id).toBe("prd-1");
+  expect(txMock.product.delete.mock.calls.length).toBe(1);
 });
 
 // ============================================================================
@@ -816,12 +816,12 @@ test("UNIT-REPO-CART-01", "PrismaCartRepository findByUserId crea carrito si no 
   const newCart = await repo.findByUserId("usr-nuevo");
 
   // Assert
-  is(existingCart.id, "cart-1");
-  is(existingCart.items.length, 1);
-  is(existingCart.items[0].product.tags[0], "oferta");
-  is(newCart.id, "cart-nuevo");
-  is(newCart.items.length, 0);
-  is(db.cart.create.mock.calls.length, 1);
+  expect(existingCart.id).toBe("cart-1");
+  expect(existingCart.items.length).toBe(1);
+  expect(existingCart.items[0].product.tags[0]).toBe("oferta");
+  expect(newCart.id).toBe("cart-nuevo");
+  expect(newCart.items.length).toBe(0);
+  expect(db.cart.create.mock.calls.length).toBe(1);
 });
 
 test("UNIT-REPO-CART-02", "PrismaCartRepository addItem, update, remove, clear, findItemOwner y getReservedQuantities", async () => {
@@ -909,13 +909,13 @@ test("UNIT-REPO-CART-02", "PrismaCartRepository addItem, update, remove, clear, 
   const reservas = await repo.getReservedQuantities("cart-1", ["prd-1"]);
 
   // Assert
-  is(itemAcumulado.quantity, 5);
-  is(itemNuevo.id, "ci-nuevo");
-  is(itemNuevo.quantity, 4);
-  is(itemActualizado.quantity, 6);
-  is(db.cartItem.delete.mock.calls.length, 1);
-  is(db.cartItem.deleteMany.mock.calls.length, 1);
-  is(owner, "usr-1");
-  is(noOwner, null);
-  is(reservas["prd-1"], 5);
+  expect(itemAcumulado.quantity).toBe(5);
+  expect(itemNuevo.id).toBe("ci-nuevo");
+  expect(itemNuevo.quantity).toBe(4);
+  expect(itemActualizado.quantity).toBe(6);
+  expect(db.cartItem.delete.mock.calls.length).toBe(1);
+  expect(db.cartItem.deleteMany.mock.calls.length).toBe(1);
+  expect(owner).toBe("usr-1");
+  expect(noOwner).toBe(null);
+  expect(reservas["prd-1"]).toBe(5);
 });

@@ -3,7 +3,7 @@
 //
 // Patrón AAA en cada caso: Arrange / Act / Assert.
 
-import { test, is, ok, grab, expect } from "./harness.js";
+import { test, grab, expect } from "./harness.js";
 import { fakeUsuarios, usuario } from "./helpers.js";
 import { LoginUserUseCase } from "../src/application/use-cases/auth.use-cases.js";
 import { loginSchema } from "../src/infrastructure/http/validators/auth.validator.js";
@@ -21,7 +21,7 @@ test("CP-F-AUTH-02-01", "Rechaza correo con formato inválido antes de consultar
   const resultado = loginSchema.safeParse(credenciales);
 
   // Assert
-  is(resultado.success, false);
+  expect(resultado.success).toBe(false);
   expect(repo.findByEmail).not.toHaveBeenCalled();
 });
 
@@ -35,8 +35,8 @@ test("CP-F-AUTH-02-02", "Rechaza credenciales cuando el correo no existe", async
   const error = await grab(caso.execute("nadie@homara.com", "ClaveSegura8"));
 
   // Assert
-  ok(error instanceof AppError);
-  is(error.message, MENSAJE_GENERICO);
+  expect(error).toBeInstanceOf(AppError);
+  expect(error.message).toBe(MENSAJE_GENERICO);
 });
 
 test("CP-F-AUTH-02-03", "Rechaza credenciales cuando la contraseña no coincide", async () => {
@@ -49,7 +49,7 @@ test("CP-F-AUTH-02-03", "Rechaza credenciales cuando la contraseña no coincide"
   const error = await grab(caso.execute("ana@homara.com", "LaEquivocada8"));
 
   // Assert
-  is(error.message, MENSAJE_GENERICO);
+  expect(error.message).toBe(MENSAJE_GENERICO);
 });
 
 test("CP-F-AUTH-02-04", "Emite credencial de sesión al ingresar credenciales válidas", async () => {
@@ -62,9 +62,9 @@ test("CP-F-AUTH-02-04", "Emite credencial de sesión al ingresar credenciales v�
   const salida = await caso.execute("ana@homara.com", "ClaveSegura8");
 
   // Assert
-  is(typeof salida.token, "string");
-  is(salida.user.id, "usr_001");
-  is((salida.user as any).password, undefined);
+  expect(typeof salida.token).toBe("string");
+  expect(salida.user.id).toBe("usr_001");
+  expect((salida.user as any).password).toBe(undefined);
 });
 
 test("CP-F-AUTH-02-03b", "Devuelve el mismo mensaje de error para correo inexistente y clave incorrecta", async () => {
@@ -80,7 +80,7 @@ test("CP-F-AUTH-02-03b", "Devuelve el mismo mensaje de error para correo inexist
   const claveMala = await caso.execute("ana@homara.com", "otra").catch((e) => e.message);
 
   // Assert
-  is(sinCorreo, claveMala);
+  expect(sinCorreo).toBe(claveMala);
 });
 
 test("CP-F-AUTH-02-04b", "Normaliza correo antes de consultar", async () => {
