@@ -8,7 +8,17 @@ export default defineConfig({
   },
   test: {
     include: ["tests/**/*.ts"],
-    exclude: ["tests/harness.ts", "tests/helpers.ts", "tests/mocks/**", "tests/regression/soporte.ts"],
+    // Las suites tests/api y tests/security son pruebas en vivo (HTTP real contra
+    // el stack levantado). CI no tiene servidor corriendo, así que se excluyen del
+    // `vitest run` por defecto; se ejecutan con sus propios configs (test:api / test:security).
+    exclude: [
+      "tests/harness.ts",
+      "tests/helpers.ts",
+      "tests/mocks/**",
+      "tests/regression/soporte.ts",
+      "tests/api/**",
+      "tests/security/**",
+    ],
     coverage: {
       provider: "v8",
       all: true,
