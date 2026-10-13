@@ -1,0 +1,16 @@
+===== Resumen k6 — stress =====
+Peticiones totales : 14000
+Iteraciones        : 2807
+http_req_failed    : 0.00%
+Duración (todas)   : avg=257.2ms p90=554.8ms p95=612.0ms max=1120.4ms
+dur_login          : avg=536.7ms p95=1023.5ms max=1048.6ms
+dur_autenticado    : avg=342.8ms p95=718.8ms max=1110.1ms
+dur_lectura        : avg=220.1ms p95=562.6ms max=1120.4ms
+
+Umbrales:
+  [OK ] dur_autenticado: p(95)<800
+  [FALLA] dur_lectura: p(95)<500
+  [OK ] http_req_failed: rate<0.01
+  [FALLA] dur_login: p(95)<1000
+
+RESULTADO: ALGÚN UMBRAL FALLÓ

@@ -1,0 +1,16 @@
+===== Resumen k6 — load =====
+Peticiones totales : 11379
+Iteraciones        : 2301
+http_req_failed    : 0.00%
+Duración (todas)   : avg=37.3ms p90=85.8ms p95=104.6ms max=232.6ms
+dur_autenticado    : avg=35.8ms p95=101.6ms max=220.4ms
+dur_login          : avg=85.5ms p95=144.2ms max=215.6ms
+dur_lectura        : avg=33.7ms p95=100.2ms max=232.6ms
+
+Umbrales:
+  [OK ] dur_login: p(95)<1000
+  [OK ] dur_lectura: p(95)<500
+  [OK ] http_req_failed: rate<0.01
+  [OK ] dur_autenticado: p(95)<800
+
+RESULTADO: TODOS LOS UMBRALES PASARON

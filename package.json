@@ -13,7 +13,12 @@
     "test:coverage": "npm run prisma:generate && vitest run --coverage",
     "test:watch": "vitest",
     "test:regression": "vitest run tests/regression",
-    "test:regression:demo": "node scripts/regression-demo.mjs"
+    "test:regression:demo": "node scripts/regression-demo.mjs",
+    "test:api": "vitest run --config vitest.api.config.ts",
+    "test:security": "vitest run --config vitest.security.config.ts",
+    "test:perf:smoke": "docker run --rm -i -v ./perf:/perf -v ./docs/pruebas/evidencias:/salida --add-host=host.docker.internal:host-gateway -e API_URL=http://host.docker.internal:5000 grafana/k6:0.54.0 run /perf/smoke.js",
+    "test:perf:load": "docker run --rm -i -v ./perf:/perf -v ./docs/pruebas/evidencias:/salida --add-host=host.docker.internal:host-gateway -e API_URL=http://host.docker.internal:5000 grafana/k6:0.54.0 run /perf/load.js",
+    "test:perf:stress": "docker run --rm -i -v ./perf:/perf -v ./docs/pruebas/evidencias:/salida --add-host=host.docker.internal:host-gateway -e API_URL=http://host.docker.internal:5000 grafana/k6:0.54.0 run /perf/stress.js"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

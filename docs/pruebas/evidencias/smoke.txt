@@ -1,0 +1,16 @@
+===== Resumen k6 — smoke =====
+Peticiones totales : 364
+Iteraciones        : 52
+http_req_failed    : 0.00%
+Duración (todas)   : avg=27.9ms p90=73.6ms p95=76.4ms max=137.1ms
+dur_lectura        : avg=15.6ms p95=71.8ms max=77.2ms
+dur_login          : avg=80.8ms p95=134.9ms max=137.1ms
+dur_autenticado    : avg=26.0ms p95=77.9ms max=82.5ms
+
+Umbrales:
+  [OK ] dur_lectura: p(95)<500
+  [OK ] dur_login: p(95)<1000
+  [OK ] dur_autenticado: p(95)<800
+  [OK ] http_req_failed: rate<0.01
+
+RESULTADO: TODOS LOS UMBRALES PASARON

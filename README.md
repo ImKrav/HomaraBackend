@@ -199,6 +199,35 @@ Una vez que el servidor esté corriendo (en cualquier modalidad):
 
 ---
 
+## 🧪 Pruebas
+
+La suite por defecto (unitarias, funcionales y de regresión con mocks) se
+documenta en [`tests/README.md`](tests/README.md):
+
+```bash
+npm test                 # vitest run — 258 casos con mocks (no requiere servidor)
+npm run test:coverage    # cobertura LCOV
+```
+
+Las pruebas de **sistema contra el stack en vivo** (API HTTP, seguridad y
+rendimiento) se documentan en [`docs/pruebas/`](docs/pruebas/README.md):
+
+```bash
+npm run test:api          # API HTTP real (requiere el stack arriba)
+npm run test:security     # revisión defensiva de seguridad
+npm run test:perf:smoke   # k6 humo (:load y :stress para carga/estrés)
+```
+
+- [docs/pruebas/API.md](docs/pruebas/API.md) — 65 casos de API (positivos y negativos).
+- [docs/pruebas/SEGURIDAD.md](docs/pruebas/SEGURIDAD.md) — controles verificados y **11 defectos de seguridad** confirmados.
+- [docs/pruebas/RENDIMIENTO.md](docs/pruebas/RENDIMIENTO.md) — resultados k6 (humo/carga/estrés) y mejoras propuestas.
+- Evidencias de cada corrida en [docs/pruebas/evidencias/](docs/pruebas/evidencias/).
+
+> Las suites en vivo están excluidas del `vitest run` por defecto (CI no tiene
+> servidor), mediante `vitest.api.config.ts` y `vitest.security.config.ts`.
+
+---
+
 ## ✅ Coverage para SonarQube Cloud
 
 Para generar el reporte de coverage en formato **LCOV** (consumido por SonarQube Cloud), ejecuta:
