@@ -1,5 +1,5 @@
 // Prueba de estrés (stress) acotada: rampa hasta ~60 VUs durante ~2 min.
-// Se mantiene moderada porque otros agentes comparten el stack. ESC38.
+// Se mantiene moderada porque otros procesos comparten el stack. ESC38.
 import { sleep } from "k6";
 import { flujoPublico, flujoLogin, flujoAutenticado, umbrales } from "./comun.js";
 import { construirResumen } from "./resumen.js";

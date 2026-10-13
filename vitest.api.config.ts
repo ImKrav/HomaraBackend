@@ -13,7 +13,7 @@ export default defineConfig({
     include: ["tests/api/**/*.ts"],
     exclude: ["tests/api/soporte-api.ts"],
     // Secuencial: las pruebas crean/borran datos propios y comparten el stack
-    // con otros agentes; evitamos carreras entre archivos.
+    // con otras pruebas; evitamos carreras entre archivos.
     fileParallelism: false,
     testTimeout: 30_000,
     hookTimeout: 30_000,

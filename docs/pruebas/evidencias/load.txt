@@ -1,16 +1,16 @@
 ===== Resumen k6 — load =====
-Peticiones totales : 7281
-Iteraciones        : 1521
+Peticiones totales : 11379
+Iteraciones        : 2301
 http_req_failed    : 0.00%
-Duración (todas)   : avg=1776.5ms p90=369.3ms p95=497.2ms max=2890035.5ms
-dur_autenticado    : avg=191.0ms p95=549.9ms max=1797.0ms
-dur_lectura        : avg=2078.5ms p95=473.5ms max=2890035.5ms
-dur_login          : avg=342.8ms p95=603.5ms max=39156.6ms
+Duración (todas)   : avg=37.3ms p90=85.8ms p95=104.6ms max=232.6ms
+dur_autenticado    : avg=35.8ms p95=101.6ms max=220.4ms
+dur_login          : avg=85.5ms p95=144.2ms max=215.6ms
+dur_lectura        : avg=33.7ms p95=100.2ms max=232.6ms
 
 Umbrales:
   [OK ] dur_login: p(95)<1000
+  [OK ] dur_lectura: p(95)<500
   [OK ] http_req_failed: rate<0.01
   [OK ] dur_autenticado: p(95)<800
-  [OK ] dur_lectura: p(95)<500
 
 RESULTADO: TODOS LOS UMBRALES PASARON

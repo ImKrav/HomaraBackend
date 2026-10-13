@@ -11,8 +11,8 @@ código de estado, forma del cuerpo y sobre `{success,data}` / `{success:false,e
 - Evidencia de la corrida: [`evidencias/test-api.txt`](evidencias/test-api.txt)
 
 Los usuarios y datos de prueba se crean con correos/nombres con sello de tiempo
-(`qa_<timestamp>@test.local`) para no colisionar con la semilla ni con otros
-agentes. Los productos creados por el ADMIN se eliminan en el mismo caso.
+(`qa_<timestamp>@test.local`) para no colisionar con la semilla ni con otras
+ejecuciones. Los productos creados por el ADMIN se eliminan en el mismo caso.
 
 **Resultado de la última corrida: 65/65 Aprobados.**
 

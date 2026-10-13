@@ -23,7 +23,7 @@ export const API = `${BASE_URL}/api/v1`;
 export const claveDePrueba = (): string => `Qa-${randomUUID()}`; // válida (>= 8 caracteres)
 export const claveCorta = (): string => randomUUID().slice(0, 3); // viola RN-002 (< 8)
 
-/** Sello de tiempo único para no colisionar con datos sembrados ni de otros agentes. */
+/** Sello de tiempo único para no colisionar con datos sembrados ni de otras ejecuciones. */
 export function sello(): string {
   return `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
 }

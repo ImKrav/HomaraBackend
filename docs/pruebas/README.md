@@ -17,6 +17,10 @@ Las evidencias de cada corrida real están en [`evidencias/`](evidencias/).
 - El stack debe estar levantado (docker compose): API en `http://localhost:5000`,
   rutas bajo `/api/v1`, Swagger en `/api-docs`. Usuarios semilla con clave
   `123456` (`admin@homara.co`, `juan@email.com`, …).
+- **`CORS_ORIGINS=http://localhost:3000`** en el backend: el contenedor corre con
+  `NODE_ENV=production` y, sin esta variable, no permite ningún origen, por lo que
+  `CP-SEG-CORS-01` falla. Basta con `cp .env.example .env` antes de
+  `docker compose up -d`, o con `CORS_ORIGINS=http://localhost:3000 docker compose up -d`.
 - Para las pruebas de API y seguridad: `npm install` y `npx prisma generate`
   (necesario también para la suite por defecto).
 - Para rendimiento: Docker, con la imagen `grafana/k6:0.54.0`.
