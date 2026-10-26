@@ -14,6 +14,12 @@ const options = {
         description: "API Server"
       }
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+        cookieAuth: { type: "apiKey", in: "cookie", name: "homara_session" },
+      },
+    },
   },
   apis: ["./src/infrastructure/http/routes/*.ts", "./dist/infrastructure/http/routes/*.js"],
 };

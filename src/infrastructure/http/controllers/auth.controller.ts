@@ -4,6 +4,7 @@ import { RegisterUserUseCase, LoginUserUseCase, GetUserProfileUseCase } from "..
 import { prisma } from "../../database/prisma-client.js";
 import { AppError } from "../../../shared/errors/AppError.js";
 import { hashPassword } from "../../../shared/utils/authHelper.js";
+import { setSessionCookie, clearSessionCookie, readSessionCookie } from "../session-cookie.js";
 
 import { IUserRepository } from "../../../domain/repositories/user-repository.interface.js";
 
@@ -50,6 +51,7 @@ export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await registerUserUseCase.execute(req.body);
+      setSessionCookie(res, result.token);
       res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -60,7 +62,24 @@ export class AuthController {
     try {
       const { email, password } = req.body;
       const result = await loginUserUseCase.execute(email, password);
+      setSessionCookie(res, result.token);
       res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static logout(_req: Request, res: Response) {
+    clearSessionCookie(res);
+    res.json({ success: true, data: null });
+  }
+
+  // Sonda de sesión para el navegador: 200 con `null` si no hay sesión (sin 401 en cada carga anónima).
+  static async getSession(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = req.user ? await AuthController.getUserWithMetrics(req.user.id) : null;
+      if (!data && readSessionCookie(req)) clearSessionCookie(res); // cookie vencida, manipulada o de un usuario dado de baja
+      res.json({ success: true, data });
     } catch (error) {
       next(error);
     }

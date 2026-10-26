@@ -728,6 +728,10 @@ test("UNIT-CTRL-AUTH-01", "AuthController.register y login exitosos", async () =
   // Assert
   expect(ctxReg.res.statusCode).toBe(201);
   expect(ctxReg.res.body.success).toBe(true);
+  expect(ctxReg.res.cookies.homara_session).toMatchObject({
+    value: ctxReg.res.body.data.token,
+    options: { httpOnly: true, sameSite: "strict" },
+  });
   expect(ctxRegErr.next.mock.calls.length).toBe(1);
 });
 

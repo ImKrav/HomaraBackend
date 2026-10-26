@@ -8,6 +8,7 @@ import { mockUsuarios, mockPedidos, mockCarritos, mockPrisma, reiniciarRepositor
 import { usuario } from "../helpers.js";
 import { pedir, sesion } from "./soporte.js";
 import { calculateShipping } from "../../src/domain/services/shipping.js";
+import { hashPassword } from "../../src/shared/utils/authHelper.js";
 
 vi.mock("../../src/infrastructure/database/repositories/prisma-user.repository.js", async () => {
   const { mockUsuarios } = await import("../mocks/repositorios.js");
@@ -171,4 +172,37 @@ test("REG-DEF-10", "CP-SEG-DEF-06 / DEF-10: un cliente no lee el detalle del ped
   expect(comoCliente.body).not.toHaveProperty("data");
   expect(comoAdmin.status).toBe(200);
   expect(comoAdmin.body.data.customer.email).toBe("otra@homara.com");
+});
+
+test("REG-DEF-11", "DEF-SEG-FE-02: la sesión del navegador viaja en una cookie HttpOnly que el logout borra", async () => {
+  // Arrange
+  const guardado = usuario({ password: await hashPassword("ClaveSegura8") });
+  mockUsuarios.findByEmail.mockResolvedValue(guardado);
+  mockUsuarios.findById.mockResolvedValue(guardado);
+  mockPrisma.project.count.mockResolvedValue(0);
+  mockPrisma.order.count.mockResolvedValue(0);
+
+  // Act
+  const login = await pedir("POST", "/api/v1/users/login", { body: { email: guardado.email, password: "ClaveSegura8" } });
+  const setCookie = login.headers.get("set-cookie") ?? "";
+  const cookie = setCookie.split(";")[0];
+  const perfil = await pedir("GET", "/api/v1/users/me", { cookie });
+  const conSesion = await pedir("GET", "/api/v1/users/session", { cookie });
+  const sinSesion = await pedir("GET", "/api/v1/users/session");
+  const cookieManipulada = await pedir("GET", "/api/v1/users/session", { cookie: "homara_session=token.manipulado" });
+  const logout = await pedir("POST", "/api/v1/users/logout", { cookie });
+
+  // Assert
+  expect(cookie).toBe(`homara_session=${login.body.data.token}`);
+  expect(setCookie).toMatch(/HttpOnly/i);
+  expect(setCookie).toMatch(/SameSite=Strict/i);
+  expect(setCookie).toMatch(/Path=\//);
+  expect(perfil.status).toBe(200);
+  expect(conSesion.body.data.email).toBe(guardado.email);
+  expect(sinSesion.status).toBe(200);
+  expect(sinSesion.body.data).toBeNull();
+  expect(sinSesion.headers.get("set-cookie")).toBeNull();
+  expect(cookieManipulada.body.data).toBeNull();
+  expect(cookieManipulada.headers.get("set-cookie")).toMatch(/homara_session=;/);
+  expect(logout.headers.get("set-cookie")).toMatch(/homara_session=;.*Expires=Thu, 01 Jan 1970/i);
 });

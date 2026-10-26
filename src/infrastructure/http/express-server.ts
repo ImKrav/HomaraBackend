@@ -32,6 +32,7 @@ app.use(
     origin: envConfig.corsOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // la cookie de sesión cuando el frontend llama directo (sin el proxy /api de Next)
   })
 );
 

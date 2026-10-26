@@ -275,6 +275,15 @@ export function contextoExpress(authHeader?: string) {
       this.body = b;
       return this;
     },
+    cookies: {} as Record<string, { value: string; options: any }>,
+    cookie(nombre: string, value: string, options: any) {
+      this.cookies[nombre] = { value, options };
+      return this;
+    },
+    clearCookie(nombre: string, options: any) {
+      this.cookies[nombre] = { value: "", options };
+      return this;
+    },
   };
   const next = vi.fn();
   return { req, res, next };

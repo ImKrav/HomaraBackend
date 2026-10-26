@@ -119,16 +119,61 @@ const result = await listOrdersUseCase.execute({ userId: req.user.id, admin: isA
   afecta a k6 porque solo cuenta intentos **fallidos**.
 - **OBS-06 (archivar productos):** requiere un campo nuevo en el esquema y filtros
   en todas las consultas; es una funcionalidad, no un defecto.
-- **DEF-SEG-FE-02 (JWT en `localStorage`):** migrar a cookie `HttpOnly` cambia el
-  contrato de autenticación de ambos repositorios y de todas las suites E2E; queda
-  como el siguiente paso recomendado (ver el documento del frontend).
 
-## 7. Cómo reproducir
+## 7. Segunda iteración: DEF-SEG-FE-02, sesión en cookie `HttpOnly`
+
+El frontend guardaba el JWT en `localStorage`, legible por cualquier script de la
+página: un XSS futuro habría robado la sesión. Ahora el backend la emite en una
+cookie que JavaScript no puede leer.
+
+| | Antes | Después |
+|---|---|---|
+| Emisión | `POST /users/login` y `/users/register` devolvían el JWT solo en el cuerpo | Además emiten `Set-Cookie: homara_session=<JWT>; HttpOnly; SameSite=Strict; Path=/; Max-Age=7 días` (`Secure` con `NODE_ENV=production`) |
+| Autenticación | Solo `Authorization: Bearer` | `Bearer` (clientes de API, k6, suites) **o** la cookie de sesión (navegador) |
+| CSRF | No aplicaba (sin cookies) | `SameSite=Strict`: el navegador no envía la cookie desde otro sitio. CORS sigue limitado a `CORS_ORIGINS`, ahora con `credentials: true` |
+| Cierre de sesión | Solo en el navegador (borrar `localStorage`) | `POST /users/logout` borra la cookie (solo el servidor puede hacerlo) |
+| Sonda de sesión | El frontend llamaba a `/users/me` solo si tenía token | `GET /users/session` (`optionalAuth`): 200 con el perfil o `null`, sin 401 en cada carga anónima; si la cookie es inválida, vencida o de un usuario dado de baja, la borra |
+
+```ts
+// ANTES — middlewares/auth.ts
+function extractToken(authHeader: string | undefined): string {
+  if (!authHeader?.startsWith("Bearer ")) throw new AppError("Token no provisto.", 401);
+  return authHeader.split(" ")[1];
+}
+
+// DESPUÉS
+function findToken(req: Request): string | undefined {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) return authHeader.split(" ")[1];
+  return readSessionCookie(req); // http/session-cookie.ts
+}
+```
+
+El JWT **sigue** viajando en el cuerpo del login para los clientes de API (las
+suites en vivo, k6, Cypress API y Screenplay lo usan como `Bearer`); el frontend ya
+no lo guarda. Un script que pudiera leer esa respuesta tendría que estar presente
+en la página del login, donde también podría leer la contraseña escrita, así que
+no amplía la exposición. No se agregaron dependencias: Express ya trae
+`res.cookie`/`res.clearCookie` y la cabecera `Cookie` se lee en cinco líneas.
+
+Pruebas: `REG-DEF-11` (atributos de la cookie, `/users/me` y `/users/session` con
+solo la cookie, cookie manipulada que se borra, logout), `UNIT-AUTH-07`
+(`requireAuth` con la cookie), `UNIT-CTRL-AUTH-01` (el registro emite la cookie
+`HttpOnly`/`Strict`) y una mutación nueva en la demo (`httpOnly: false` → detectada).
+
+| Suite | Resultado |
+|---|---|
+| `npm test` | **270/270** (+2) |
+| Demo de regresión | **19/19** |
+| API en vivo | 65/65 |
+| Seguridad en vivo | 33/33 |
+
+## 8. Cómo reproducir
 
 ```bash
 npm install && npx prisma generate
-npm test                                  # 268/268
-npm run test:regression:demo              # 18/18 mutaciones detectadas
+npm test                                  # 270/270
+npm run test:regression:demo              # 19/19 mutaciones detectadas
 
 # En vivo (requiere el stack arriba; JWT_SECRET igual al del backend).
 # En esta refactorización también se corrió la suite Cypress completa del frontend
