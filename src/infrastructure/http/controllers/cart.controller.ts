@@ -14,7 +14,7 @@ const removeCartItemUseCase = new RemoveCartItemUseCase(cartRepository);
 export class CartController {
   static async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || (req.query.userId as string);
+      const userId = req.user?.id;
       if (!userId) {
         return res.json({
           success: true,

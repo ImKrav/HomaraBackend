@@ -150,14 +150,17 @@ test("REG-ORD-06", "El admin cambia el estado solo a valores válidos", async ()
   expect(mockPedidos.updateStatus).toHaveBeenCalledTimes(1);
 });
 
-test("REG-ORD-07", "El detalle de un pedido inexistente responde 404", async () => {
+test("REG-ORD-07", "El detalle de un pedido exige sesión y uno inexistente responde 404", async () => {
   // Arrange
+  const { token } = sesion();
   mockPedidos.findByIdOrNumber.mockResolvedValue(null);
 
   // Act
-  const res = await pedir("GET", "/api/v1/orders/ORD-2026-9999");
+  const sinSesion = await pedir("GET", "/api/v1/orders/ORD-2026-9999");
+  const res = await pedir("GET", "/api/v1/orders/ORD-2026-9999", { token });
 
   // Assert
+  expect(sinSesion.status).toBe(401);
   expect(res.status).toBe(404);
   expect(res.body.error).toBe("Pedido no encontrado");
 });

@@ -109,17 +109,19 @@ test("REG-ADM-04", "El admin da de alta, edita y elimina productos", async () =>
   expect(mockProductos.delete).toHaveBeenCalledWith(CUID.producto);
 });
 
-test("REG-ADM-05", "El alta rechaza precios o stock negativos antes de llegar al repositorio", async () => {
+test("REG-ADM-05", "El alta rechaza precios no positivos o stock negativo antes de llegar al repositorio", async () => {
   // Arrange
   const { token } = admin();
 
   // Act
   const precio = await pedir("POST", "/api/v1/products", { token, body: datosProducto({ price: -1 }) });
+  const precioCero = await pedir("POST", "/api/v1/products", { token, body: datosProducto({ price: 0 }) });
   const stock = await pedir("POST", "/api/v1/products", { token, body: datosProducto({ stockQuantity: -3 }) });
 
   // Assert
   expect(precio.status).toBe(400);
-  expect(precio.body.error).toContain("El precio no puede ser negativo.");
+  expect(precio.body.error).toContain("El precio debe ser mayor a 0.");
+  expect(precioCero.status).toBe(400);
   expect(stock.status).toBe(400);
   expect(stock.body.error).toContain("El stock no puede ser negativo.");
   expect(mockProductos.create).not.toHaveBeenCalled();

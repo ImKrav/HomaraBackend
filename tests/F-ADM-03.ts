@@ -24,8 +24,8 @@ async function reporteCon(productos: any[]) {
   return { cuerpo: res.body as any, next };
 }
 
-// Defecto abierto #11 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-ADM-03-01", "Clasifica productos con existencias menores a cero como stock_negativo", async () => {
+// Defecto #11 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-ADM-03-01", "Clasifica productos con existencias menores a cero como stock_negativo", async () => {
   // Arrange
   const filas = [filaProductoPrisma({ id: "prd_neg", stockQuantity: -5, price: 1000, inStock: false })];
 
@@ -44,7 +44,7 @@ test.fails("CP-F-ADM-03-01", "Clasifica productos con existencias menores a cero
     outOfStockCount: 0,
     negativeStockCount: 1,
   });
-  // DEFECTO: totalUnits debería sumar solo existencias positivas (no restar stock negativo)
+  // Corregido (defecto): totalUnits debería sumar solo existencias positivas (no restar stock negativo)
   expect(cuerpo.data.stats.totalUnits).toBe(0);
 });
 
@@ -106,8 +106,8 @@ test("CP-F-ADM-03-04", "Marca 50 unidades como límite inferior de inventario no
   });
 });
 
-// Defecto abierto #11 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-ADM-03-05", "Procesa múltiples productos combinando estados en el reporte", async () => {
+// Defecto #11 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-ADM-03-05", "Procesa múltiples productos combinando estados en el reporte", async () => {
   // Arrange
   const filas = [
     filaProductoPrisma({ id: "prd_neg", name: "Arena", stockQuantity: -3, price: 5000, inStock: false }),
@@ -129,6 +129,6 @@ test.fails("CP-F-ADM-03-05", "Procesa múltiples productos combinando estados en
     outOfStockCount: 1,
     negativeStockCount: 1,
   });
-  // DEFECTO: totalUnits no debería restar existencias negativas
+  // Corregido (defecto): totalUnits no debería restar existencias negativas
   expect(cuerpo.data.stats.totalUnits).toBe(0);
 });

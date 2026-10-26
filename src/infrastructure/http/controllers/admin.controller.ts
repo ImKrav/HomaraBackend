@@ -157,7 +157,8 @@ export class AdminController {
       const lowStock = products.filter((p) => p.stockQuantity > 0 && p.stockQuantity < 50);
       const outOfStock = products.filter((p) => p.stockQuantity === 0);
       const negativeStock = products.filter((p) => p.stockQuantity < 0);
-      const totalUnits = products.reduce((sum: number, p) => sum + p.stockQuantity, 0);
+      // Las existencias negativas (pedidos en espera) no restan unidades en bodega (defecto #11).
+      const totalUnits = products.reduce((sum: number, p) => sum + Math.max(0, p.stockQuantity), 0);
 
       res.json({
         success: true,

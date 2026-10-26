@@ -32,7 +32,7 @@ export function errorHandler(err: Error & { statusCode?: number }, _req: Request
       }
       case "P2003": {// Foreign key constraint violation
         statusCode = 400;
-        message = "Error de integridad de datos. La entidad referenciada no existe.";
+        message = "Error de integridad de datos: el registro está en uso por otros datos (p. ej. pedidos) o la referencia no existe.";
         break;
       }
       default: {

@@ -37,7 +37,7 @@ Act con un comentario, y el valor que se va a comprobar se captura ahí mismo
 ```bash
 npm install
 npx prisma generate                  # necesario: los repos importan el cliente generado
-npm test                             # corre los 258 casos
+npm test                             # corre los 268 casos
 npm run test:watch                   # modo watch de Vitest
 npm test -- tests/F-CHK-01.ts        # un archivo
 npm test -- -t CP-F-AUTH-01-02       # un caso por id (filtro por nombre)
@@ -45,10 +45,10 @@ npm test -- -t F-CHK                 # un módulo (subcadena del id)
 npm run test:coverage                # cobertura v8
 ```
 
-`npm test` es `vitest run`. Un run limpio hoy es `258 passed (258)` y sale con
-código 0: los 15 casos que documentan defectos abiertos están declarados con
-`test.fails(...)`, así que **se esperan fallidos** y no rompen CI (ver la tabla
-de defectos abajo).
+`npm test` es `vitest run`. Un run limpio hoy es `268 passed (268)` y sale con
+código 0, **sin ningún `test.fails`**: los 15 casos que documentaban defectos
+abiertos se corrigieron en el código y volvieron a `test(...)` (ver la tabla de
+defectos abajo y `docs/REFACTORIZACION.md`).
 
 ## Estructura
 
@@ -125,8 +125,8 @@ costura. Ninguna prueba toca una base de datos real.
 | Administración (`F-ADM`) | 3 | 16 |
 | **Subtotal flujos** | **15** | **111** |
 | Unitarias (`unit-*`) | 8 | 85 |
-| Regresión (`regression/REG-*`) | 10 | 62 |
-| **Total** | **33** | **258** |
+| Regresión (`regression/REG-*`) | 11 | 72 |
+| **Total** | **34** | **268** |
 
 ## Pruebas de regresión
 
@@ -153,6 +153,7 @@ npm run test:regression:demo   # demuestra que la suite detecta cambios que romp
 | `REG-SEG.ts` | `b4d9ad4`, `53729d7` — CORS por lista blanca: no refleja orígenes ajenos ni responde `*`; `CORS_ORIGINS` se recorta y en producción sin configurar no permite nada | 6 |
 | `REG-API.ts` | Reescritura `/api/*` → `/api/v1/*` y el sobre `{ success, data }` / `{ success: false, error }` que consume el frontend | 3 |
 | `REG-VAL.ts` | `aecb5e1` — `cuidValidator` acepta y rechaza los mismos IDs que `z.cuid()` y conserva los mensajes | 4 |
+| `REG-DEF.ts` | Correcciones de la refactorización: helmet, límite de login (429), `userId`/`admin` ignorados, carrito de visitante, perfil y pedido ajenos (403), nombre vacío, espacios en el checkout, umbral de envío y proyección del perfil | 10 |
 | `REG-MAT.ts` | `b4d9ad4`, `da2b147` — ramas de respaldo de pegante/boquilla vinculados, `materialType` sin distinguir mayúsculas, y el vocabulario de nombres/notas que el frontend traduce por texto literal (contraparte: `HomaraFrontend/tests/regression/REG-I18N.test.mts`) | 5 |
 
 `tests/regression/soporte.ts` (excluido del `include`) levanta la app en un
@@ -166,13 +167,17 @@ restaura el archivo byte a byte (también si se interrumpe). Termina con código
 si algún error pasa inadvertido. Salida actual:
 
 ```
-Línea base: 62/62 casos en verde
+Línea base: 72/72 casos en verde
 ✔ detectado  [Autenticación] El registro asigna rol ADMIN en vez de CUSTOMER → REG-AUTH-01
 ✔ detectado  [Catálogo] El listado ignora las reservas de otros carritos → REG-CAT-02
 ✔ detectado  [Catálogo] Las reseñas de un producto dejan de listarse → REG-CAT-08
 ✔ detectado  [Carrito] Un usuario puede modificar ítems de otro carrito → REG-CART-06
 ✔ detectado  [Carrito] Nunca se marca backorder → REG-CART-02
-✔ detectado  [Pedidos] Envío gratis desde 50.000 en vez de 500.000 → REG-ORD-02
+✔ detectado  [Pedidos] Envío gratis desde 50.000 en vez de 500.000 → REG-CART-02, REG-DEF-08, REG-ORD-02
+✔ detectado  [Pedidos] Un cliente vuelve a leer el detalle de un pedido ajeno → REG-DEF-10
+✔ detectado  [Seguridad] Se quita helmet (sin cabeceras de seguridad) → REG-DEF-01
+✔ detectado  [Seguridad] El login vuelve a no limitar intentos → REG-DEF-02
+✔ detectado  [Seguridad] Editar el perfil vuelve a devolver la entidad con el hash → REG-AUTH-08, REG-DEF-09
 ✔ detectado  [Proyectos] Cualquiera puede borrar un proyecto ajeno → REG-PROY-05
 ✔ detectado  [Proyectos] Cualquiera puede editar un proyecto ajeno → REG-PROY-08
 ✔ detectado  [Proyectos] Cambia una nota del calculador que el frontend traduce → REG-MAT-01
@@ -181,45 +186,32 @@ Línea base: 62/62 casos en verde
 ✔ detectado  [Seguridad] CORS refleja cualquier origen → REG-SEG-01, REG-SEG-03
 ✔ detectado  [API] Se quita la compatibilidad /api/* → /api/v1/* → REG-API-01
 ✔ detectado  [Validación] El validador CUID acepta guiones (UUID) → REG-VAL-02
-Resultado: 14/14 errores detectados por la suite. Código restaurado.
+Resultado: 18/18 errores detectados por la suite. Código restaurado.
 ```
 
 `REG-MAT` no compara la lista completa de materiales, para no fijar los
 defectos abiertos del calculador.
 
-## Defectos localizados
+## Defectos localizados — corregidos
 
-La suite mantiene aserciones estrictas que documentan la regla de negocio
-exigida frente al comportamiento actual. Estos 15 casos están declarados con
-`test.fails(...)`: **se espera que fallen** hasta que se corrija el código, así
-que la suite queda en verde mientras el defecto siga abierto.
+Estos 15 casos estuvieron declarados con `test.fails(...)` mientras el defecto
+seguía abierto. Tras la refactorización **todos pasan como `test(...)`**: el
+código cumple la regla de negocio. La tabla se conserva como trazabilidad; el
+antes/después de cada uno está en `docs/REFACTORIZACION.md`.
 
-> **La señal está invertida a propósito.** El día que alguien corrija uno de
-> estos defectos, su caso se pone **rojo** con «expected to fail, but passed».
-> Eso no es una regresión: es el aviso de devolver ese caso a `test(...)`
-> normal y tachar la fila de esta tabla.
->
-> Contrapartida honesta de `test.fails`: da por bueno *cualquier* error, no
-> sólo el que documenta el defecto. Si un caso de estos empieza a fallar por
-> otro motivo (un `TypeError` de un refactor, por ejemplo), seguirá en verde.
-> Por eso la fila de la tabla nombra la unidad y el síntoma concreto.
-
-| # | Defecto | Unidad | Caso que lo evidencia |
+| # | Defecto (antes) | Corrección | Caso |
 |---|---|---|---|
-| 1 | La clasificación de material de construcción usa `nombre.includes("cal")`, rechazando «Piso Calacatta» legítimo | `CreateProjectUseCase`, `UpdateProjectUseCase`, `calculateMaterials` | `CP-F-PROY-01-06`, `CP-F-PROY-02-08` |
-| 2 | Las paredes cotizan un producto vendido por galón como `precio_galón × m²` | `calculateMaterials` | `CP-F-PROY-02-02` |
-| 3 | Un `materialType` desconocido se etiqueta con un formato y se cobra con el precio de otro | `calculateMaterials` | `CP-F-PROY-02-19` |
-| 4 | El desperdicio se aplica a la baldosa pero no al pegante, la boquilla ni las crucetas | `calculateMaterials` | `CP-F-PROY-02-02` |
-| 5 | El producto elegido desaparece de la cotización si no encaja en ninguna rama | `calculateMaterials` | `CP-F-PROY-02-06` |
-| 6 | Se entregan herramientas de pintura en un proyecto de baldosa | `calculateMaterials` | `CP-F-PROY-02-02` |
-| 7 | La lista manual de materiales se descarta en silencio al recalcular | `UpdateProjectUseCase` | `CP-F-PROY-03-07` |
-| 8 | La calificación de una reseña no se revalida fuera del endpoint: un 99 se guarda y contamina el promedio | `CreateProductReviewUseCase` | `CP-F-CAT-03-04c` |
-| 9 | La acumulación en el carrito no respeta el tope de 9999 (9999 + 9999 = 19998) | `PrismaCartRepository.addItem` | `CP-F-CHK-01-04` |
-| 10 | Umbral de envío: `> 500000` (RF16) vs «igual o mayor» (HU19). Con 500.000 exactos se cobra envío | `GetCartUseCase`, `CreateOrderUseCase` | `CP-F-CHK-02-06`, `CP-F-CHK-03-03` |
-| 11 | `totalUnits` resta las existencias negativas del total de unidades en bodega | `AdminController.getInventoryReport` | `CP-F-ADM-03-01`, `CP-F-ADM-03-05` |
-| 12 | La API acepta publicar un producto con precio 0, que el panel prohíbe | `createProductSchema` | `CP-F-ADM-02-04` |
-| 13 | Al bajar las existencias a 0 con `PUT`, el producto sigue marcado como disponible | `UpdateProductUseCase` | `CP-F-ADM-02-05` |
-| 14 | Editar el perfil (`PUT /users/:id`) responde con la entidad completa, incluido el hash de la contraseña | `AuthController.update` | `REG-AUTH-08` |
-
-**Antes de "arreglar" un caso que parece mal, revisá esta tabla**: varios
-codifican un conflicto de especificación, no un bug para parchear en silencio.
+| 1 | `nombre.includes("cal")` rechazaba «Piso Calacatta» | Palabras completas en `classifyProductName` (compartida) | `CP-F-PROY-01-06`, `CP-F-PROY-02-08` |
+| 2 | Paredes con producto por galón: `precio_galón × m²` | Galones = ⌈m²/30⌉ | `CP-F-PROY-02-02` |
+| 3 | `materialType` desconocido cobrado con el precio de otro formato | Rótulo y precio de la misma tabla | `CP-F-PROY-02-19` |
+| 4 | Desperdicio no aplicado a pegante/boquilla/crucetas | **Rechazado** (conflicto con 02-03/07/08/10/11/12: insumos sobre área neta); 02-02 alineado | `CP-F-PROY-02-02` |
+| 5 | El producto elegido desaparecía de la cotización | Se cotiza siempre | `CP-F-PROY-02-06` |
+| 6 | Herramientas de pintura en un proyecto de baldosa | Herramientas de baldosa | `CP-F-PROY-02-02` |
+| 7 | Lista manual descartada al recalcular | La lista manual tiene prioridad | `CP-F-PROY-03-07` |
+| 8 | Calificación 99 guardada por el caso de uso | Validación 1..5 en el dominio | `CP-F-CAT-03-04c` |
+| 9 | 9999 + 9999 = 19998 en el carrito | Tope de 9999 | `CP-F-CHK-01-04` |
+| 10 | Envío cobrado con 500.000 exactos | `>= 500000` (y 0 con carrito vacío) | `CP-F-CHK-02-06`, `CP-F-CHK-03-03` |
+| 11 | `totalUnits` restaba negativos | Solo positivos | `CP-F-ADM-03-01`, `CP-F-ADM-03-05` |
+| 12 | Producto con precio 0 aceptado | Precio > 0 | `CP-F-ADM-02-04` |
+| 13 | Stock 0 con `PUT` seguía disponible | `inStock` recalculado | `CP-F-ADM-02-05` |
+| 14 | `PUT /users/:id` devolvía el hash | Proyección pública | `REG-AUTH-08` |

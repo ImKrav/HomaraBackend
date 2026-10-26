@@ -18,13 +18,9 @@ const router = Router();
  *     tags:
  *       - Cart
  *     summary: Obtener el carrito
- *     description: Devuelve el carrito activo del usuario actual, calculando subtotal, envío y total.
- *     parameters:
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *         required: false
+ *     description: Carrito del usuario autenticado con subtotal, envío y total. Sin sesión devuelve un carrito de visitante vacío.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Carrito retornado.
@@ -52,8 +48,6 @@ router.get("/", optionalAuth, CartController.get);
  *                 type: string
  *               quantity:
  *                 type: integer
- *               userId:
- *                 type: string
  *     responses:
  *       201:
  *         description: Item agregado al carrito.

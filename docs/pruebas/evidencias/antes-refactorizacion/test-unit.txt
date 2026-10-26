@@ -1,0 +1,140 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend[39m
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-01  Un cliente no entra al panel ni gestiona productos
+[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-01  No se puede pagar un carrito vacío
+[22m[39m[400] El carrito está vacío
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-01  Un cliente no entra al panel ni gestiona productos
+[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-API.ts[2m > [22m[2mREG-API-03  Los errores conservan el sobre { success: false, error } con el mensaje
+[22m[39m❌ Error: Base de datos caída
+Error: Base de datos caída
+    at C:\Users\jdmg2\WebstormProjects\Homara\HomaraBackend\tests\regression\REG-API.ts:68:44
+    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at runSuite (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runFiles (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3)
+
+[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-02  Crear exige sesión y datos válidos
+[22m[39m[401] Token no provisto.
+
+[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-01  Un cliente no entra al panel ni gestiona productos
+[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-CAT.ts[2m > [22m[2mREG-CAT-04  La ficha de un producto inexistente responde 404
+[22m[39m[404] Producto no encontrado
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-02  Crear exige sesión y datos válidos
+[22m[39m[400] Validación fallida: type: Tipo debe ser PISO, PARED, TECHO o INTEGRAL
+
+[90mstderr[2m | tests/regression/REG-CART.ts[2m > [22m[2mREG-CART-04  Agregar exige sesión y un productId CUID
+[22m[39m[401] Token no provisto.
+
+[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-02  Crear exige sesión y datos válidos
+[22m[39m[400] Validación fallida: area: El área debe ser un número positivo
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-CART.ts[2m > [22m[2mREG-CART-04  Agregar exige sesión y un productId CUID
+[22m[39m[400] Validación fallida: productId: ID de producto inválido
+
+[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-05  Un cliente no puede cambiar el estado de un pedido
+[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-CAT.ts[2m > [22m[2mREG-CAT-05  Reseñar recalcula el promedio del producto; una segunda reseña se rechaza
+[22m[39m[400] Ya has calificado este producto
+
+[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-04  Consultar exige un id CUID y responde 404 si no existe
+[22m[39m[400] Validación fallida: id: El ID proporcionado debe ser un formato CUID válido.
+
+[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-04  Consultar exige un id CUID y responde 404 si no existe
+[22m[39m[404] Proyecto no encontrado
+
+[90mstderr[2m | tests/regression/REG-CART.ts[2m > [22m[2mREG-CART-06  Cambiar la cantidad de un ítem ajeno responde 403 y no lo modifica
+[22m[39m[403] No tienes permiso para modificar este item del carrito.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-06  El admin cambia el estado solo a valores válidos
+[22m[39m[400] Validación fallida: status: Estado debe ser PENDIENTE, PROCESANDO, ENVIADO, ENTREGADO o CANCELADO
+
+[90mstderr[2m | tests/regression/REG-CAT.ts[2m > [22m[2mREG-CAT-06  Una calificación fuera de 1..5 no llega al repositorio
+[22m[39m[400] Validación fallida: rating: La calificación máxima es 5 estrellas.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-05  Solo el dueño puede borrar un proyecto
+[22m[39m[403] No tienes permiso para eliminar este proyecto.
+
+[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-07  El detalle de un pedido inexistente responde 404
+[22m[39m[404] Pedido no encontrado
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-05  El alta rechaza precios o stock negativos antes de llegar al repositorio
+[22m[39m[400] Validación fallida: price: El precio no puede ser negativo.
+
+[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-08  Nadie edita un proyecto ajeno
+[22m[39m[403] No tienes permiso para modificar este proyecto.
+
+[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-02  El registro normaliza el correo y rechaza uno ya registrado
+[22m[39m[400] El correo electrónico ya está registrado.
+
+[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-05  El alta rechaza precios o stock negativos antes de llegar al repositorio
+[22m[39m[400] Validación fallida: stockQuantity: El stock no puede ser negativo.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-01  Maneja AppError devolviendo el statusCode y el mensaje
+[22m[39m[404] Recurso no disponible
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-02  Maneja Prisma P2002 como 409 conflicto con campos duplicados
+[22m[39m[409] El registro ya existe. Campo duplicado: email
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-03  Maneja Prisma P2025 como 404 no encontrado
+[22m[39m[404] El recurso solicitado no fue encontrado o no tienes permisos para acceder a él.
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-04  Maneja Prisma P2003 como 400 error de integridad
+[22m[39m[400] Error de integridad de datos. La entidad referenciada no existe.
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-05  Maneja PrismaClientValidationError como 400
+[22m[39m[400] Los datos proporcionados no coinciden con la estructura requerida.
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-06  Maneja TokenExpiredError como 401
+[22m[39m[401] Token expirado. Por favor, inicia sesión nuevamente.
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-07  Maneja JsonWebTokenError como 401
+[22m[39m[401] Token inválido o malformado.
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-08  Maneja error inesperado como 500
+[22m[39m❌ Error: Fallo imprevisto
+Error: Fallo imprevisto
+    at C:\Users\jdmg2\WebstormProjects\Homara\HomaraBackend\tests\unit-error-handler.ts:137:22
+    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at runSuite (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runFiles (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3)
+
+[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-09  Maneja código Prisma desconocido como 400 genérico
+[22m[39m[400] Error en base de datos (P9999): Generic DB error
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-04  El login con clave incorrecta responde 401 con mensaje genérico
+[22m[39m[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-05  El perfil exige token y nunca expone la contraseña
+[22m[39m[401] Token no provisto.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-06  Un token de un usuario dado de baja deja de servir
+[22m[39m[401] Usuario no encontrado o dado de baja.
+
+[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m
+
+[2m Test Files [22m [1m[32m33 passed[39m[22m[90m (33)[39m
+[2m      Tests [22m [1m[32m258 passed[39m[22m[90m (258)[39m
+[2m   Start at [22m 15:55:11
+[2m   Duration [22m 5.87s[2m (transform 4.63s, setup 0ms, collect 39.87s, tests 9.92s, environment 14ms, prepare 10.00s)[22m
+

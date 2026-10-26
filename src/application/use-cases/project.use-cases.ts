@@ -4,7 +4,7 @@
 
 import { IProjectRepository } from "../../domain/repositories/project-repository.interface.js";
 import { IProductRepository } from "../../domain/repositories/product-repository.interface.js";
-import { calculateMaterials } from "../../domain/services/materialCalculator.js";
+import { calculateMaterials, classifyProductName } from "../../domain/services/materialCalculator.js";
 import { AppError } from "../../shared/errors/AppError.js";
 
 const ALLOWED_MATERIAL_TYPES = new Set(["ceramica", "porcelanato", "madera", "vinilo", "pintura"]);
@@ -31,11 +31,8 @@ async function resolveSelectedProduct(
   }
 
   const normalizedMaterialType = materialType.toLowerCase();
-  const productName = product.name.toLowerCase();
   const isConstructionMaterial =
-    product.categorySlug === "materiales-construccion" ||
-    ["pegante", "cemento", "adhesivo", "mortero", "yeso", "cal", "boquilla"]
-      .some((term) => productName.includes(term));
+    product.categorySlug === "materiales-construccion" || classifyProductName(product.name).isConstructionMaterial;
 
   if (isConstructionMaterial) {
     if (product.categorySlug !== "materiales-construccion") {
@@ -85,10 +82,13 @@ export class ListUserProjectsUseCase {
 export class GetProjectUseCase {
   constructor(private readonly projectRepository: IProjectRepository) {}
 
-  async execute(id: string) {
+  async execute(id: string, requester: { id: string; role: string }) {
     const project = await this.projectRepository.findById(id);
     if (!project) {
       throw new AppError("Proyecto no encontrado", 404);
+    }
+    if (project.userId !== requester.id && requester.role !== "ADMIN") {
+      throw new AppError("No tienes permiso para ver este proyecto.", 403);
     }
     return project;
   }
@@ -255,7 +255,9 @@ export class UpdateProjectUseCase {
       (field) => (data as Record<string, unknown>)[field] !== undefined
     );
 
-    if (needsRecalculation) {
+    // Defecto #7: una lista manual enviada junto a un campo de cálculo se descartaba en silencio;
+    // ahora la lista editada a mano tiene prioridad sobre el recálculo.
+    if (needsRecalculation && dataMaterials === undefined) {
       const calcArea = data.area ?? existing.area;
       const calcType = data.materialType ?? (existing.materialType ?? "ceramica");
       const calcFormat = data.tileFormat ?? (existing.tileFormat ?? "60x60");

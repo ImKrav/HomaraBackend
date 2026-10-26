@@ -6,8 +6,8 @@
 //
 // - Toda ruta documentada debe existir de verdad (no documentar rutas fantasma).
 // - Toda ruta pública principal implementada debe estar documentada.
-// - Se detectan rutas implementadas pero NO documentadas (hueco de documentación,
-//   RN-064): quedan registradas como defecto conocido con `it.fails`.
+// - Las rutas de vitrina, reseñas y CRUD de productos, que estaban implementadas
+//   pero sin documentar (CP-API-DOC-04, RN-064), ya están en Swagger.
 // ============================================================================
 
 import { test, expect, describe } from "../harness.js";
@@ -137,9 +137,9 @@ describe("API · Contrato de documentación (Swagger vs. implementación)", () =
     expect(sinDocumentar.map((o) => `${o.method} ${o.path}`)).toEqual([]);
   });
 
-  test.fails(
+  test(
     "CP-API-DOC-04",
-    "ESC42/RN-064 — DEFECTO: hay rutas implementadas sin documentar en Swagger (storefront, reseñas, CRUD de productos)",
+    "ESC42/RN-064 — las rutas de vitrina, reseñas y CRUD de productos están documentadas en Swagger",
     async () => {
       // Arrange
       const doc = await obtenerOpenApi();
@@ -150,8 +150,7 @@ describe("API · Contrato de documentación (Swagger vs. implementación)", () =
         (op) => !documentadas.has(`${op.method} ${op.path}`),
       );
 
-      // Assert (comportamiento correcto esperado: deberían estar todas documentadas).
-      // Mientras el defecto siga abierto, esta aserción falla y el caso queda en verde.
+      // Assert (corregido: antes faltaban las seis operaciones)
       expect(sinDocumentar).toEqual([]);
     },
   );

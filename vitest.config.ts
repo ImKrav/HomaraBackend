@@ -7,6 +7,8 @@ export default defineConfig({
     alias: [{ find: /^(\.{1,2}\/.*)\.js$/, replacement: "$1" }],
   },
   test: {
+    // El backend no arranca sin JWT_SECRET; las pruebas firman y verifican con este.
+    env: { JWT_SECRET: "secreto-solo-para-pruebas-unitarias-0123456789" },
     include: ["tests/**/*.ts"],
     // Las suites tests/api y tests/security son pruebas en vivo (HTTP real contra
     // el stack levantado). CI no tiene servidor corriendo, así que se excluyen del

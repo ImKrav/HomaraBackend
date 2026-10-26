@@ -95,8 +95,8 @@ test("CP-F-PROY-01-05", "Rechaza categorías no permitidas para proyectos (ej. h
   expect(proyectos.create).not.toHaveBeenCalled();
 });
 
-// Defecto abierto #1 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-PROY-01-06", "Valida correspondencia entre nombre de insumo y su categoría", async () => {
+// Defecto #1 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-PROY-01-06", "Valida correspondencia entre nombre de insumo y su categoría", async () => {
   // Arrange
   const { proyectos, productos, caso } = montar();
   productos.findById.mockResolvedValue(producto({ name: "Pegante Ceramico Gris 25kg", categorySlug: "pisos-ceramicas" }));
@@ -118,7 +118,7 @@ test.fails("CP-F-PROY-01-06", "Valida correspondencia entre nombre de insumo y s
   expect(error.statusCode).toBe(400);
   expect(creadosTrasElRechazo).toBe(0);
   const observado = resultado instanceof AppError ? resultado.message : "proyecto creado";
-  // DEFECTO: la subcadena 'cal' dentro de 'Calacatta' clasifica erróneamente un piso como material de construcción
+  // Corregido (defecto): la subcadena 'cal' dentro de 'Calacatta' clasifica erróneamente un piso como material de construcción
   expect(observado).toBe("proyecto creado");
   expect(proyectos.create.mock.calls.length).toBe(1);
 });

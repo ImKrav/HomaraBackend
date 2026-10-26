@@ -117,10 +117,10 @@ swagger-ui-express) contra las rutas realmente implementadas.
 | CP-API-DOC-01 | ESC42 | `/api-docs` expone OpenAPI 3 con rutas | doc válido | Aprobado |
 | CP-API-DOC-02 | ESC42 / RN-064 | Toda ruta documentada existe (sin rutas fantasma) | 0 faltantes | Aprobado |
 | CP-API-DOC-03 | ESC42 | Rutas públicas principales documentadas | 0 sin documentar | Aprobado |
-| CP-API-DOC-04 | ESC42 / RN-064 | **DEFECTO**: rutas implementadas sin documentar | `test.fails` (en verde) | Defecto |
+| CP-API-DOC-04 | ESC42 / RN-064 | Rutas de vitrina, reseñas y CRUD de productos documentadas | 0 sin documentar | Aprobado (corregido) |
 
-**Defecto de documentación (CP-API-DOC-04):** quedan sin bloque `@openapi` las
+**Defecto de documentación (CP-API-DOC-04) — corregido:** quedaban sin bloque `@openapi` las
 rutas `GET /products/storefront`, `GET`/`POST /products/{id}/reviews` y el CRUD de
 administración de productos (`POST /products`, `PUT /products/{id}`,
-`DELETE /products/{id}`). Severidad **Baja**. Corrección: documentarlas en
-`routes/products.ts`.
+`DELETE /products/{id}`). Severidad **Baja**. Se documentaron en
+`routes/products.ts` (ver `../REFACTORIZACION.md`).

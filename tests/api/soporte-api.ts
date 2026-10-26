@@ -141,7 +141,18 @@ export async function unaCategoriaId(): Promise<string> {
 }
 
 /**
- * Firma un JWT HS256 a mano con el secreto por defecto del contenedor, sin
+ * Secreto con el que firma el backend bajo prueba. Desde la refactorización no
+ * hay valor por defecto: las pruebas que necesitan una firma VÁLIDA (token
+ * expirado, usuario inexistente) lo leen del entorno, igual que el servidor.
+ */
+export function secretoDelServidor(): string {
+  const s = process.env.JWT_SECRET;
+  if (!s) throw new Error("Defina JWT_SECRET con el mismo valor que usa el backend.");
+  return s;
+}
+
+/**
+ * Firma un JWT HS256 a mano con el secreto por defecto (ya revocado), sin
  * dependencias. Se usa SÓLO en la revisión de seguridad para demostrar, de forma
  * defensiva sobre el propio stack del equipo, el riesgo del secreto embebido.
  */

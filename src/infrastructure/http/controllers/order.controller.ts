@@ -20,12 +20,13 @@ const updateOrderStatusUseCase = new UpdateOrderStatusUseCase(orderRepository);
 export class OrderController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || (req.query.userId as string);
-      if (!userId) {
+      // El usuario sale SIEMPRE del token; sin sesión no hay pedidos que mostrar.
+      if (!req.user) {
         return res.json({ success: true, data: [] });
       }
-      const isAdmin = req.query.admin === "true";
-      const result = await listOrdersUseCase.execute({ userId, admin: isAdmin });
+      // Express 5 recalcula req.query en cada lectura: llega el texto "true", no el booleano de Zod.
+      const isAdmin = req.user.role === "ADMIN" && String(req.query.admin) === "true";
+      const result = await listOrdersUseCase.execute({ userId: req.user.id, admin: isAdmin });
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -34,7 +35,7 @@ export class OrderController {
 
   static async getDetail(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await getOrderDetailUseCase.execute(req.params.id as string);
+      const result = await getOrderDetailUseCase.execute(req.params.id as string, req.user!);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

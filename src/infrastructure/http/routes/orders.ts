@@ -18,12 +18,10 @@ const router = Router();
  *     tags:
  *       - Orders
  *     summary: Listar pedidos
- *     description: Obtiene la lista de pedidos de un usuario, o todos si el usuario es administrador y pasa el query param ?admin=true.
+ *     description: Pedidos del usuario autenticado (el usuario sale del token). Con ?admin=true un ADMIN obtiene todos; para otros roles se ignora. Sin sesión devuelve una lista vacía.
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
  *       - in: query
  *         name: admin
  *         schema:
@@ -41,7 +39,9 @@ router.get("/", optionalAuth, validateZod(listOrdersQuerySchema, "query"), Order
  *     tags:
  *       - Orders
  *     summary: Detalles de un pedido
- *     description: Consigue la información detallada de una orden de compra por ID o por Número de Orden (ej. ORD-2024-001).
+ *     description: Detalle de una orden por ID o por número (ej. ORD-2024-001). Solo su dueño o un ADMIN.
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -51,10 +51,14 @@ router.get("/", optionalAuth, validateZod(listOrdersQuerySchema, "query"), Order
  *     responses:
  *       200:
  *         description: Detalle del pedido.
+ *       401:
+ *         description: No autenticado.
+ *       403:
+ *         description: El pedido pertenece a otro usuario.
  *       404:
  *         description: Pedido no encontrado.
  */
-router.get("/:id", OrderController.getDetail);
+router.get("/:id", requireAuth, OrderController.getDetail);
 
 /**
  * @openapi

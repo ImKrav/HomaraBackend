@@ -14,6 +14,7 @@ import { usuario } from "../helpers.js";
 export interface Respuesta {
   status: number;
   body: any;
+  headers: Headers;
 }
 
 /** Levanta la app en un puerto libre, hace una petición JSON y cierra el servidor. */
@@ -34,7 +35,7 @@ export async function pedir(
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
     });
-    return { status: res.status, body: await res.json() };
+    return { status: res.status, body: await res.json(), headers: res.headers };
   } finally {
     server.close();
   }

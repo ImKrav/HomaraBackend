@@ -1,74 +1,74 @@
 
-[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend[39m
+ RUN  v3.2.7 /home/user/HomaraBackend
 
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-01  ESC28/RN-036/RN-042 — checkout genera pedido PENDIENTE con número ORD-YYYY-NNN (201)[33m 1093[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-02  ESC28/RN-038 — el carrito queda vacío después de generar el pedido[33m 572[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-03  ESC28/RN-063 — checkout con carrito vacío se rechaza (400)[33m 450[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-04  ESC28 — checkout sin token se rechaza (401)[32m 14[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-05  ESC28/RN-063 — método de pago obligatorio (400)[33m 364[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-06  ESC28 — el cliente lista sus propios pedidos y ve el recién creado[33m 410[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-07  ESC28 — detalle del pedido por número (GET /orders/:id)[33m 543[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-08  ESC28/RN-062 — pedido inexistente responde 404[32m 18[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-09  ESC34/RN-010 — un CUSTOMER no puede cambiar el estado de un pedido (403)[33m 450[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-10  ESC34/RN-043 — un ADMIN cambia el estado de MI pedido a uno válido (200)[33m 748[2mms[22m[39m
- [32m✓[39m tests/api/API-PEDIDOS.ts[2m > [22mAPI · Pedidos[2m > [22mCP-API-ORD-11  ESC34/RN-043 — estado fuera del catálogo se rechaza (400)[33m 803[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-01  ESC13 — carrito de visitante (sin token) vacío con totales en cero[32m 151[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-02  ESC13/RN-063 — agregar al carrito exige sesión (401)[32m 85[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-03  ESC13/RN-063 — productId que no es CUID se rechaza (400)[33m 313[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-04  ESC13 — agrega un producto al carrito (201)[33m 366[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-05  RN-024 — agregar el mismo producto acumula la cantidad[33m 456[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-06  ESC16/RN-029..031 — calcula subtotal y cobra envío cuando subtotal <= 500.000[33m 382[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-07  ESC16/RN-032 — envío gratis cuando el subtotal supera 500.000[32m 280[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-08  RN-011/ESC36 — actualizar un ítem inexistente responde 404[32m 212[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-09  RN-011/ESC36 — un usuario no puede modificar el ítem de otro (403)[33m 469[2mms[22m[39m
- [32m✓[39m tests/api/API-CARRITO.ts[2m > [22mAPI · Carrito[2m > [22mCP-API-CART-10  ESC13 — eliminar un ítem propio del carrito (200)[32m 276[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-01  ESC17 — crea un proyecto y calcula materiales (201)[33m 322[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-02  ESC17 — crear proyecto sin token se rechaza (401)[32m 7[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-03  ESC17/RN-063 — tipo inválido se rechaza con 400[32m 205[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-04  ESC17/RN-063 — área no positiva se rechaza (400)[32m 218[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-05  ESC17 — el usuario lista solo sus proyectos[32m 254[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-06  ESC17/RN-062 — proyecto inexistente responde 404[32m 11[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-07  ESC36/RN-011 — un usuario no puede editar el proyecto de otro (403)[33m 454[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-08  ESC36/RN-011 — un usuario no puede borrar el proyecto de otro (403)[33m 420[2mms[22m[39m
- [32m✓[39m tests/api/API-PROYECTOS.ts[2m > [22mAPI · Proyectos[2m > [22mCP-API-PROY-09  ESC17/RN-011 — el dueño edita y borra su propio proyecto (200)[32m 264[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-01  ESC01 · RN-001 · RN-002 — registro válido responde 201 con la sesión del usuario[32m 269[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-02  ESC01/RN-005 — el registro nunca devuelve la contraseña[32m 266[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-03  ESC01/RN-004 — el correo se normaliza a minúsculas[32m 236[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-04  ESC01 · RN-002 · RN-063 — rechaza clave de menos de 8 caracteres con 400[32m 7[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-05  ESC01/RN-001 — rechaza correo con formato inválido (400)[32m 8[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-06  ESC01/RN-003 — rechaza correo duplicado (400)[32m 200[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-07  ESC02 — inicia sesión con credenciales correctas (200)[32m 185[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-08  ESC02/RN-006 — error genérico con contraseña incorrecta (401)[32m 189[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-09  ESC02/RN-006 — mismo error genérico con correo inexistente (401)[32m 8[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-10  ESC02 — GET /users/me devuelve el perfil del usuario autenticado[32m 196[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-11  RN-007 — el token expira a 7 días (campo exp del JWT)[32m 189[2mms[22m[39m
- [32m✓[39m tests/api/API-AUTH.ts[2m > [22mAPI · Autenticación y usuarios[2m > [22mCP-API-AUTH-12  ESC36/RN-011 — un usuario puede editar su propio perfil (200)[32m 223[2mms[22m[39m
- [32m✓[39m tests/api/API-ADMIN.ts[2m > [22mAPI · Administración[2m > [22mCP-API-ADM-01  ESC06/RN-010 — /admin/metrics sin token se rechaza (401)[32m 70[2mms[22m[39m
- [32m✓[39m tests/api/API-ADMIN.ts[2m > [22mAPI · Administración[2m > [22mCP-API-ADM-02  ESC06/RN-010 — un CUSTOMER no entra a /admin/metrics (403)[32m 213[2mms[22m[39m
- [32m✓[39m tests/api/API-ADMIN.ts[2m > [22mAPI · Administración[2m > [22mCP-API-ADM-03  ESC06 — un ADMIN obtiene métricas del dashboard (200)[32m 215[2mms[22m[39m
- [32m✓[39m tests/api/API-ADMIN.ts[2m > [22mAPI · Administración[2m > [22mCP-API-ADM-04  ESC06 — un ADMIN obtiene el reporte de inventario (200)[32m 193[2mms[22m[39m
- [32m✓[39m tests/api/API-ADMIN.ts[2m > [22mAPI · Administración[2m > [22mCP-API-ADM-05  ESC32/RN-010 — un CUSTOMER no puede crear productos (403)[32m 209[2mms[22m[39m
- [32m✓[39m tests/api/API-ADMIN.ts[2m > [22mAPI · Administración[2m > [22mCP-API-ADM-06  ESC32 — un ADMIN crea, edita y borra un producto (ciclo completo)[32m 261[2mms[22m[39m
- [32m✓[39m tests/api/API-ADMIN.ts[2m > [22mAPI · Administración[2m > [22mCP-API-ADM-07  ESC32/RN-063 — crear producto con precio negativo se rechaza (400)[32m 202[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-01  ESC08 — GET /categories lista categorías (200, sobre {success,data})[32m 76[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-02  ESC08 — GET /products lista productos con forma esperada[32m 30[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-03  ESC09/RN-016 — filtra por categoría (?category=slug)[32m 30[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-04  ESC09/RN-016 — búsqueda de texto insensible a mayúsculas (?q=)[32m 43[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-05  ESC09/RN-017 — combina categoría y texto en un mismo filtro[32m 38[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-06  ESC08 — GET /products/:id devuelve el detalle del producto[32m 26[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-07  ESC08/RN-062 — producto inexistente responde 404 con sobre de error[32m 6[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-08  ESC08 — GET /products/storefront agrupa recomendados/ofertas/más vendidos[32m 45[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-09  RN-020 — GET /products/:id/reviews lista reseñas (array)[32m 29[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-10  RN-020 — crea una reseña y rechaza una segunda del mismo usuario[32m 272[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-11  RN-063 — reseña con calificación fuera de rango se rechaza (400)[32m 207[2mms[22m[39m
- [32m✓[39m tests/api/API-CATALOGO.ts[2m > [22mAPI · Catálogo (categorías, productos, reseñas)[2m > [22mCP-API-CAT-12  ESC36 — crear reseña sin token es rechazado (401)[32m 18[2mms[22m[39m
- [32m✓[39m tests/api/API-CONTRATO.ts[2m > [22mAPI · Contrato de documentación (Swagger vs. implementación)[2m > [22mCP-API-DOC-01  ESC42 — /api-docs expone un documento OpenAPI 3 con rutas[32m 78[2mms[22m[39m
- [32m✓[39m tests/api/API-CONTRATO.ts[2m > [22mAPI · Contrato de documentación (Swagger vs. implementación)[2m > [22mCP-API-DOC-02  ESC42/RN-064 — toda ruta documentada existe de verdad (no hay rutas fantasma)[32m 156[2mms[22m[39m
- [32m✓[39m tests/api/API-CONTRATO.ts[2m > [22mAPI · Contrato de documentación (Swagger vs. implementación)[2m > [22mCP-API-DOC-03  ESC42 — las rutas públicas principales están documentadas[32m 4[2mms[22m[39m
- [32m✓[39m tests/api/API-CONTRATO.ts[2m > [22mAPI · Contrato de documentación (Swagger vs. implementación)[2m > [22mCP-API-DOC-04  ESC42/RN-064 — DEFECTO: hay rutas implementadas sin documentar en Swagger (storefront, reseñas, CRUD de productos)[32m 19[2mms[22m[39m
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-01  ESC28/RN-036/RN-042 — checkout genera pedido PENDIENTE con número ORD-YYYY-NNN (201) 176ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-02  ESC28/RN-038 — el carrito queda vacío después de generar el pedido 143ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-03  ESC28/RN-063 — checkout con carrito vacío se rechaza (400) 102ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-04  ESC28 — checkout sin token se rechaza (401) 3ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-05  ESC28/RN-063 — método de pago obligatorio (400) 119ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-06  ESC28 — el cliente lista sus propios pedidos y ve el recién creado 142ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-07  ESC28 — detalle del pedido por número (GET /orders/:id) 119ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-08  ESC28/RN-062 — pedido inexistente responde 404 95ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-09  ESC34/RN-010 — un CUSTOMER no puede cambiar el estado de un pedido (403) 140ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-10  ESC34/RN-043 — un ADMIN cambia el estado de MI pedido a uno válido (200) 241ms
+ ✓ tests/api/API-PEDIDOS.ts > API · Pedidos > CP-API-ORD-11  ESC34/RN-043 — estado fuera del catálogo se rechaza (400) 254ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-01  ESC17 — crea un proyecto y calcula materiales (201) 148ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-02  ESC17 — crear proyecto sin token se rechaza (401) 3ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-03  ESC17/RN-063 — tipo inválido se rechaza con 400 115ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-04  ESC17/RN-063 — área no positiva se rechaza (400) 108ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-05  ESC17 — el usuario lista solo sus proyectos 107ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-06  ESC17/RN-062 — proyecto inexistente responde 404 95ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-07  ESC36/RN-011 — un usuario no puede editar el proyecto de otro (403) 197ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-08  ESC36/RN-011 — un usuario no puede borrar el proyecto de otro (403) 217ms
+ ✓ tests/api/API-PROYECTOS.ts > API · Proyectos > CP-API-PROY-09  ESC17/RN-011 — el dueño edita y borra su propio proyecto (200) 118ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-01  ESC13 — carrito de visitante (sin token) vacío con totales en cero 22ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-02  ESC13/RN-063 — agregar al carrito exige sesión (401) 15ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-03  ESC13/RN-063 — productId que no es CUID se rechaza (400) 101ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-04  ESC13 — agrega un producto al carrito (201) 118ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-05  RN-024 — agregar el mismo producto acumula la cantidad 138ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-06  ESC16/RN-029..031 — calcula subtotal y cobra envío cuando subtotal <= 500.000 132ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-07  ESC16/RN-032 — envío gratis cuando el subtotal supera 500.000 116ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-08  RN-011/ESC36 — actualizar un ítem inexistente responde 404 94ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-09  RN-011/ESC36 — un usuario no puede modificar el ítem de otro (403) 193ms
+ ✓ tests/api/API-CARRITO.ts > API · Carrito > CP-API-CART-10  ESC13 — eliminar un ítem propio del carrito (200) 107ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-01  ESC01 · RN-001 · RN-002 — registro válido responde 201 con la sesión del usuario 115ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-02  ESC01/RN-005 — el registro nunca devuelve la contraseña 92ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-03  ESC01/RN-004 — el correo se normaliza a minúsculas 95ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-04  ESC01 · RN-002 · RN-063 — rechaza clave de menos de 8 caracteres con 400 4ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-05  ESC01/RN-001 — rechaza correo con formato inválido (400) 3ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-06  ESC01/RN-003 — rechaza correo duplicado (400) 101ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-07  ESC02 — inicia sesión con credenciales correctas (200) 92ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-08  ESC02/RN-006 — error genérico con contraseña incorrecta (401) 91ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-09  ESC02/RN-006 — mismo error genérico con correo inexistente (401) 6ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-10  ESC02 — GET /users/me devuelve el perfil del usuario autenticado 77ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-11  RN-007 — el token expira a 7 días (campo exp del JWT) 115ms
+ ✓ tests/api/API-AUTH.ts > API · Autenticación y usuarios > CP-API-AUTH-12  ESC36/RN-011 — un usuario puede editar su propio perfil (200) 117ms
+ ✓ tests/api/API-ADMIN.ts > API · Administración > CP-API-ADM-01  ESC06/RN-010 — /admin/metrics sin token se rechaza (401) 28ms
+ ✓ tests/api/API-ADMIN.ts > API · Administración > CP-API-ADM-02  ESC06/RN-010 — un CUSTOMER no entra a /admin/metrics (403) 123ms
+ ✓ tests/api/API-ADMIN.ts > API · Administración > CP-API-ADM-03  ESC06 — un ADMIN obtiene métricas del dashboard (200) 111ms
+ ✓ tests/api/API-ADMIN.ts > API · Administración > CP-API-ADM-04  ESC06 — un ADMIN obtiene el reporte de inventario (200) 96ms
+ ✓ tests/api/API-ADMIN.ts > API · Administración > CP-API-ADM-05  ESC32/RN-010 — un CUSTOMER no puede crear productos (403) 114ms
+ ✓ tests/api/API-ADMIN.ts > API · Administración > CP-API-ADM-06  ESC32 — un ADMIN crea, edita y borra un producto (ciclo completo) 121ms
+ ✓ tests/api/API-ADMIN.ts > API · Administración > CP-API-ADM-07  ESC32/RN-063 — crear producto con precio negativo se rechaza (400) 92ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-01  ESC08 — GET /categories lista categorías (200, sobre {success,data}) 21ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-02  ESC08 — GET /products lista productos con forma esperada 8ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-03  ESC09/RN-016 — filtra por categoría (?category=slug) 10ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-04  ESC09/RN-016 — búsqueda de texto insensible a mayúsculas (?q=) 39ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-05  ESC09/RN-017 — combina categoría y texto en un mismo filtro 12ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-06  ESC08 — GET /products/:id devuelve el detalle del producto 10ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-07  ESC08/RN-062 — producto inexistente responde 404 con sobre de error 3ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-08  ESC08 — GET /products/storefront agrupa recomendados/ofertas/más vendidos 16ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-09  RN-020 — GET /products/:id/reviews lista reseñas (array) 11ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-10  RN-020 — crea una reseña y rechaza una segunda del mismo usuario 120ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-11  RN-063 — reseña con calificación fuera de rango se rechaza (400) 96ms
+ ✓ tests/api/API-CATALOGO.ts > API · Catálogo (categorías, productos, reseñas) > CP-API-CAT-12  ESC36 — crear reseña sin token es rechazado (401) 8ms
+ ✓ tests/api/API-CONTRATO.ts > API · Contrato de documentación (Swagger vs. implementación) > CP-API-DOC-01  ESC42 — /api-docs expone un documento OpenAPI 3 con rutas 25ms
+ ✓ tests/api/API-CONTRATO.ts > API · Contrato de documentación (Swagger vs. implementación) > CP-API-DOC-02  ESC42/RN-064 — toda ruta documentada existe de verdad (no hay rutas fantasma) 96ms
+ ✓ tests/api/API-CONTRATO.ts > API · Contrato de documentación (Swagger vs. implementación) > CP-API-DOC-03  ESC42 — las rutas públicas principales están documentadas 3ms
+ ✓ tests/api/API-CONTRATO.ts > API · Contrato de documentación (Swagger vs. implementación) > CP-API-DOC-04  ESC42/RN-064 — las rutas de vitrina, reseñas y CRUD de productos están documentadas en Swagger 2ms
 
-[2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
-[2m      Tests [22m [1m[32m65 passed[39m[22m[90m (65)[39m
-[2m   Start at [22m 16:14:38
-[2m   Duration [22m 19.64s[2m (transform 377ms, setup 0ms, collect 669ms, tests 15.07s, environment 3ms, prepare 1.39s)[22m
+ Test Files  7 passed (7)
+      Tests  65 passed (65)
+   Start at  16:55:57
+   Duration  7.38s (transform 183ms, setup 0ms, collect 245ms, tests 5.77s, environment 1ms, prepare 489ms)
 

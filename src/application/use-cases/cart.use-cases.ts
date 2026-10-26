@@ -3,15 +3,8 @@
 // ============================================
 
 import { ICartRepository } from "../../domain/repositories/cart-repository.interface.js";
-import { Product } from "../../domain/entities/product.js";
 import { AppError } from "../../shared/errors/AppError.js";
-
-type ProductWithRelations = Product & {
-  category?: {
-    name: string;
-    slug: string;
-  };
-};
+import { calculateShipping } from "../../domain/services/shipping.js";
 
 export class GetCartUseCase {
   constructor(private readonly cartRepository: ICartRepository) {}
@@ -25,7 +18,7 @@ export class GetCartUseCase {
     
     // Formatear items del carrito de la forma que espera el frontend
     const items = (cart.items || []).map((item) => {
-      const product = item.product as ProductWithRelations | undefined;
+      const product = item.product;
       const reservedQty = reservedQuantities[item.productId] || 0;
       const availableStock = Math.max(0, (product?.stockQuantity || 0) - reservedQty);
       const isBackorder = item.quantity > availableStock;
@@ -34,6 +27,8 @@ export class GetCartUseCase {
       return {
         id: item.id,
         quantity: item.quantity,
+        // El frontend cuenta los 15 min de reserva desde aquí (DEF-21).
+        updatedAt: item.updatedAt,
         availableStock,
         isBackorder,
         backorderQuantity,
@@ -44,8 +39,8 @@ export class GetCartUseCase {
           price: product?.price,
           originalPrice: product?.originalPrice,
           image: product?.image,
-          category: product?.category?.name || "Sin Categoría",
-          categorySlug: product?.category?.slug || "sin-categoria",
+          category: product?.category || "Sin Categoría",
+          categorySlug: product?.categorySlug || "sin-categoria",
           rating: product?.rating,
           reviews: product?.reviewCount,
           inStock: product?.inStock,
@@ -60,7 +55,7 @@ export class GetCartUseCase {
       (sum, item) => sum + (item.product.price || 0) * item.quantity,
       0
     );
-    const shipping = subtotal > 500000 ? 0 : 25000;
+    const shipping = calculateShipping(subtotal);
     const total = subtotal + shipping;
 
     return {

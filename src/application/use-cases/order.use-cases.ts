@@ -7,6 +7,7 @@ import { ICartRepository } from "../../domain/repositories/cart-repository.inter
 import { IProductRepository } from "../../domain/repositories/product-repository.interface.js";
 import { Product } from "../../domain/entities/product.js";
 import { AppError } from "../../shared/errors/AppError.js";
+import { calculateShipping } from "../../domain/services/shipping.js";
 
 type ProductWithCategory = Product & {
   category?: {
@@ -27,6 +28,8 @@ export class ListOrdersUseCase {
       items: o.items?.length || 0,
       total: o.total,
       customer: o.user ? `${o.user.firstName} ${o.user.lastName}` : "Usuario Desconocido",
+      // El buscador del admin filtra por ciudad (DEF-06).
+      shippingCity: o.shippingCity,
     }));
   }
 }
@@ -34,10 +37,13 @@ export class ListOrdersUseCase {
 export class GetOrderDetailUseCase {
   constructor(private readonly orderRepository: IOrderRepository) {}
 
-  async execute(idOrNumber: string) {
+  async execute(idOrNumber: string, requester: { id: string; role: string }) {
     const order = await this.orderRepository.findByIdOrNumber(idOrNumber);
     if (!order) {
       throw new AppError("Pedido no encontrado", 404);
+    }
+    if (order.userId !== requester.id && requester.role !== "ADMIN") {
+      throw new AppError("No tienes permiso para ver este pedido.", 403);
     }
 
     return {
@@ -102,7 +108,7 @@ export class CreateOrderUseCase {
       (sum, item) => sum + (item.product?.price || 0) * item.quantity,
       0
     );
-    const shippingCost = subtotal > 500000 ? 0 : 25000;
+    const shippingCost = calculateShipping(subtotal);
     const total = subtotal + shippingCost;
 
     // 3. Crear items de la orden

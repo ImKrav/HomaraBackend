@@ -1,12 +1,12 @@
 // ============================================================================
-// Revisión defensiva de seguridad — DEFECTOS CONOCIDOS (ESC36/ESC35/ESC06)
+// Revisión defensiva de seguridad — DEFECTOS CORREGIDOS (ESC36/ESC35/ESC06)
 //
-// Cada caso AFIRMA el comportamiento SEGURO esperado y está marcado con
-// `test.fails(...)`: mientras el defecto siga abierto el caso queda en VERDE
-// (se espera que falle). El día que se corrija el código, el caso se pondrá
-// ROJO con «expected to fail, but passed» → señal de devolverlo a `test(...)`.
+// Cada caso afirma el comportamiento SEGURO. Hasta la refactorización estaban
+// marcados con `test.fails(...)` (defecto abierto); tras corregir el código se
+// devolvieron a `test(...)` y deben pasar. Si alguno vuelve a fallar, es una
+// regresión de seguridad.
 //
-// Severidad y recomendación de corrección: ver docs/pruebas/SEGURIDAD.md.
+// Detalle de cada corrección: docs/pruebas/SEGURIDAD.md y docs/REFACTORIZACION.md.
 // ============================================================================
 
 import { test, expect, describe } from "../harness.js";
@@ -27,7 +27,7 @@ async function victimaConRecursos() {
   await pedir("/cart/items", { method: "POST", token: v.token, body: { productId: pid, quantity: 1 } });
   const orden = await pedir("/orders", { method: "POST", token: v.token, body: { paymentMethod: "tarjeta" } });
   const proyecto = await pedir("/projects", { method: "POST", token: v.token, body: { name: "Privado", type: "PISO", area: 15 } });
-  const detalle = await pedir(`/orders/${orden.body.data.orderNumber}`);
+  const detalle = await pedir(`/orders/${orden.body.data.orderNumber}`, { token: v.token });
   return {
     sesion: v,
     orderNumber: orden.body.data.orderNumber,
@@ -36,9 +36,9 @@ async function victimaConRecursos() {
   };
 }
 
-describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", () => {
+describe("Seguridad · Defectos corregidos (afirman el comportamiento seguro)", () => {
   // ── DEF-SEG-01 · Secreto JWT embebido ─────────────────────────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-01",
     "ESC35 (Alta) — un token de ADMIN forjado con el secreto por defecto NO debe ser aceptado",
     async () => {
@@ -52,13 +52,13 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
       // Act
       const res = await pedir("/admin/metrics", { token: forjado });
 
-      // Assert (seguro): debería rechazarse; hoy responde 200 porque el secreto es conocido.
+      // Assert (seguro): JWT_SECRET ya no tiene valor por defecto; antes respondía 200.
       expect(res.status).toBe(401);
     },
   );
 
   // ── DEF-SEG-02 · ?admin=true honrado para cualquier autenticado ───────────
-  test.fails(
+  test(
     "CP-SEG-DEF-02",
     "ESC36 (Alta) — ?admin=true NO debe listar todos los pedidos a un CUSTOMER",
     async () => {
@@ -68,14 +68,14 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
       // Act
       const res = await pedir("/orders?admin=true", { token: cliente.token });
 
-      // Assert (seguro): un cliente sólo debería ver SUS pedidos (0 recién registrado).
-      // Hoy devuelve TODOS los pedidos del sistema.
+      // Assert (seguro): un cliente sólo ve SUS pedidos (0 recién registrado).
+      // Antes devolvía TODOS los pedidos del sistema.
       expect(res.body.data.length).toBe(0);
     },
   );
 
   // ── DEF-SEG-03 · /orders?userId=X sin token ───────────────────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-03",
     "ESC36 (Alta) — GET /orders?userId=<ajeno> sin token NO debe filtrar pedidos de otro usuario",
     async () => {
@@ -91,7 +91,7 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
   );
 
   // ── DEF-SEG-04 · /projects?userId=X sin token ─────────────────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-04",
     "ESC36 (Alta) — GET /projects?userId=<ajeno> sin token NO debe filtrar proyectos de otro usuario",
     async () => {
@@ -107,7 +107,7 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
   );
 
   // ── DEF-SEG-05 · /cart?userId=X sin token ─────────────────────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-05",
     "ESC36 (Media) — GET /cart?userId=<ajeno> sin token NO debe exponer el carrito de otro usuario",
     async () => {
@@ -125,7 +125,7 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
   );
 
   // ── DEF-SEG-06 · GET /orders/:id sin auth ni propiedad ────────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-06",
     "ESC36 (Alta) — GET /orders/:id sin token NO debe exponer el detalle ni el PII del cliente",
     async () => {
@@ -141,7 +141,7 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
   );
 
   // ── DEF-SEG-07 · GET /projects/:id sin auth ni propiedad ──────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-07",
     "ESC36 (Alta) — GET /projects/:id sin token NO debe exponer el proyecto de otro usuario",
     async () => {
@@ -157,7 +157,7 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
   );
 
   // ── DEF-SEG-08 · GET /users/:id expone PII sin propiedad ──────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-08",
     "ESC36 (Alta) — GET /users/:id NO debe exponer el PII (teléfono/dirección) de otro usuario",
     async () => {
@@ -175,7 +175,7 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
   );
 
   // ── DEF-SEG-09 · PUT /users/:id devuelve el hash de la contraseña ─────────
-  test.fails(
+  test(
     "CP-SEG-DEF-09",
     "ESC35 (Alta) — PUT /users/:id NO debe devolver la entidad con el hash de la contraseña",
     async () => {
@@ -195,24 +195,26 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
   );
 
   // ── DEF-SEG-10 · Sin cabeceras de seguridad (helmet) ──────────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-10",
     "ESC35 (Media) — deberían existir cabeceras de seguridad (p. ej. X-Content-Type-Options)",
     async () => {
       // Act
       const res = await pedir("/categories");
 
-      // Assert (seguro): helmet añadiría nosniff; hoy no está presente.
+      // Assert (seguro): helmet añade nosniff (antes no estaba).
       expect(res.headers.get("x-content-type-options")).toBe("nosniff");
     },
   );
 
   // ── DEF-SEG-11 · Sin límite de intentos en el login ───────────────────────
-  test.fails(
+  test(
     "CP-SEG-DEF-11",
     "ESC35 (Media) — el login debería limitar intentos (rate limiting) tras muchos fallos",
     async () => {
-      // Arrange: 25 intentos fallidos rápidos
+      // Arrange: 25 intentos fallidos rápidos contra una cuenta propia de la prueba
+      // (no contra un usuario semilla, para no bloquear su login al resto de suites).
+      const victima = await registrarUsuario();
       const intentos = 25;
 
       // Act
@@ -220,7 +222,7 @@ describe("Seguridad · Defectos conocidos (afirman el comportamiento seguro)", (
       for (let i = 0; i < intentos; i++) {
         const res = await pedir("/users/login", {
           method: "POST",
-          body: { email: SEMILLA.juan.email, password: claveDePrueba() },
+          body: { email: victima.email, password: claveDePrueba() },
         });
         if (res.status === 429) {
           huboBloqueo = true;

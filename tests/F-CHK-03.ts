@@ -102,8 +102,8 @@ test("CP-F-CHK-03-02", "Genera pedido con envío gratuito e ítems congelados cu
   expect(productos.findById).not.toHaveBeenCalled();
 });
 
-// Defecto abierto #10 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-CHK-03-03", "Evalúa umbral de envío gratuito con subtotal de 500000 exactos", async () => {
+// Defecto #10 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-CHK-03-03", "Evalúa umbral de envío gratuito con subtotal de 500000 exactos", async () => {
   // Arrange
   const { pedidos, carritos, caso } = montar();
   carritos.findByUserId.mockResolvedValue(carritoCon([itemCarrito({ quantity: 4, price: 125000 })]));
@@ -121,7 +121,7 @@ test.fails("CP-F-CHK-03-03", "Evalúa umbral de envío gratuito con subtotal de 
   expect(enviado.items).toStrictEqual([{ productId: ID_A, quantity: 4, unitPrice: 125000, total: 500000 }]);
   expect(pedido.orderNumber).toBe("ORD-2026-001");
   expect(enviadoPorEncima.shippingCost).toBe(0);
-  // DEFECTO: con 500.000 exactos el envío no es gratuito según HU19 (RF16 vs HU19)
+  // Corregido (defecto): con 500.000 exactos el envío no es gratuito según HU19 (RF16 vs HU19)
   expect(enviado.shippingCost).toBe(0);
   expect(enviado.total).toBe(500000);
   expect(pedido.total).toBe(500000);

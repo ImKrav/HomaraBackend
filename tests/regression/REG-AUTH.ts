@@ -112,8 +112,8 @@ test("REG-AUTH-07", "Editar el perfil solo cambia campos permitidos y no toca el
   expect(res.body.data.role).toBe("CUSTOMER");
 });
 
-// Defecto abierto #14 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("REG-AUTH-08", "La respuesta de editar el perfil no expone el hash de la contraseña", async () => {
+// Defecto #14 corregido (ver "Defectos corregidos" en tests/README.md).
+test("REG-AUTH-08", "La respuesta de editar el perfil no expone el hash de la contraseña", async () => {
   // Arrange
   const { token } = sesion();
   mockUsuarios.update.mockImplementation(async (id: string, d: any) => usuario({ id, ...d }));
@@ -121,7 +121,7 @@ test.fails("REG-AUTH-08", "La respuesta de editar el perfil no expone el hash de
   // Act
   const res = await pedir("PUT", "/api/v1/users/me", { token, body: { city: "Medellín" } });
 
-  // Assert — DEFECTO: AuthController.update devuelve la entidad completa del repositorio.
+  // Assert — antes AuthController.update devolvía la entidad completa del repositorio.
   expect(res.status).toBe(200);
   expect(res.body.data).not.toHaveProperty("password");
 });

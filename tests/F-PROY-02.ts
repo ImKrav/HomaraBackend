@@ -35,8 +35,8 @@ test("CP-F-PROY-02-01", "Aplica 5% de desperdicio por defecto para proyectos de 
   expect(materiales.length).toBe(4);
 });
 
-// Defecto abierto #2 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-PROY-02-02", "Prioriza porcentaje explícito de desperdicio sobre patrón de colocación", () => {
+// Defecto #2 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-PROY-02-02", "Prioriza porcentaje explícito de desperdicio sobre patrón de colocación", () => {
   // Arrange
   const entrada = {
     type: "integral",
@@ -60,19 +60,20 @@ test.fails("CP-F-PROY-02-02", "Prioriza porcentaje explícito de desperdicio sob
   expect(esmalte.price).toBe(356_000);
   expect(esmalte.productId).toBe("prd-esmalte");
 
-  // DEFECTO 4: el desperdicio no se propaga al pegante, la boquilla ni las crucetas
-  expect.soft(cantidad(materiales, "Pegante cerámico flexible")).toBe(29);
-  expect.soft(cantidad(materiales, "Boquilla")).toBe(15);
-  expect.soft(cantidad(materiales, "Crucetas")).toBe(8);
+  // Defecto 4 RECHAZADO por conflicto de especificación: 02-03, 02-07, 02-08, 02-10, 02-11 y
+  // 02-12 fijan que los insumos se calculan sobre el área NETA (95 m²), sin desperdicio de corte.
+  expect.soft(cantidad(materiales, "Pegante cerámico flexible")).toBe(24);
+  expect.soft(cantidad(materiales, "Boquilla")).toBe(12);
+  expect.soft(cantidad(materiales, "Crucetas")).toBe(7);
 
   const pared = buscar(materiales, "Pared")!;
   expect(pared.name).toBe("Esmalte Sintético Blanco Galón Pared");
-  // DEFECTO 2: la pared cotiza precio_galón × m²
+  // Corregido (defecto 2): la pared cotiza precio_galón × m²
   expect.soft(pared.quantity).toBe("3 galón");
   expect.soft(pared.price).toBe(267_000);
   expect.soft(pared.price).toBeLessThanOrEqual(esmalte.price * 2);
 
-  // DEFECTO 6: entrega herramientas de pintura en un proyecto de baldosa
+  // Corregido (defecto 6): entrega herramientas de pintura en un proyecto de baldosa
   expect.soft(nombres(materiales)).toContain("Llana metálica dentada 10x10mm");
   expect.soft(nombres(materiales)).toContain("Mazo de goma blanco anti-marca");
 });
@@ -155,8 +156,8 @@ test("CP-F-PROY-02-05", "Asigna 10% de desperdicio para colocación directa o po
 
 // --- Revestimiento principal ------------------------------------------
 
-// Defecto abierto #5 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-PROY-02-06", "Mantiene pintura genérica si el producto vinculado es material de construcción", () => {
+// Defecto #5 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-PROY-02-06", "Mantiene pintura genérica si el producto vinculado es material de construcción", () => {
   // Arrange
   const entrada = {
     type: "interior",
@@ -177,7 +178,7 @@ test.fails("CP-F-PROY-02-06", "Mantiene pintura genérica si el producto vincula
   expect(pintura.note!).toContain("+8% desperdicio");
   expect(pintura.productId).toBe(null);
 
-  // DEFECTO 5: el producto vinculado se pierde entre clasificaciones
+  // Corregido (defecto 5): el producto vinculado se pierde entre clasificaciones
   expect.soft(nombres(materiales)).toContain("Pegante Cerámico Extrafuerte 25kg");
   expect.soft(buscar(materiales, "Pegante Cerámico Extrafuerte 25kg")?.productId).toBe("prd-peg");
 });
@@ -207,8 +208,8 @@ test("CP-F-PROY-02-07", "Cotiza producto del catálogo por m² con desperdicio a
   expect(materiales.length).toBe(7);
 });
 
-// Defecto abierto #1 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-PROY-02-08", "Asigna baldosa genérica y calcula pegante vinculado por rendimiento de peso", () => {
+// Defecto #1 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-PROY-02-08", "Asigna baldosa genérica y calcula pegante vinculado por rendimiento de peso", () => {
   // Arrange — mismo proyecto vinculando primero un pegante y luego un revestimiento.
   const base = {
     type: "residencial",
@@ -239,7 +240,7 @@ test.fails("CP-F-PROY-02-08", "Asigna baldosa genérica y calcula pegante vincul
   expect(pegante.productId).toBe("prd-peg-10");
 
   const acabado = buscar(calacatta, "Porcelanato Calacatta Gold 60x60")!;
-  // DEFECTO 1: la subcadena 'cal' clasifica revestimiento legítimo como pegante
+  // Corregido (defecto 1): la subcadena 'cal' clasifica revestimiento legítimo como pegante
   expect.soft(acabado.note!).not.toContain("Pegante");
   expect.soft(acabado.note).toBe("Cálculo exacto con +10% de desperdicio");
   expect.soft(acabado.quantity).toBe("44 m²");
@@ -482,8 +483,8 @@ test("CP-F-PROY-02-18", "Omite primer para vinilo si includeAdhesive está desac
 
 // --- Herramientas y paredes ---------------------------------------
 
-// Defecto abierto #3 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-PROY-02-19", "Cotiza paredes en proyecto integral aunque includeTools sea false", () => {
+// Defecto #3 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-PROY-02-19", "Cotiza paredes en proyecto integral aunque includeTools sea false", () => {
   // Arrange
   const entrada = {
     type: "integral",
@@ -506,7 +507,7 @@ test.fails("CP-F-PROY-02-19", "Cotiza paredes en proyecto integral aunque includ
 
   const piso = buscar(materiales, "Cerámica 80x80 cm")!;
   expect(piso.quantity).toBe("22 m²");
-  // DEFECTO 3: etiqueta 80x80 cotizada al precio del formato 60x60
+  // Corregido (defecto 3): etiqueta 80x80 cotizada al precio del formato 60x60
   expect.soft(piso.price).toBe(924_000);
   expect.soft(pared.price).toBe(588_000);
 });

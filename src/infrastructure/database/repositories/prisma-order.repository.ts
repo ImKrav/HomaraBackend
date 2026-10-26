@@ -271,13 +271,33 @@ export class PrismaOrderRepository implements IOrderRepository {
   }
 
   async updateStatus(id: string, status: "PENDIENTE" | "PROCESANDO" | "ENVIADO" | "ENTREGADO" | "CANCELADO"): Promise<Order> {
-    const o = await this.db.order.update({
-      where: { id },
-      data: { status },
-      include: {
-        user: { select: { firstName: true, lastName: true } },
-        items: true
+    const o = await this.db.$transaction(async (tx: Prisma.TransactionClient) => {
+      const current = await tx.order.findUnique({ where: { id }, include: { items: true } });
+
+      // DEF-28: entrar a CANCELADO devuelve al inventario lo descontado en el checkout;
+      // salir de CANCELADO lo vuelve a descontar.
+      if (current && (current.status === "CANCELADO") !== (status === "CANCELADO")) {
+        const sign = status === "CANCELADO" ? 1 : -1;
+        for (const item of current.items) {
+          const product = await tx.product.update({
+            where: { id: item.productId },
+            data: { stockQuantity: { increment: sign * item.quantity } }
+          });
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { inStock: product.stockQuantity > 0 }
+          });
+        }
       }
+
+      return tx.order.update({
+        where: { id },
+        data: { status },
+        include: {
+          user: { select: { firstName: true, lastName: true } },
+          items: true
+        }
+      });
     });
 
     return this.mapOrderSummary(o);

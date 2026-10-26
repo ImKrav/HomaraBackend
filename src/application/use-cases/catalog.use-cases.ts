@@ -114,6 +114,11 @@ export class CreateProductReviewUseCase {
   ) {}
 
   async execute(userId: string, productId: string, rating: number, comment?: string) {
+    // Regla de dominio, no solo del endpoint: un 99 contaminaría el promedio (defecto #8).
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      throw new AppError("La calificación debe ser un entero entre 1 y 5.", 400);
+    }
+
     const product = await this.productRepository.findById(productId);
     if (!product) {
       throw new AppError("Producto no encontrado", 404);
@@ -217,7 +222,9 @@ export class UpdateProductUseCase {
       throw new AppError("Producto no encontrado", 404);
     }
 
-    return await this.productRepository.update(id, data);
+    // Bajar las existencias a 0 (o subirlas) debe reflejarse en la disponibilidad (defecto #13).
+    const patch = data.stockQuantity === undefined ? data : { ...data, inStock: data.stockQuantity > 0 };
+    return await this.productRepository.update(id, patch);
   }
 }
 
