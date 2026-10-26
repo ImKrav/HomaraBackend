@@ -28,6 +28,8 @@ export class ListOrdersUseCase {
       items: o.items?.length || 0,
       total: o.total,
       customer: o.user ? `${o.user.firstName} ${o.user.lastName}` : "Usuario Desconocido",
+      // El buscador del admin filtra por ciudad (DEF-06).
+      shippingCity: o.shippingCity,
     }));
   }
 }

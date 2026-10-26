@@ -17,6 +17,7 @@ Las evidencias de cada corrida real están en [`evidencias/`](evidencias/).
 - El stack debe estar levantado (docker compose): API en `http://localhost:5000`,
   rutas bajo `/api/v1`, Swagger en `/api-docs`. Usuarios semilla con clave
   `123456` (`admin@homara.co`, `juan@email.com`, …).
+- **`JWT_SECRET`** definido (obligatorio, sin valor por defecto: `openssl rand -hex 32`).
 - **`CORS_ORIGINS=http://localhost:3000`** en el backend: el contenedor corre con
   `NODE_ENV=production` y, sin esta variable, no permite ningún origen, por lo que
   `CP-SEG-CORS-01` falla. Basta con `cp .env.example .env` antes de
@@ -47,17 +48,24 @@ npm run test:perf:stress
 > `vitest run` por defecto (ver `vitest.config.ts`), porque CI no tiene servidor
 > corriendo. Sólo corren con sus scripts dedicados.
 
-## Resumen de resultados (última corrida real)
+> **Estado tras la refactorización:** todos los defectos de esta página están
+> **corregidos**. Comparación antes/después y detalle de cada cambio en
+> [`../REFACTORIZACION.md`](../REFACTORIZACION.md). Las corridas previas se
+> conservan en [`evidencias/antes-refactorizacion/`](evidencias/antes-refactorizacion/).
 
-- **API:** 65/65 Aprobados — ver [`evidencias/test-api.txt`](evidencias/test-api.txt).
-- **Seguridad:** 33/33 en verde (22 controles Aprobados + 11 defectos confirmados
-  marcados `test.fails`) — ver [`evidencias/test-security.txt`](evidencias/test-security.txt).
-- **Suite por defecto (mocks):** 258/258 Aprobados, sin afectación por los
-  cambios — ver [`evidencias/test-unit.txt`](evidencias/test-unit.txt).
+## Resumen de resultados (última corrida real, después de la refactorización)
+
+- **API:** 65/65 Aprobados, sin `test.fails` — ver [`evidencias/test-api.txt`](evidencias/test-api.txt).
+- **Seguridad:** 33/33 Aprobados (los 11 defectos, antes `test.fails`, ahora
+  afirman el comportamiento seguro y pasan) — ver [`evidencias/test-security.txt`](evidencias/test-security.txt).
+- **Suite por defecto (mocks):** 268/268 Aprobados, sin `test.fails` — ver
+  [`evidencias/test-unit.txt`](evidencias/test-unit.txt).
+- La suite de seguridad necesita `JWT_SECRET` con el mismo valor que el backend
+  (el secreto ya no tiene valor por defecto).
 - **Rendimiento:** ver [RENDIMIENTO.md](RENDIMIENTO.md) y los JSON/TXT en
   `evidencias/` (`smoke`, `load`, `stress`).
 
-## Tabla de defectos encontrados
+## Tabla de defectos encontrados (todos corregidos)
 
 Defectos **de seguridad** (detalle y corrección en [SEGURIDAD.md](SEGURIDAD.md)):
 
@@ -81,7 +89,6 @@ Defecto **de documentación**:
 |---|---|---|
 | CP-API-DOC-04 | Baja | Rutas implementadas sin documentar en Swagger (storefront, reseñas, CRUD de productos) |
 
-Todos son defectos **documentados** (no se corrige el código de `src/`, que es el
-objeto bajo prueba). Los casos de seguridad afirman el comportamiento seguro y
-usan `test.fails`, de modo que la suite queda en verde mientras el defecto siga
-abierto.
+Estos defectos se documentaron primero con `test.fails` y luego se **corrigieron**
+en `src/`; los casos volvieron a `test(...)` y pasan. Ver
+[`../REFACTORIZACION.md`](../REFACTORIZACION.md).

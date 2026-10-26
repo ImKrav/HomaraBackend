@@ -56,7 +56,7 @@ test("REG-DEF-02", "CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y corr
   expect(otroCorreo.status).toBe(401);
 });
 
-test("REG-DEF-03", "CP-SEG-DEF-02/03: los pedidos salen del token; userId y admin=true de un cliente se ignoran", async () => {
+test("REG-DEF-03", "CP-SEG-DEF-02/03: los pedidos salen del token; userId y admin=true de un cliente se ignoran, no los de un ADMIN", async () => {
   // Arrange
   const { token } = sesion();
   mockPedidos.findAll.mockResolvedValue([]);
@@ -65,11 +65,17 @@ test("REG-DEF-03", "CP-SEG-DEF-02/03: los pedidos salen del token; userId y admi
   const sinSesion = await pedir("GET", "/api/v1/orders?userId=cusr0000000000000000000a1");
   const cliente = await pedir("GET", "/api/v1/orders?admin=true&userId=cusr0000000000000000000a1", { token });
 
+  const admin = sesion({ id: "usr_admin", role: "ADMIN" });
+  const comoAdmin = await pedir("GET", "/api/v1/orders?admin=true", { token: admin.token });
+
   // Assert
   expect(sinSesion.body.data).toStrictEqual([]);
-  expect(mockPedidos.findAll).toHaveBeenCalledTimes(1);
-  expect(mockPedidos.findAll).toHaveBeenCalledWith({ userId: "usr_001", admin: false });
+  expect(mockPedidos.findAll).toHaveBeenCalledTimes(2);
+  expect(mockPedidos.findAll).toHaveBeenNthCalledWith(1, { userId: "usr_001", admin: false });
   expect(cliente.status).toBe(200);
+  // …pero un ADMIN sí obtiene el listado completo
+  expect(mockPedidos.findAll).toHaveBeenNthCalledWith(2, { userId: "usr_admin", admin: true });
+  expect(comoAdmin.status).toBe(200);
 });
 
 test("REG-DEF-04", "CP-SEG-DEF-05: sin sesión, GET /cart?userId=<ajeno> devuelve un carrito de visitante", async () => {

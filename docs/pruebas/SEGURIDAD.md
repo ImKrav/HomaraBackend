@@ -11,8 +11,8 @@ lo necesario para evidenciar cada hallazgo.
   defecto `http://localhost:5000`)
 - Evidencia de la corrida: [`evidencias/test-security.txt`](evidencias/test-security.txt)
 
-Convención para los defectos: cada caso **afirma el comportamiento seguro
-esperado** y se marca con `test.fails(...)`. Mientras el defecto siga abierto el
+Convención (antes de la refactorización): cada caso **afirma el comportamiento seguro
+esperado** y se marcaba con `test.fails(...)`. Mientras el defecto siga abierto el
 caso queda **en verde** (se espera que falle). Si alguien corrige el código, el
 caso se pondrá **rojo** con «expected to fail, but passed»: esa es la señal para
 devolverlo a `test(...)` normal y cerrar la fila de la tabla.
@@ -48,7 +48,11 @@ Observaciones que **refutan** sospechas iniciales:
 - **El error de login es genérico** y no distingue correo inexistente de
   contraseña incorrecta (RN-006).
 
-## Defectos confirmados (`SEG-DEFECTOS.ts`)
+## Defectos confirmados (`SEG-DEFECTOS.ts`) — **todos corregidos**
+
+> Tras la refactorización los 11 casos dejaron de ser `test.fails` y pasan
+> afirmando el comportamiento seguro. Detalle de cada corrección en
+> [`../REFACTORIZACION.md`](../REFACTORIZACION.md#2-seguridad).
 
 Todos confirmados con peticiones reales. Severidad según impacto sobre
 confidencialidad/integridad y facilidad de explotación.

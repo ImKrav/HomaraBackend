@@ -24,7 +24,8 @@ export class OrderController {
       if (!req.user) {
         return res.json({ success: true, data: [] });
       }
-      const isAdmin = req.user.role === "ADMIN" && (req.query.admin as unknown) === true;
+      // Express 5 recalcula req.query en cada lectura: llega el texto "true", no el booleano de Zod.
+      const isAdmin = req.user.role === "ADMIN" && String(req.query.admin) === "true";
       const result = await listOrdersUseCase.execute({ userId: req.user.id, admin: isAdmin });
       res.json({ success: true, data: result });
     } catch (error) {
