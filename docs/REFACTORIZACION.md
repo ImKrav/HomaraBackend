@@ -99,6 +99,12 @@ const result = await listOrdersUseCase.execute({ userId: req.user.id, admin: isA
 - `scripts/regression-demo.mjs`: +4 mutaciones (detalle de pedido ajeno, sin
   helmet, sin límite de login, hash en el perfil). La primera **no** la detectaba
   ninguna prueba hasta que se agregó `REG-DEF-10`.
+- **Una regresión propia, detectada por Cypress:** la primera versión de la
+  corrección de CP-SEG-DEF-02 comparaba `req.query.admin === true` confiando en la
+  transformación de Zod, pero Express 5 recalcula `req.query` en cada lectura y el
+  valor seguía siendo el texto `"true"`; el ADMIN dejó de ver todos los pedidos.
+  Los flujos E2E del panel de pedidos fallaron, se corrigió y `REG-DEF-03` ahora
+  cubre también el caso ADMIN.
 - `CP-SEG-AUT-08/09` firmaban con el secreto por defecto (y pasaban por la razón
   equivocada); ahora usan el secreto real del servidor (`JWT_SECRET` en el entorno
   de la suite).
@@ -124,7 +130,9 @@ npm install && npx prisma generate
 npm test                                  # 268/268
 npm run test:regression:demo              # 18/18 mutaciones detectadas
 
-# En vivo (requiere el stack arriba; JWT_SECRET igual al del backend)
+# En vivo (requiere el stack arriba; JWT_SECRET igual al del backend).
+# En esta refactorización también se corrió la suite Cypress completa del frontend
+# contra este backend: 232/232 (ver HomaraFrontend/docs/REFACTORIZACION.md).
 export JWT_SECRET=<el del backend>
 API_URL=http://localhost:5000 npm run test:api        # 65/65
 API_URL=http://localhost:5000 npm run test:security   # 33/33
