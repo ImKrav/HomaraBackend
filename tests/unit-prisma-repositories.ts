@@ -484,8 +484,13 @@ test("UNIT-REPO-ORD-01", "PrismaOrderRepository findAll, findByIdOrNumber, updat
         ...orderRow,
         status: args.data.status
       })),
-      count: vi.fn(async () => 8)
-    }
+      count: vi.fn(async () => 8),
+      findUnique: vi.fn(async () => orderRow)
+    },
+    product: {
+      update: vi.fn(async (args: any) => ({ id: args.where.id, stockQuantity: 5 }))
+    },
+    $transaction: vi.fn(async (fn: any) => fn(db))
   };
 
   const repo = new PrismaOrderRepository(db as any);
@@ -500,6 +505,10 @@ test("UNIT-REPO-ORD-01", "PrismaOrderRepository findAll, findByIdOrNumber, updat
   const none = await repo.findByIdOrNumber("ORD-none");
 
   const updated = await repo.updateStatus("ord-1", "ENVIADO");
+  const stockTrasEnviar = db.product.update.mock.calls.length;
+
+  // DEF-28: cancelar devuelve al inventario las unidades del pedido
+  await repo.updateStatus("ord-1", "CANCELADO");
 
   const count = await repo.countByYear(2026);
 
@@ -513,6 +522,12 @@ test("UNIT-REPO-ORD-01", "PrismaOrderRepository findAll, findByIdOrNumber, updat
   expect(byNum).not.toBe(null);
   expect(none).toBe(null);
   expect(updated.status).toBe("ENVIADO");
+  expect(stockTrasEnviar).toBe(0);
+  expect(db.product.update.mock.calls[0][0]).toStrictEqual({
+    where: { id: "prd-1" },
+    data: { stockQuantity: { increment: 2 } }
+  });
+  expect(db.product.update.mock.calls[1][0].data).toStrictEqual({ inStock: true });
   expect(count).toBe(8);
 });
 

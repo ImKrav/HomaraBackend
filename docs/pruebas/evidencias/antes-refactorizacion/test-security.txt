@@ -1,0 +1,42 @@
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend[39m
+
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-01  ESC35 (Alta) — un token de ADMIN forjado con el secreto por defecto NO debe ser aceptado[32m 101[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-02  ESC36 (Alta) — ?admin=true NO debe listar todos los pedidos a un CUSTOMER[32m 187[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-03  ESC36 (Alta) — GET /orders?userId=<ajeno> sin token NO debe filtrar pedidos de otro usuario[32m 266[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-04  ESC36 (Alta) — GET /projects?userId=<ajeno> sin token NO debe filtrar proyectos de otro usuario[32m 219[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-05  ESC36 (Media) — GET /cart?userId=<ajeno> sin token NO debe exponer el carrito de otro usuario[32m 180[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-06  ESC36 (Alta) — GET /orders/:id sin token NO debe exponer el detalle ni el PII del cliente[32m 243[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-07  ESC36 (Alta) — GET /projects/:id sin token NO debe exponer el proyecto de otro usuario[32m 228[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-08  ESC36 (Alta) — GET /users/:id NO debe exponer el PII (teléfono/dirección) de otro usuario[32m 283[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-09  ESC35 (Alta) — PUT /users/:id NO debe devolver la entidad con el hash de la contraseña[32m 145[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-10  ESC35 (Media) — deberían existir cabeceras de seguridad (p. ej. X-Content-Type-Options)[32m 4[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-DEFECTOS.ts[2m > [22mSeguridad · Defectos conocidos (afirman el comportamiento seguro)[2m > [22mCP-SEG-DEF-11  ESC35 (Media) — el login debería limitar intentos (rate limiting) tras muchos fallos[33m 4980[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-01  ESC36/RN-008 — GET /users/me sin token responde 401[32m 52[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-02  ESC36/RN-008 — POST /cart/items sin token responde 401[32m 11[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-03  ESC36/RN-008 — POST /orders sin token responde 401[32m 5[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-04  ESC36/RN-008 — POST /projects sin token responde 401[32m 5[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-05  ESC36/RN-008 — GET /admin/metrics sin token responde 401[32m 4[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-06  ESC36/RN-008 — GET /admin/inventory sin token responde 401[32m 6[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-07  RN-008 — token malformado se rechaza (401)[32m 8[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-08  RN-008 — token expirado se rechaza (401)[32m 8[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-09  RN-008 — token de usuario inexistente se rechaza (401)[32m 7[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Autenticación de rutas protegidas[2m > [22mCP-SEG-AUT-10  ESC06/RN-010 — un CUSTOMER no entra a las rutas de administrador (403)[32m 154[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Credenciales y datos sensibles[2m > [22mCP-SEG-CRED-01  ESC35/RN-005 — login no devuelve la contraseña ni su hash[32m 138[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Credenciales y datos sensibles[2m > [22mCP-SEG-CRED-02  ESC35/RN-006 — el error de login es genérico (no revela si el correo existe)[32m 137[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Credenciales y datos sensibles[2m > [22mCP-SEG-CRED-03  ESC35/RN-005 — GET /users/me nunca incluye la contraseña[32m 144[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Credenciales y datos sensibles[2m > [22mCP-SEG-CRED-04  RN-012 — PUT /users/:id no permite escalar el rol a ADMIN[32m 157[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Credenciales y datos sensibles[2m > [22mCP-SEG-CRED-05  ESC36/RN-011 — un usuario no puede editar el perfil de otro (403)[33m 300[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Manejo uniforme de errores y configuración[2m > [22mCP-SEG-ERR-01  ESC41/RN-062 — los errores usan el sobre {success:false,error}[32m 6[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Manejo uniforme de errores y configuración[2m > [22mCP-SEG-ERR-02  ESC41 — en producción las respuestas de error NO filtran el stack trace[32m 5[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Manejo uniforme de errores y configuración[2m > [22mCP-SEG-ERR-03  ESC41/RN-063 — JSON malformado se maneja con el sobre uniforme (400)[32m 5[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Manejo uniforme de errores y configuración[2m > [22mCP-SEG-CFG-01  Config — no se expone la cabecera X-Powered-By[32m 5[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Manejo uniforme de errores y configuración[2m > [22mCP-SEG-CFG-02  Config — existe un límite de tamaño de cuerpo (payload grande = 413)[32m 19[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Manejo uniforme de errores y configuración[2m > [22mCP-SEG-CORS-01  ESC36 — CORS refleja exactamente el origen permitido, nunca el comodín *[32m 5[2mms[22m[39m
+ [32m✓[39m tests/security/SEG-CONTROLES.ts[2m > [22mSeguridad · Manejo uniforme de errores y configuración[2m > [22mCP-SEG-CORS-02  ESC36 — CORS no refleja un origen ajeno a la lista blanca[32m 4[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m33 passed[39m[22m[90m (33)[39m
+[2m   Start at [22m 15:54:59
+[2m   Duration [22m 8.92s[2m (transform 108ms, setup 0ms, collect 150ms, tests 8.03s, environment 1ms, prepare 250ms)[22m
+

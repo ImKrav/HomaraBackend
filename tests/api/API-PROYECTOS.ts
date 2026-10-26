@@ -85,8 +85,11 @@ describe("API · Proyectos", () => {
   });
 
   test("CP-API-PROY-06", "ESC17/RN-062 — proyecto inexistente responde 404", async () => {
+    // Arrange (el detalle exige sesión desde la corrección de CP-SEG-DEF-07)
+    const sesion = await registrarUsuario();
+
     // Act
-    const res = await pedir("/projects/cnoexistexxxxxxxxxxxxxxx");
+    const res = await pedir("/projects/cnoexistexxxxxxxxxxxxxxx", { token: sesion.token });
 
     // Assert
     expect(res.status).toBe(404);

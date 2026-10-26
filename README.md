@@ -72,11 +72,12 @@ Sigue los siguientes pasos para levantar y ejecutar el backend localmente con No
    ```bash
    cp .env.example .env
    ```
-   Edita `.env` con tus variables, principalmente `DATABASE_URL`:
+   Edita `.env` con tus variables, principalmente `DATABASE_URL` y `JWT_SECRET`
+   (obligatorio y sin valor por defecto: la API no arranca sin él; genéralo con `openssl rand -hex 32`):
    ```env
    PORT=5000
    DATABASE_URL="postgresql://postgres:postgres@localhost:51214/homara?schema=public"
-   JWT_SECRET="tu_secreto_super_seguro_para_tokens"
+   JWT_SECRET="<salida de: openssl rand -hex 32>"
    CORS_ORIGINS="http://localhost:3000"
    ```
 
@@ -115,7 +116,7 @@ Para usarla directamente sin clonar este repo (asume un PostgreSQL accesible):
 docker run -d -p 5000:5000 --name homara-backend \
   -e DATABASE_URL="postgresql://usuario:password@host_postgres:5432/homara?schema=public" \
   -e PORT=5000 \
-  -e JWT_SECRET="homara_jwt_secret_key_2026_secure" \
+  -e JWT_SECRET="$(openssl rand -hex 32)" \
   imkrav/homara-backend:latest
 ```
 
@@ -173,7 +174,7 @@ POSTGRES_DB=homara
 POSTGRES_PORT=51214
 BACKEND_PORT=5000
 PRISMA_STUDIO_PORT=5555
-JWT_SECRET=homara_jwt_secret_key_2026_secure
+JWT_SECRET=<obligatorio: openssl rand -hex 32>
 ```
 
 ---

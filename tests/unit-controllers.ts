@@ -274,18 +274,26 @@ test("UNIT-CTRL-ORD-04", "OrderController.getDetail retorna detalle de pedido", 
     shippingState: "C",
     shippingZip: "D",
     shippingNotes: null,
+    userId: "usr-1",
     createdAt: new Date()
   });
   const { req, res, next } = contextoExpress();
   req.params = { id: "ord-1" };
+  req.user = { id: "usr-1", role: "CUSTOMER" };
+  const ajeno = contextoExpress();
+  ajeno.req.params = { id: "ord-1" };
+  ajeno.req.user = { id: "usr-2", role: "CUSTOMER" };
 
   // Act
   await OrderController.getDetail(req, res, next);
+  await OrderController.getDetail(ajeno.req, ajeno.res, ajeno.next);
 
   // Assert
   expect(res.body.success).toBe(true);
   expect(res.body.data.id).toBe("ORD-2026-001");
   expect(next.mock.calls.length).toBe(0);
+  // CP-SEG-DEF-06: el pedido de otro cliente no se entrega
+  expect(ajeno.next.mock.calls[0][0].statusCode).toBe(403);
 });
 
 test("UNIT-CTRL-ORD-05", "OrderController.getDetail delega error a next", async () => {
@@ -422,15 +430,21 @@ test("UNIT-CTRL-PROY-03", "ProjectController.list delega error a next", async ()
 
 test("UNIT-CTRL-PROY-04", "ProjectController.getDetail retorna proyecto y maneja error", async () => {
   // Arrange
-  mockProyectos.findById.mockResolvedValue({ id: "p-1", name: "Cocina" });
+  mockProyectos.findById.mockResolvedValue({ id: "p-1", name: "Cocina", userId: "usr-1" });
 
   const { req, res, next } = contextoExpress();
   req.params = { id: "p-1" };
+  req.user = { id: "usr-1", role: "CUSTOMER" };
+  const ajeno = contextoExpress();
+  ajeno.req.params = { id: "p-1" };
+  ajeno.req.user = { id: "usr-2", role: "CUSTOMER" };
   const ctxErr = contextoExpress();
   ctxErr.req.params = { id: "p-none" };
+  ctxErr.req.user = { id: "usr-1", role: "CUSTOMER" };
 
   // Act
   await ProjectController.getDetail(req, res, next);
+  await ProjectController.getDetail(ajeno.req, ajeno.res, ajeno.next);
 
   // Error case
   mockProyectos.findById.mockRejectedValue(new Error("No encontrado"));
@@ -439,6 +453,8 @@ test("UNIT-CTRL-PROY-04", "ProjectController.getDetail retorna proyecto y maneja
   // Assert
   expect(res.body.success).toBe(true);
   expect(res.body.data.id).toBe("p-1");
+  // CP-SEG-DEF-07: el proyecto de otro usuario no se entrega
+  expect(ajeno.next.mock.calls[0][0].statusCode).toBe(403);
   expect(ctxErr.next.mock.calls.length).toBe(1);
 });
 
@@ -738,9 +754,13 @@ test("UNIT-CTRL-AUTH-02", "AuthController.getMe y getById formatean perfil", asy
   ctxByIdMe.req.user = { id: "usr-1" };
   ctxByIdMe.req.params = { id: "me" };
 
-  // getById ("other")
+  // getById ("other") — CP-SEG-DEF-08: un cliente no ve el perfil ajeno; un ADMIN sí
   const ctxByIdOther = contextoExpress();
+  ctxByIdOther.req.user = { id: "usr-1", role: "CUSTOMER" };
   ctxByIdOther.req.params = { id: "usr-2" };
+  const ctxByIdAdmin = contextoExpress();
+  ctxByIdAdmin.req.user = { id: "adm-1", role: "ADMIN" };
+  ctxByIdAdmin.req.params = { id: "usr-1" };
   const ctxErr = contextoExpress();
   ctxErr.req.params = { id: "me" };
   ctxErr.req.user = { id: "usr-1" };
@@ -749,6 +769,7 @@ test("UNIT-CTRL-AUTH-02", "AuthController.getMe y getById formatean perfil", asy
   await AuthController.getMe(ctxMe.req, ctxMe.res, ctxMe.next);
   await AuthController.getById(ctxByIdMe.req, ctxByIdMe.res, ctxByIdMe.next);
   await AuthController.getById(ctxByIdOther.req, ctxByIdOther.res, ctxByIdOther.next);
+  await AuthController.getById(ctxByIdAdmin.req, ctxByIdAdmin.res, ctxByIdAdmin.next);
 
   // getById error delegation
   mockUsuarios.findById.mockRejectedValue(new Error("Find err"));
@@ -760,13 +781,17 @@ test("UNIT-CTRL-AUTH-02", "AuthController.getMe y getById formatean perfil", asy
   expect(ctxMe.res.body.data.orderCount).toBe(5);
   expect(ctxByIdMe.res.body.success).toBe(true);
   expect(ctxByIdMe.res.body.data.id).toBe("usr-1");
-  expect(ctxByIdOther.res.body.success).toBe(true);
+  expect(ctxByIdOther.next.mock.calls[0][0].statusCode).toBe(403);
+  expect(ctxByIdAdmin.res.body.data.id).toBe("usr-1");
   expect(ctxErr.next.mock.calls.length).toBe(1);
 });
 
 test("UNIT-CTRL-AUTH-03", "AuthController.update restringe acceso y actualiza campos permitidos", async () => {
   // Arrange
-  mockUsuarios.update.mockResolvedValue({ id: "usr-1", firstName: "NuevoNombre" });
+  mockUsuarios.update.mockResolvedValue({ id: "usr-1", firstName: "NuevoNombre", password: "$2a$10$hash" });
+  mockUsuarios.findById.mockResolvedValue({ id: "usr-1", firstName: "NuevoNombre", password: "$2a$10$hash" });
+  mockPrisma.project.count.mockResolvedValue(0);
+  mockPrisma.order.count.mockResolvedValue(0);
 
   // No autorizado (intenta modificar otro perfil sin ser admin)
   const ctxForbidden = contextoExpress();
@@ -798,6 +823,8 @@ test("UNIT-CTRL-AUTH-03", "AuthController.update restringe acceso y actualiza ca
   expect(err.statusCode).toBe(403);
   expect(ctxOk.res.body.success).toBe(true);
   expect(ctxOk.res.body.data.firstName).toBe("NuevoNombre");
+  // CP-SEG-DEF-09: la respuesta usa la proyección del perfil, sin el hash
+  expect(ctxOk.res.body.data).not.toHaveProperty("password");
   expect(ctxPass.res.body.success).toBe(true);
 });
 
@@ -864,7 +891,8 @@ test("UNIT-CTRL-ADM-02", "AdminController.getInventoryReport genera estadística
   expect(ctx.res.body.success).toBe(true);
   const stats = ctx.res.body.data.stats;
   expect(stats.totalProducts).toBe(4);
-  expect(stats.totalUnits).toBe(78);
+  // Defecto #11 corregido: el −2 no resta unidades en bodega (60 + 20 + 0 + 0)
+  expect(stats.totalUnits).toBe(80);
   expect(stats.lowStockCount).toBe(1);
   expect(stats.outOfStockCount).toBe(1);
   expect(stats.negativeStockCount).toBe(1);

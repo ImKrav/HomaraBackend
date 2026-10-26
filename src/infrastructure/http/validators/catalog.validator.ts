@@ -16,7 +16,7 @@ export const createReviewSchema = z.object({
 export const createProductSchema = z.object({
   name: z.string().min(1, "El nombre es obligatorio y no puede estar vacío."),
   description: z.string().min(1, "La descripción es obligatoria y no puede estar vacía."),
-  price: z.number().int().nonnegative("El precio no puede ser negativo."),
+  price: z.number().int().positive("El precio debe ser mayor a 0."),
   originalPrice: z.number().int().nonnegative().nullable().optional(),
   image: z.string().optional(),
   stockQuantity: z.number().int().nonnegative("El stock no puede ser negativo."),
@@ -28,7 +28,7 @@ export const createProductSchema = z.object({
 export const updateProductSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
-  price: z.number().int().nonnegative().optional(),
+  price: z.number().int().positive("El precio debe ser mayor a 0.").optional(),
   originalPrice: z.number().int().nonnegative().nullable().optional(),
   image: z.string().optional(),
   stockQuantity: z.number().int().nonnegative().optional(),

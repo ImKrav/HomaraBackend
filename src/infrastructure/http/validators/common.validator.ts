@@ -24,17 +24,16 @@ export const itemIdParamSchema = z.object({
 });
 
 /**
- * Esquema para filtrar listados de proyectos.
+ * Esquema para filtrar listados de proyectos. El usuario sale del token: un
+ * `userId` en la query se descarta (CP-SEG-DEF-04).
  */
-export const listProjectsQuerySchema = z.object({
-  userId: cuidValidator("El ID de usuario de consulta debe ser un formato CUID válido.").optional(),
-});
+export const listProjectsQuerySchema = z.object({});
 
 /**
  * Esquema para filtrar listados de pedidos.
  */
 export const listOrdersQuerySchema = z.object({
-  userId: cuidValidator("El ID de usuario de consulta debe ser un formato CUID válido.").optional(),
+  // `userId` se descarta (CP-SEG-DEF-03) y `admin` solo vale para el rol ADMIN (CP-SEG-DEF-02).
   admin: z
     .enum(["true", "false"], { message: "El parámetro admin debe ser 'true' o 'false'" })
     .transform((val) => val === "true")

@@ -124,6 +124,13 @@ const FORMAT_LABELS: Record<string, string> = {
   "10x20": "10x20 cm",
 };
 
+// Un tipo desconocido se rotula como "Cerámica", así que se cobra con la tabla de cerámica
+// del MISMO formato (defecto #3: antes usaba siempre el precio de 60x60).
+function tilePricePerM2(materialType: string, tileFormat: string): number {
+  const table = TILE_PRICES[materialType] ?? TILE_PRICES.ceramica;
+  return table[tileFormat] ?? TILE_PRICES.ceramica["60x60"];
+}
+
 function parseWeightFromProductName(name: string): number | null {
   const regexKg = /\b(\d+(?:\.\d+)?)\s*(?:kg|kilos|kilogramos)\b/i;
   const regexG = /\b(\d+(?:\.\d+)?)\s*(?:g|gramos)\b/i;
@@ -211,7 +218,7 @@ function calculateMainCovering(
 
   const matName = MATERIAL_NAMES[materialType] || "Cerámica";
   const formatLabel = FORMAT_LABELS[tileFormat] || tileFormat;
-  const pricePerM2 = TILE_PRICES[materialType]?.[tileFormat] || TILE_PRICES.ceramica["60x60"];
+  const pricePerM2 = tilePricePerM2(materialType, tileFormat);
 
   return {
     name: `${matName} ${formatLabel}`,
@@ -330,7 +337,8 @@ function calculateTools(
   selectedProduct: CalculatorParams["selectedProduct"],
   isTile: boolean
 ): CalculatedMaterial[] {
-  if (materialType === "pintura" || selectedProduct?.unit === "galón") {
+  // Defecto #6: un producto por galón ya no da herramientas de pintura a un proyecto de baldosa.
+  if (materialType === "pintura" || (!isTile && selectedProduct?.unit === "galón")) {
     return [
       {
         name: "Kit Rodillo Antigoteo Profesional 23cm",
@@ -394,42 +402,25 @@ function calculateTools(
   return toolList;
 }
 
-const CONSTRUCTION_KEYWORDS = [
-  "pegante",
-  "cemento",
-  "adhesivo",
-  "mortero",
-  "yeso",
-  "cal",
-  "boquilla",
-];
+// Palabras completas (con plural): "cal" no debe coincidir con "Calacatta" (defecto #1).
+const PEGANTE_PATTERN = /\b(pegante|cemento|adhesivo|mortero|yeso|cal)(e?s)?\b/i;
+const BOQUILLA_PATTERN = /\bboquillas?\b/i;
 
-const PEGANTE_KEYWORDS = [
-  "pegante",
-  "cemento",
-  "adhesivo",
-  "mortero",
-  "yeso",
-  "cal",
-];
+/** Clasifica un producto por su nombre. La usan el calculador y la validación de proyectos. */
+export function classifyProductName(name: string) {
+  const isPeganteProduct = PEGANTE_PATTERN.test(name);
+  const isBoquillaProduct = BOQUILLA_PATTERN.test(name);
+  return {
+    isConstructionMaterial: isPeganteProduct || isBoquillaProduct,
+    isPeganteProduct,
+    isBoquillaProduct,
+  };
+}
 
 function identifyProductTypes(selectedProduct: CalculatorParams["selectedProduct"]) {
-  if (!selectedProduct) {
-    return {
-      isConstructionMaterial: false,
-      isPeganteProduct: false,
-      isBoquillaProduct: false,
-    };
-  }
-
-  const nameLower = selectedProduct.name.toLowerCase();
-  const hasKeyword = (keywords: string[]) => keywords.some((kw) => nameLower.includes(kw));
-
-  return {
-    isConstructionMaterial: hasKeyword(CONSTRUCTION_KEYWORDS),
-    isPeganteProduct: hasKeyword(PEGANTE_KEYWORDS),
-    isBoquillaProduct: nameLower.includes("boquilla"),
-  };
+  return selectedProduct
+    ? classifyProductName(selectedProduct.name)
+    : { isConstructionMaterial: false, isPeganteProduct: false, isBoquillaProduct: false };
 }
 
 function calculateNetArea(
@@ -503,13 +494,16 @@ function calculateIntegralWallMaterials(
   const wallTotal = Math.ceil(Number((wallArea * wasteMultiplier).toFixed(4)));
 
   if (selectedProduct) {
+    // Defecto #2: un producto por galón se cotiza en galones, no como precio_galón × m².
+    const isPaintProduct = selectedProduct.unit === "galón" || selectedProduct.unit === "galones";
+    const quantity = isPaintProduct ? Math.ceil(wallTotal / COVERAGE.pintura) : wallTotal;
     return [
       {
         name: `${selectedProduct.name} Pared`.trim(),
-        quantity: `${wallTotal} m²`,
+        quantity: `${quantity} ${isPaintProduct ? selectedProduct.unit : "m²"}`,
         note: `Paredes estimadas (+${actualWastePercent}% desperdicio)`,
         icon: "🧱",
-        price: selectedProduct.price * wallTotal,
+        price: selectedProduct.price * quantity,
         productId: selectedProduct.id,
       },
     ];
@@ -517,7 +511,7 @@ function calculateIntegralWallMaterials(
 
   const matName = MATERIAL_NAMES[materialType] || "Cerámica";
   const formatLabel = FORMAT_LABELS[tileFormat] || tileFormat;
-  const pricePerM2 = TILE_PRICES[materialType]?.[tileFormat] || TILE_PRICES.ceramica["60x60"];
+  const pricePerM2 = tilePricePerM2(materialType, tileFormat);
 
   return [
     {
@@ -585,6 +579,16 @@ export function calculateMaterials({
   materials.push(
     ...calculateIntegralWallMaterials(type, materialType, tileFormat, netArea, wasteMultiplier, actualWastePercent, selectedProduct)
   );
+
+  // 9. Defecto #5: un insumo elegido que no encajó en ninguna rama (p. ej. pegante en un
+  // proyecto de pintura, o con su insumo desactivado) se cotiza igual en vez de desaparecer.
+  if (selectedProduct && isConstructionMaterial && !materials.some((m) => m.productId === selectedProduct.id)) {
+    materials.push(
+      isBoquillaProduct
+        ? calculateGroutSupply(netArea, selectedProduct, true)
+        : calculateAdhesiveSupply(netArea, selectedProduct, true)
+    );
+  }
 
   return materials;
 }

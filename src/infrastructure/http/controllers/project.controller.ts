@@ -18,11 +18,10 @@ const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
 export class ProjectController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id || (req.query.userId as string);
-      if (!userId) {
+      if (!req.user) {
         return res.json({ success: true, data: [] });
       }
-      const result = await listUserProjectsUseCase.execute(userId);
+      const result = await listUserProjectsUseCase.execute(req.user.id);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);
@@ -31,7 +30,7 @@ export class ProjectController {
 
   static async getDetail(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await getProjectUseCase.execute(req.params.id as string);
+      const result = await getProjectUseCase.execute(req.params.id as string, req.user!);
       res.json({ success: true, data: result });
     } catch (error) {
       next(error);

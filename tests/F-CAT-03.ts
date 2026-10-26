@@ -122,8 +122,8 @@ test("CP-F-CAT-03-04b", "Valida límites de calificación (1 y 5) y longitud má
   expect(productos.updateProductRating).toHaveBeenCalledWith("prd_001", 1, 1);
 });
 
-// Defecto abierto #8 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-CAT-03-04c", "Rechaza calificación fuera de rango directamente en el caso de uso", async () => {
+// Defecto #8 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-CAT-03-04c", "Rechaza calificación fuera de rango directamente en el caso de uso", async () => {
   // Arrange
   const { productos, resenas, caso } = montar();
   productos.findById.mockResolvedValue(producto({ id: "prd_001" }));
@@ -135,11 +135,11 @@ test.fails("CP-F-CAT-03-04c", "Rechaza calificación fuera de rango directamente
   const error = await caso.execute("usr_001", "prd_001", 99).then((r: any) => r, (e: any) => e);
 
   // Assert
-  // DEFECTO: CreateProductReviewUseCase.execute() no valida el rango de rating y acepta 99
+  // Corregido (defecto): CreateProductReviewUseCase.execute() no valida el rango de rating y acepta 99
   expect(error).toBeInstanceOf(AppError);
   expect(error.statusCode).toBe(400);
-  // DEFECTO: la reseña fuera de rango se persiste en lugar de rechazarse
+  // Corregido (defecto): la reseña fuera de rango se persiste en lugar de rechazarse
   expect(resenas.create).not.toHaveBeenCalled();
-  // DEFECTO: el promedio del producto queda contaminado con la calificación 99
+  // Corregido (defecto): el promedio del producto queda contaminado con la calificación 99
   expect(productos.updateProductRating).not.toHaveBeenCalled();
 });

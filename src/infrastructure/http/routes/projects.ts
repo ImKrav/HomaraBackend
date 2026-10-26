@@ -18,13 +18,9 @@ const router = Router();
  *     tags:
  *       - Projects
  *     summary: Listar proyectos del usuario
- *     description: Lista todos los proyectos del usuario especificado.
- *     parameters:
- *       - in: query
- *         name: userId
- *         schema:
- *           type: string
- *         required: false
+ *     description: Proyectos del usuario autenticado (el usuario sale del token). Sin sesión devuelve una lista vacía.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de proyectos obtenida.
@@ -38,7 +34,9 @@ router.get("/", optionalAuth, validateZod(listProjectsQuerySchema, "query"), Pro
  *     tags:
  *       - Projects
  *     summary: Detalles de un proyecto
- *     description: Retorna los detalles de un proyecto calculado junto a su lista de materiales.
+ *     description: Detalle de un proyecto con su lista de materiales. Solo su dueño o un ADMIN.
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -48,10 +46,14 @@ router.get("/", optionalAuth, validateZod(listProjectsQuerySchema, "query"), Pro
  *     responses:
  *       200:
  *         description: Proyecto encontrado.
+ *       401:
+ *         description: No autenticado.
+ *       403:
+ *         description: El proyecto pertenece a otro usuario.
  *       404:
  *         description: Proyecto no encontrado.
  */
-router.get("/:id", validateZod(cuidParamSchema, "params"), ProjectController.getDetail);
+router.get("/:id", requireAuth, validateZod(cuidParamSchema, "params"), ProjectController.getDetail);
 
 /**
  * @openapi
@@ -87,8 +89,6 @@ router.get("/:id", validateZod(cuidParamSchema, "params"), ProjectController.get
  *               materialType:
  *                 type: string
  *               tileFormat:
- *                 type: string
- *               userId:
  *                 type: string
  *     responses:
  *       201:

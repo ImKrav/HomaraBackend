@@ -92,11 +92,11 @@ describe("API · Pedidos", () => {
 
   test("CP-API-ORD-07", "ESC28 — detalle del pedido por número (GET /orders/:id)", async () => {
     // Arrange
-    const { res } = await generarPedido();
+    const { sesion, res } = await generarPedido();
     const numero = res.body.data.orderNumber;
 
     // Act
-    const detalle = await pedir(`/orders/${numero}`);
+    const detalle = await pedir(`/orders/${numero}`, { token: sesion.token });
 
     // Assert
     expect(detalle.status).toBe(200);
@@ -105,8 +105,11 @@ describe("API · Pedidos", () => {
   });
 
   test("CP-API-ORD-08", "ESC28/RN-062 — pedido inexistente responde 404", async () => {
+    // Arrange
+    const sesion = await registrarUsuario();
+
     // Act
-    const res = await pedir("/orders/ORD-1900-999");
+    const res = await pedir("/orders/ORD-1900-999", { token: sesion.token });
 
     // Assert
     expect(res.status).toBe(404);
@@ -116,7 +119,7 @@ describe("API · Pedidos", () => {
   test("CP-API-ORD-09", "ESC34/RN-010 — un CUSTOMER no puede cambiar el estado de un pedido (403)", async () => {
     // Arrange
     const { sesion, res } = await generarPedido();
-    const detalle = await pedir(`/orders/${res.body.data.orderNumber}`);
+    const detalle = await pedir(`/orders/${res.body.data.orderNumber}`, { token: sesion.token });
     const dbId = detalle.body.data.dbId;
 
     // Act
@@ -133,8 +136,8 @@ describe("API · Pedidos", () => {
 
   test("CP-API-ORD-10", "ESC34/RN-043 — un ADMIN cambia el estado de MI pedido a uno válido (200)", async () => {
     // Arrange: creamos un pedido propio para no tocar los pedidos sembrados
-    const { res } = await generarPedido();
-    const detalle = await pedir(`/orders/${res.body.data.orderNumber}`);
+    const { sesion, res } = await generarPedido();
+    const detalle = await pedir(`/orders/${res.body.data.orderNumber}`, { token: sesion.token });
     const dbId = detalle.body.data.dbId;
     const admin = await iniciarSesion(SEMILLA.admin.email, SEMILLA.admin.password);
 
@@ -152,8 +155,8 @@ describe("API · Pedidos", () => {
 
   test("CP-API-ORD-11", "ESC34/RN-043 — estado fuera del catálogo se rechaza (400)", async () => {
     // Arrange
-    const { res } = await generarPedido();
-    const detalle = await pedir(`/orders/${res.body.data.orderNumber}`);
+    const { sesion, res } = await generarPedido();
+    const detalle = await pedir(`/orders/${res.body.data.orderNumber}`, { token: sesion.token });
     const dbId = detalle.body.data.dbId;
     const admin = await iniciarSesion(SEMILLA.admin.email, SEMILLA.admin.password);
 

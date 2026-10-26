@@ -4,8 +4,9 @@
 
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { envConfig } from "../../infrastructure/config/env.config.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || "homara_jwt_secret_key_2026_secure";
+const JWT_SECRET = envConfig.jwtSecret;
 
 interface TokenPayload {
   id: string;

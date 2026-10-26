@@ -4,6 +4,7 @@
 
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import swaggerUi from "swagger-ui-express";
 import { specs } from "../config/swagger.config.js";
 import { envConfig } from "../config/env.config.js";
@@ -22,6 +23,7 @@ const app = express();
 app.disable("x-powered-by");
 
 // Middlewares globales
+app.use(helmet());
 app.use(express.json());
 
 // CORS — solo permite orígenes explícitamente configurados

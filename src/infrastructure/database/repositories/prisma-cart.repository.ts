@@ -3,6 +3,9 @@ import { Cart, CartItem } from "../../../domain/entities/cart.js";
 import { Product } from "../../../domain/entities/product.js";
 import { prisma } from "../prisma-client.js";
 
+// Mismo tope que el validador de cantidad (cart.validator.ts).
+const MAX_ITEM_QUANTITY = 9999;
+
 export class PrismaCartRepository implements ICartRepository {
   constructor(private readonly db = prisma) {}
 
@@ -53,7 +56,7 @@ export class PrismaCartRepository implements ICartRepository {
     if (existing) {
       item = await this.db.cartItem.update({
         where: { id: existing.id },
-        data: { quantity: existing.quantity + quantity },
+        data: { quantity: Math.min(existing.quantity + quantity, MAX_ITEM_QUANTITY) },
         include: { product: true }
       });
     } else {
@@ -101,7 +104,9 @@ export class PrismaCartRepository implements ICartRepository {
         item.product.categoryId,
         item.product.createdAt,
         item.product.updatedAt,
-        tags
+        tags,
+        item.product.category?.name,
+        item.product.category?.slug
       ),
       item.createdAt,
       item.updatedAt

@@ -86,8 +86,9 @@ test("CP-F-CHK-02-01", "Crea un carrito vacío cuando el usuario no tenía uno p
   expect(salida.items).toStrictEqual([]);
   expect(salida.itemCount).toBe(0);
   expect(salida.subtotal).toBe(0);
-  expect(salida.shipping).toBe(25000);
-  expect(salida.total).toBe(25000);
+  // DEF-03 corregido: un carrito vacío no cobra envío.
+  expect(salida.shipping).toBe(0);
+  expect(salida.total).toBe(0);
 });
 
 test("CP-F-CHK-02-02", "Retorna estructura de carrito existente sin productos", async () => {
@@ -102,7 +103,8 @@ test("CP-F-CHK-02-02", "Retorna estructura de carrito existente sin productos", 
   expect(db.cart.create).not.toHaveBeenCalled();
   expect(db.cart.findUnique.mock.calls[0][0].where).toStrictEqual({ userId: ID_USUARIO });
   expect(db.cartItem.findMany).not.toHaveBeenCalled();
-  expect(salida as any).toMatchObject({ subtotal: 0, shipping: 25000, total: 25000, itemCount: 0 });
+  // DEF-03 corregido: un carrito vacío no cobra envío.
+  expect(salida as any).toMatchObject({ subtotal: 0, shipping: 0, total: 0, itemCount: 0 });
 });
 
 test("CP-F-CHK-02-03", "Calcula backorder y aplica envío gratuito cuando subtotal supera 500000", async () => {
@@ -179,8 +181,8 @@ test("CP-F-CHK-02-05", "Itera múltiples líneas combinando disponibles y pedido
   expect(salida.itemCount).toBe(2);
 });
 
-// Defecto abierto #10 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-CHK-02-06", "Cobra tarifa de envío con subtotal inferior al umbral y evalúa umbral de 500000", async () => {
+// Defecto #10 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-CHK-02-06", "No cobra envío a un carrito vacío y evalúa umbral de 500000", async () => {
   // Arrange
   const { db, caso } = montar();
   db.cart.findUnique.mockResolvedValue(filaCarrito([]));
@@ -196,10 +198,10 @@ test.fails("CP-F-CHK-02-06", "Cobra tarifa de envío con subtotal inferior al um
 
   // Assert
   expect(vacio.subtotal).toBe(0);
-  expect(vacio.shipping).toBe(25000);
-  expect(vacio.total).toBe(25000);
+  expect(vacio.shipping).toBe(0);
+  expect(vacio.total).toBe(0);
   expect(limite.subtotal).toBe(500000);
-  // DEFECTO: con 500.000 exactos el envío no es gratuito según HU19 (RF16 vs HU19)
+  // RN-031 / HU19: con 500.000 exactos el envío es gratuito
   expect(limite.shipping).toBe(0);
   expect(limite.total).toBe(500000);
 });

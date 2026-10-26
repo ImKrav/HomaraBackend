@@ -16,3 +16,6 @@ export const loginSchema = z.object({
   email: z.email({ message: "Email inválido" }).transform((val) => val.toLowerCase().trim()),
   password: z.string().min(1, "Contraseña es requerida").regex(/\S/, "Contraseña no puede ser solo espacios"),
 });
+
+// Edición de perfil: mismas reglas que el registro, todas opcionales (CP DEF-08: nombre vacío).
+export const updateProfileSchema = registerSchema.partial();

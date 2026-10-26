@@ -1,140 +1,467 @@
 
-[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend[39m
+ RUN  v3.2.7 /home/user/HomaraBackend
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-01  Un cliente no entra al panel ni gestiona productos
-[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
+ ✓ tests/regression/REG-VAL.ts > REG-VAL-01  Acepta CUIDs reales, incluidos los de Prisma y en mayúsculas 3ms
+ ✓ tests/regression/REG-VAL.ts > REG-VAL-02  Rechaza IDs que no son CUID 1ms
+ ✓ tests/regression/REG-VAL.ts > REG-VAL-03  Cada esquema conserva su mensaje de error propio 2ms
+ ✓ tests/regression/REG-VAL.ts > REG-VAL-04  Los listados descartan un userId de la query (el usuario sale del token) 1ms
+ ✓ tests/F-AUTH-02.ts > CP-F-AUTH-02-01  Rechaza correo con formato inválido antes de consultar repositorio 4ms
+ ✓ tests/F-AUTH-02.ts > CP-F-AUTH-02-02  Rechaza credenciales cuando el correo no existe 1ms
+ ✓ tests/F-AUTH-02.ts > CP-F-AUTH-02-03  Rechaza credenciales cuando la contraseña no coincide 195ms
+ ✓ tests/F-AUTH-02.ts > CP-F-AUTH-02-04  Emite credencial de sesión al ingresar credenciales válidas 192ms
+ ✓ tests/F-AUTH-02.ts > CP-F-AUTH-02-03b  Devuelve el mismo mensaje de error para correo inexistente y clave incorrecta 167ms
+ ✓ tests/F-AUTH-02.ts > CP-F-AUTH-02-04b  Normaliza correo antes de consultar 160ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-01  CartController.get retorna carrito vacío si no hay usuario ni query param 3ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-02  CartController.get obtiene carrito si hay usuario autenticado 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-03  CartController.get delega errores a next 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-04  CartController.addItem agrega producto y responde 201 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-05  CartController.addItem delega errores a next 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-06  CartController.updateItemQuantity actualiza cantidad y responde 200 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-07  CartController.updateItemQuantity delega error a next 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-08  CartController.removeItem remueve item y responde 200 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CART-09  CartController.removeItem delega error a next 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-01  OrderController.list retorna vacío si no hay userId 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-02  OrderController.list lista pedidos para usuario autenticado 8ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-03  OrderController.list delega errores a next 6ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-04  OrderController.getDetail retorna detalle de pedido 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-05  OrderController.getDetail delega error a next 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-06  OrderController.create crea orden y responde 201 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-07  OrderController.create delega error a next 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-08  OrderController.updateStatus actualiza estado y responde 200 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ORD-09  OrderController.updateStatus delega error a next 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-PROY-01  ProjectController.list retorna vacío si no hay userId 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-PROY-02  ProjectController.list lista proyectos de usuario 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-PROY-03  ProjectController.list delega error a next 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-PROY-04  ProjectController.getDetail retorna proyecto y maneja error 8ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-PROY-05  ProjectController.create crea proyecto y responde 201 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-PROY-06  ProjectController.update actualiza proyecto y delega error 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-PROY-07  ProjectController.delete borra proyecto y delega error 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CAT-01  CatalogController.listCategories y listProducts funcionan y delegan errores 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CAT-02  CatalogController.getProductDetail y getStorefrontProducts 1ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-CAT-03  CatalogController CRUD productos y reseñas de catálogo 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-AUTH-01  AuthController.register y login exitosos 118ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-AUTH-02  AuthController.getMe y getById formatean perfil 2ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-AUTH-03  AuthController.update restringe acceso y actualiza campos permitidos 93ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ADM-01  AdminController.getMetrics calcula métricas y delega errores a next 23ms
+ ✓ tests/unit-controllers.ts > UNIT-CTRL-ADM-02  AdminController.getInventoryReport genera estadísticas de inventario y delega errores 2ms
+stderr | tests/regression/REG-AUTH.ts > REG-AUTH-02  El registro normaliza el correo y rechaza uno ya registrado
+[400] El correo electrónico ya está registrado.
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-01  No se puede pagar un carrito vacío
-[22m[39m[400] El carrito está vacío
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-01  El registro crea un CUSTOMER con la clave cifrada y devuelve un token válido 135ms
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-02  El registro normaliza el correo y rechaza uno ya registrado 14ms
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-03  El login con la clave correcta devuelve un token del usuario 253ms
+stderr | tests/regression/REG-AUTH.ts > REG-AUTH-04  El login con clave incorrecta responde 401 con mensaje genérico
+[401] Credenciales incorrectas. Verifique correo y contraseña.
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-01  Un cliente no entra al panel ni gestiona productos
-[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-04  El login con clave incorrecta responde 401 con mensaje genérico 212ms
+stderr | tests/regression/REG-AUTH.ts > REG-AUTH-05  El perfil exige token y nunca expone la contraseña
+[401] Token no provisto.
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-API.ts[2m > [22m[2mREG-API-03  Los errores conservan el sobre { success: false, error } con el mensaje
-[22m[39m❌ Error: Base de datos caída
+stderr | tests/regression/REG-AUTH.ts > REG-AUTH-06  Un token de un usuario dado de baja deja de servir
+[401] Usuario no encontrado o dado de baja.
+
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-05  El perfil exige token y nunca expone la contraseña 19ms
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-07  Editar el perfil solo cambia campos permitidos y no toca el rol 12ms
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-08  La respuesta de editar el perfil no expone el hash de la contraseña 8ms
+ ✓ tests/regression/REG-AUTH.ts > REG-AUTH-06  Un token de un usuario dado de baja deja de servir 12ms
+ ✓ tests/F-AUTH-01.ts > CP-F-AUTH-01-01  Rechaza contraseña corta en validación de esquema sin consultar repositorio 10ms
+ ✓ tests/F-AUTH-01.ts > CP-F-AUTH-01-02  Rechaza registro si el correo ya existe 2ms
+ ✓ tests/F-AUTH-01.ts > CP-F-AUTH-01-03  Crea la cuenta con contraseña cifrada y retorna token de sesión 115ms
+ ✓ tests/F-AUTH-01.ts > CP-F-AUTH-01-03b  Normaliza correo con mayúsculas y espacios y acepta contraseña de 8 caracteres 87ms
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-01  CP-SEG-DEF-10: la API responde con cabeceras de seguridad (helmet) 41ms
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[429] Demasiados intentos de inicio de sesión. Intente de nuevo en 15 minutos.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo
+[401] Credenciales incorrectas. Verifique correo y contraseña.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-05  CP-SEG-DEF-08: GET /users/:id exige sesión y solo entrega el perfil propio
+[401] Token no provisto.
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-05  CP-SEG-DEF-08: GET /users/:id exige sesión y solo entrega el perfil propio
+[403] No tienes permiso para ver este perfil.
+
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-02  CP-SEG-DEF-11: el login bloquea tras 10 fallos por IP y correo, sin afectar a otro correo 118ms
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-03  CP-SEG-DEF-02/03: los pedidos salen del token; userId y admin=true de un cliente se ignoran 22ms
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-04  CP-SEG-DEF-05: sin sesión, GET /cart?userId=<ajeno> devuelve un carrito de visitante 8ms
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-05  CP-SEG-DEF-08: GET /users/:id exige sesión y solo entrega el perfil propio 12ms
+stderr | tests/regression/REG-DEF.ts > REG-DEF-06  DEF-08: editar el perfil rechaza un nombre vacío en el servidor
+[400] Validación fallida: firstName: Nombre es requerido
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-07  DEF-03 (ESC27): el checkout rechaza datos de envío formados solo por espacios
+[400] Validación fallida: shippingAddress: La dirección no puede estar vacío; shippingCity: La ciudad no puede estar vacío; shippingState: El departamento no puede estar vacío
+
+stderr | tests/regression/REG-DEF.ts > REG-DEF-10  CP-SEG-DEF-06 / DEF-10: un cliente no lee el detalle del pedido de otro; un ADMIN sí
+[403] No tienes permiso para ver este pedido.
+
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-06  DEF-08: editar el perfil rechaza un nombre vacío en el servidor 11ms
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-07  DEF-03 (ESC27): el checkout rechaza datos de envío formados solo por espacios 18ms
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-08  RN-031 / DEF-03: envío gratis desde 500.000 inclusive y sin envío para un carrito vacío 2ms
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-09  CP-SEG-DEF-09: la edición del perfil responde con la proyección pública 7ms
+ ✓ tests/regression/REG-DEF.ts > REG-DEF-10  CP-SEG-DEF-06 / DEF-10: un cliente no lee el detalle del pedido de otro; un ADMIN sí 10ms
+stderr | tests/regression/REG-ADM.ts > REG-ADM-01  Un cliente no entra al panel ni gestiona productos
+[403] Acceso denegado. Se requieren permisos de administrador.
+
+stderr | tests/regression/REG-ADM.ts > REG-ADM-01  Un cliente no entra al panel ni gestiona productos
+[403] Acceso denegado. Se requieren permisos de administrador.
+
+stderr | tests/regression/REG-ADM.ts > REG-ADM-01  Un cliente no entra al panel ni gestiona productos
+[403] Acceso denegado. Se requieren permisos de administrador.
+
+ ✓ tests/regression/REG-ADM.ts > REG-ADM-01  Un cliente no entra al panel ni gestiona productos 79ms
+stderr | tests/regression/REG-ADM.ts > REG-ADM-05  El alta rechaza precios no positivos o stock negativo antes de llegar al repositorio
+[400] Validación fallida: price: El precio debe ser mayor a 0.
+
+stderr | tests/regression/REG-ADM.ts > REG-ADM-05  El alta rechaza precios no positivos o stock negativo antes de llegar al repositorio
+[400] Validación fallida: price: El precio debe ser mayor a 0.
+
+stderr | tests/regression/REG-ADM.ts > REG-ADM-05  El alta rechaza precios no positivos o stock negativo antes de llegar al repositorio
+[400] Validación fallida: stockQuantity: El stock no puede ser negativo.
+
+ ✓ tests/regression/REG-ADM.ts > REG-ADM-02  Las métricas suman solo pedidos ENTREGADOS y cuentan los activos 48ms
+ ✓ tests/regression/REG-ADM.ts > REG-ADM-03  El inventario clasifica el stock y valoriza cada producto 15ms
+ ✓ tests/regression/REG-ADM.ts > REG-ADM-04  El admin da de alta, edita y elimina productos 40ms
+ ✓ tests/regression/REG-ADM.ts > REG-ADM-05  El alta rechaza precios no positivos o stock negativo antes de llegar al repositorio 51ms
+stderr | tests/regression/REG-PROY.ts > REG-PROY-02  Crear exige sesión y datos válidos
+[401] Token no provisto.
+
+stderr | tests/regression/REG-PROY.ts > REG-PROY-02  Crear exige sesión y datos válidos
+[400] Validación fallida: type: Tipo debe ser PISO, PARED, TECHO o INTEGRAL
+
+stderr | tests/regression/REG-PROY.ts > REG-PROY-02  Crear exige sesión y datos válidos
+[400] Validación fallida: area: El área debe ser un número positivo
+
+stderr | tests/regression/REG-PROY.ts > REG-PROY-04  Consultar exige sesión, un id CUID y responde 404 si no existe
+[401] Token no provisto.
+
+stderr | tests/regression/REG-ORD.ts > REG-ORD-01  No se puede pagar un carrito vacío
+[400] El carrito está vacío
+
+stderr | tests/regression/REG-PROY.ts > REG-PROY-04  Consultar exige sesión, un id CUID y responde 404 si no existe
+[400] Validación fallida: id: El ID proporcionado debe ser un formato CUID válido.
+
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-01  Crear un proyecto guarda los materiales calculados y su costo total en pesos 57ms
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-02  Crear exige sesión y datos válidos 27ms
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-03  El listado devuelve solo los proyectos del usuario autenticado 7ms
+stderr | tests/regression/REG-PROY.ts > REG-PROY-04  Consultar exige sesión, un id CUID y responde 404 si no existe
+[404] Proyecto no encontrado
+
+stderr | tests/regression/REG-PROY.ts > REG-PROY-05  Solo el dueño puede borrar un proyecto
+[403] No tienes permiso para eliminar este proyecto.
+
+ ✓ tests/regression/REG-ORD.ts > REG-ORD-01  No se puede pagar un carrito vacío 54ms
+stderr | tests/regression/REG-PROY.ts > REG-PROY-08  Nadie edita un proyecto ajeno
+[403] No tienes permiso para modificar este proyecto.
+
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-04  Consultar exige sesión, un id CUID y responde 404 si no existe 20ms
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-05  Solo el dueño puede borrar un proyecto 10ms
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-06  El dueño borra su proyecto 6ms
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-07  Editar el área de un proyecto propio recalcula materiales y costo 41ms
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-08  Nadie edita un proyecto ajeno 12ms
+ ✓ tests/regression/REG-PROY.ts > REG-PROY-09  Cambiar solo el estado no recalcula los materiales 10ms
+stderr | tests/regression/REG-ORD.ts > REG-ORD-05  Un cliente no puede cambiar el estado de un pedido
+[403] Acceso denegado. Se requieren permisos de administrador.
+
+stderr | tests/regression/REG-ORD.ts > REG-ORD-06  El admin cambia el estado solo a valores válidos
+[400] Validación fallida: status: Estado debe ser PENDIENTE, PROCESANDO, ENVIADO, ENTREGADO o CANCELADO
+
+stderr | tests/regression/REG-ORD.ts > REG-ORD-07  El detalle de un pedido exige sesión y uno inexistente responde 404
+[401] Token no provisto.
+
+stderr | tests/regression/REG-ORD.ts > REG-ORD-07  El detalle de un pedido exige sesión y uno inexistente responde 404
+[404] Pedido no encontrado
+
+ ✓ tests/regression/REG-ORD.ts > REG-ORD-02  El pedido se arma con los precios del carrito, 25.000 de envío y estado PENDIENTE 69ms
+ ✓ tests/regression/REG-ORD.ts > REG-ORD-03  Con subtotal mayor a 500.000 el envío del pedido es gratis 8ms
+ ✓ tests/regression/REG-ORD.ts > REG-ORD-04  El listado del cliente muestra número, estado en minúsculas y nombre 14ms
+ ✓ tests/regression/REG-ORD.ts > REG-ORD-05  Un cliente no puede cambiar el estado de un pedido 10ms
+ ✓ tests/regression/REG-ORD.ts > REG-ORD-06  El admin cambia el estado solo a valores válidos 13ms
+ ✓ tests/regression/REG-ORD.ts > REG-ORD-07  El detalle de un pedido exige sesión y uno inexistente responde 404 13ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-SRV-01  Express App está inicializado con middlewares y rutas base 2ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-SRV-02  Middleware de reescritura /api -> /api/v1 funciona correctamente 1ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-SRV-03  Servidor Express responde a GET / con metadatos de la API 33ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-SRV-04  Servidor Express maneja peticiones OPTIONS y CORS 20ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-ROUTES-CAT-01  categoriesRouter define GET / 1ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-ROUTES-PRD-01  productsRouter define endpoints de catálogo y administración 1ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-ROUTES-PROY-01  projectsRouter define CRUD de proyectos 5ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-ROUTES-CART-01  cartRouter define endpoints de carrito 1ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-ROUTES-ORD-01  ordersRouter define endpoints de pedidos 1ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-ROUTES-USR-01  usersRouter define endpoints de autenticación y perfil 6ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-ROUTES-ADM-01  adminRouter define métricas e inventario 1ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-SRV-05  Petición HTTP a /api/v1/categories devuelve listado de categorías 14ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-SRV-06  Petición HTTP con reescritura /api/categories funciona idénticamente 9ms
+ ✓ tests/unit-routes-and-server.ts > UNIT-SRV-07  Ruta no existente retorna 404 a través del manejador global 8ms
+stderr | tests/regression/REG-CART.ts > REG-CART-04  Agregar exige sesión y un productId CUID
+[401] Token no provisto.
+
+stderr | tests/regression/REG-CART.ts > REG-CART-04  Agregar exige sesión y un productId CUID
+[400] Validación fallida: productId: ID de producto inválido
+
+stderr | tests/regression/REG-CART.ts > REG-CART-06  Cambiar la cantidad de un ítem ajeno responde 403 y no lo modifica
+[403] No tienes permiso para modificar este item del carrito.
+
+ ✓ tests/regression/REG-CART.ts > REG-CART-01  Un visitante sin sesión recibe un carrito vacío sin tocar la base 38ms
+ ✓ tests/regression/REG-CART.ts > REG-CART-02  Calcula subtotal, envío y backorder a partir del stock disponible 13ms
+ ✓ tests/regression/REG-CART.ts > REG-CART-03  El envío es gratis cuando el subtotal supera 500.000 6ms
+ ✓ tests/regression/REG-CART.ts > REG-CART-04  Agregar exige sesión y un productId CUID 26ms
+ ✓ tests/regression/REG-CART.ts > REG-CART-05  Agregar un producto lo suma al carrito del usuario autenticado 7ms
+ ✓ tests/regression/REG-CART.ts > REG-CART-06  Cambiar la cantidad de un ítem ajeno responde 403 y no lo modifica 10ms
+ ✓ tests/regression/REG-CART.ts > REG-CART-07  Actualiza y elimina ítems propios 18ms
+stderr | tests/regression/REG-CAT.ts > REG-CAT-04  La ficha de un producto inexistente responde 404
+[404] Producto no encontrado
+
+stderr | tests/regression/REG-CAT.ts > REG-CAT-05  Reseñar recalcula el promedio del producto; una segunda reseña se rechaza
+[400] Ya has calificado este producto
+
+stderr | tests/regression/REG-CAT.ts > REG-CAT-06  Una calificación fuera de 1..5 no llega al repositorio
+[400] Validación fallida: rating: La calificación máxima es 5 estrellas.
+
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-01  El listado traslada los filtros de la URL al repositorio 35ms
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-02  El listado descuenta las reservas de otros carritos del stock visible 9ms
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-03  Con sesión, las reservas del propio carrito no se descuentan 9ms
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-04  La ficha de un producto inexistente responde 404 6ms
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-05  Reseñar recalcula el promedio del producto; una segunda reseña se rechaza 25ms
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-06  Una calificación fuera de 1..5 no llega al repositorio 7ms
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-07  La vitrina devuelve recomendados, ofertas y más vendidos 4ms
+ ✓ tests/regression/REG-CAT.ts > REG-CAT-08  Las reseñas de un producto se listan desde el repositorio 9ms
+ ✓ tests/F-ADM-02.ts > CP-F-ADM-02-01  Rechaza con 403 a usuarios con rol CUSTOMER antes de modificar productos 6ms
+ ✓ tests/F-ADM-02.ts > CP-F-ADM-02-02  Rechaza campos inválidos (precio negativo, stock negativo, nombre vacío) en validación 5ms
+ ✓ tests/F-ADM-02.ts > CP-F-ADM-02-03  Retorna 404 al intentar actualizar un producto que no existe 2ms
+ ✓ tests/F-ADM-02.ts > CP-F-ADM-02-04  Crea producto nuevo con valores derivados y valida precio mayor a 0 6ms
+ ✓ tests/F-ADM-02.ts > CP-F-ADM-02-05  Aplica parche parcial en actualización y actualiza inStock si stockQuantity llega a 0 4ms
+stderr | tests/regression/REG-API.ts > REG-API-03  Los errores conservan el sobre { success: false, error } con el mensaje
+❌ Error: Base de datos caída
 Error: Base de datos caída
-    at C:\Users\jdmg2\WebstormProjects\Homara\HomaraBackend\tests\regression\REG-API.ts:68:44
-    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
-    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
-    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at /home/user/HomaraBackend/tests/regression/REG-API.ts:68:44
+    at file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
     at new Promise (<anonymous>)
-    at runWithTimeout (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
-    at runTest (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
-    at processTicksAndRejections (node:internal/process/task_queues:104:5)
-    at runSuite (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
-    at runFiles (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3)
+    at runWithTimeout (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at runSuite (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runFiles (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3)
 
-[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-02  Crear exige sesión y datos válidos
-[22m[39m[401] Token no provisto.
+ ✓ tests/regression/REG-API.ts > REG-API-01  /api/categories sin versión responde igual que /api/v1/categories 58ms
+ ✓ tests/regression/REG-API.ts > REG-API-02  Las respuestas exitosas conservan el sobre { success: true, data } 18ms
+ ✓ tests/regression/REG-API.ts > REG-API-03  Los errores conservan el sobre { success: false, error } con el mensaje 7ms
+ ✓ tests/regression/REG-SEG.ts > REG-SEG-01  No refleja un Origin fuera de la lista blanca 42ms
+ ✓ tests/regression/REG-SEG.ts > REG-SEG-02  Refleja exactamente el origen permitido, nunca el comodín * 10ms
+ ✓ tests/regression/REG-SEG.ts > REG-SEG-03  El preflight de un origen ajeno no recibe permiso 5ms
+ ✓ tests/regression/REG-SEG.ts > REG-SEG-04  CORS_ORIGINS se separa por comas, recorta espacios y descarta vacíos 7ms
+ ✓ tests/regression/REG-SEG.ts > REG-SEG-05  En producción sin CORS_ORIGINS no se permite ningún origen 12ms
+ ✓ tests/regression/REG-SEG.ts > REG-SEG-06  Fuera de producción sin CORS_ORIGINS solo se permite el front local 6ms
+ ✓ tests/F-ADM-01.ts > CP-F-ADM-01-01  Calcula variación de ventas respecto al mes anterior y categorías principales 24ms
+ ✓ tests/F-ADM-01.ts > CP-F-ADM-01-02  Evita división por cero y retorna variación 0 cuando no hay ventas el mes anterior 3ms
+ ✓ tests/F-ADM-01.ts > CP-F-ADM-01-03  Agrupa ventas del año por mes correspondiente 7ms
+ ✓ tests/F-ADM-01.ts > CP-F-ADM-01-04  Acumula montos repetidos de la misma categoría 1ms
+ ✓ tests/F-ADM-01.ts > CP-F-ADM-01-05  Ordena categorías y limita el reporte a las 5 principales 1ms
+ ✓ tests/F-ADM-01.ts > CP-F-ADM-01-06  Asigna 0% a categorías cuando las ventas totales por categoría son 0 1ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-01  Retorna 401 si no se provee cabecera Authorization 2ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-02  Retorna error cuando el token JWT ha caducado 4ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-03  Retorna 401 si el usuario asociado al token no existe en la base de datos 3ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-04  Retorna 403 cuando un usuario cliente intenta acceder a rutas de administración 1ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-05  Permite el acceso cuando el usuario tiene rol ADMIN en base de datos 2ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-06  Traduce fallos internos no controlados a error 500 1ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-04b  Valida el rol real de base de datos ignorando el payload del token 1ms
+ ✓ tests/F-AUTH-03.ts > CP-F-AUTH-03-07  Cerrar sesi�n (RF03): La API deniega el acceso si el cliente elimina su token localmente (simulado por ausencia de header) 1ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-01  Rechaza materialType no soportado antes de consultar catálogo 5ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-02  Retorna 404 si el selectedProductId no existe en el catálogo 2ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-03  Crea proyecto con materiales genéricos cuando no se vincula producto 3ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-04  Rechaza producto sin categoría válida asignada 1ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-05  Rechaza categorías no permitidas para proyectos (ej. herramientas) 1ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-06  Valida correspondencia entre nombre de insumo y su categoría 2ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-07  Rechaza producto de pisos en proyecto configurado como pintura 3ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-08  Rechaza vincular pegante en proyecto de madera 1ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-09  Rechaza pintura en proyecto de madera 3ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-10  Asigna pegante real del catálogo en proyecto de cerámica 2ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-11  Asigna pintura real del catálogo en proyecto de pintura 1ms
+ ✓ tests/F-PROY-01.ts > CP-F-PROY-01-12  Asigna producto de pisos del catálogo calculando desperdicio y costo 1ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-CAT-01  PrismaCategoryRepository.findAll mapea categorias 2ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-CAT-02  PrismaCategoryRepository findBySlug y create retornan entidad o null 2ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-USR-01  PrismaUserRepository CRUD y mapeo a User entity 5ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-REV-01  PrismaReviewRepository create, find y calculo de promedio 2ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-PROY-01  PrismaProjectRepository CRUD con mapeo de materiales 2ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-PROY-02  PrismaProjectRepository create y update con lista de materiales 1ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-ORD-01  PrismaOrderRepository findAll, findByIdOrNumber, updateStatus y countByYear 2ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-ORD-02  PrismaOrderRepository create checkout transaccional y backorder 2ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-PRD-01  PrismaProductRepository findAll, findById, create y updateStock 1ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-PRD-02  PrismaProductRepository storefronts, update y delete 2ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-CART-01  PrismaCartRepository findByUserId crea carrito si no existe o mapea existentes 1ms
+ ✓ tests/unit-prisma-repositories.ts > UNIT-REPO-CART-02  PrismaCartRepository addItem, update, remove, clear, findItemOwner y getReservedQuantities 1ms
+stderr | tests/unit-error-handler.ts > UNIT-ERR-01  Maneja AppError devolviendo el statusCode y el mensaje
+[404] Recurso no disponible
 
-[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-01  Un cliente no entra al panel ni gestiona productos
-[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
+stderr | tests/unit-error-handler.ts > UNIT-ERR-02  Maneja Prisma P2002 como 409 conflicto con campos duplicados
+[409] El registro ya existe. Campo duplicado: email
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-CAT.ts[2m > [22m[2mREG-CAT-04  La ficha de un producto inexistente responde 404
-[22m[39m[404] Producto no encontrado
+stderr | tests/unit-error-handler.ts > UNIT-ERR-03  Maneja Prisma P2025 como 404 no encontrado
+[404] El recurso solicitado no fue encontrado o no tienes permisos para acceder a él.
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-02  Crear exige sesión y datos válidos
-[22m[39m[400] Validación fallida: type: Tipo debe ser PISO, PARED, TECHO o INTEGRAL
+stderr | tests/unit-error-handler.ts > UNIT-ERR-04  Maneja Prisma P2003 como 400 error de integridad
+[400] Error de integridad de datos: el registro está en uso por otros datos (p. ej. pedidos) o la referencia no existe.
 
-[90mstderr[2m | tests/regression/REG-CART.ts[2m > [22m[2mREG-CART-04  Agregar exige sesión y un productId CUID
-[22m[39m[401] Token no provisto.
+stderr | tests/unit-error-handler.ts > UNIT-ERR-05  Maneja PrismaClientValidationError como 400
+[400] Los datos proporcionados no coinciden con la estructura requerida.
 
-[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-02  Crear exige sesión y datos válidos
-[22m[39m[400] Validación fallida: area: El área debe ser un número positivo
+stderr | tests/unit-error-handler.ts > UNIT-ERR-06  Maneja TokenExpiredError como 401
+[401] Token expirado. Por favor, inicia sesión nuevamente.
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-CART.ts[2m > [22m[2mREG-CART-04  Agregar exige sesión y un productId CUID
-[22m[39m[400] Validación fallida: productId: ID de producto inválido
+stderr | tests/unit-error-handler.ts > UNIT-ERR-07  Maneja JsonWebTokenError como 401
+[401] Token inválido o malformado.
 
-[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-05  Un cliente no puede cambiar el estado de un pedido
-[22m[39m[403] Acceso denegado. Se requieren permisos de administrador.
-
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-CAT.ts[2m > [22m[2mREG-CAT-05  Reseñar recalcula el promedio del producto; una segunda reseña se rechaza
-[22m[39m[400] Ya has calificado este producto
-
-[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-04  Consultar exige un id CUID y responde 404 si no existe
-[22m[39m[400] Validación fallida: id: El ID proporcionado debe ser un formato CUID válido.
-
-[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-04  Consultar exige un id CUID y responde 404 si no existe
-[22m[39m[404] Proyecto no encontrado
-
-[90mstderr[2m | tests/regression/REG-CART.ts[2m > [22m[2mREG-CART-06  Cambiar la cantidad de un ítem ajeno responde 403 y no lo modifica
-[22m[39m[403] No tienes permiso para modificar este item del carrito.
-
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-06  El admin cambia el estado solo a valores válidos
-[22m[39m[400] Validación fallida: status: Estado debe ser PENDIENTE, PROCESANDO, ENVIADO, ENTREGADO o CANCELADO
-
-[90mstderr[2m | tests/regression/REG-CAT.ts[2m > [22m[2mREG-CAT-06  Una calificación fuera de 1..5 no llega al repositorio
-[22m[39m[400] Validación fallida: rating: La calificación máxima es 5 estrellas.
-
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-05  Solo el dueño puede borrar un proyecto
-[22m[39m[403] No tienes permiso para eliminar este proyecto.
-
-[90mstderr[2m | tests/regression/REG-ORD.ts[2m > [22m[2mREG-ORD-07  El detalle de un pedido inexistente responde 404
-[22m[39m[404] Pedido no encontrado
-
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-05  El alta rechaza precios o stock negativos antes de llegar al repositorio
-[22m[39m[400] Validación fallida: price: El precio no puede ser negativo.
-
-[90mstderr[2m | tests/regression/REG-PROY.ts[2m > [22m[2mREG-PROY-08  Nadie edita un proyecto ajeno
-[22m[39m[403] No tienes permiso para modificar este proyecto.
-
-[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-02  El registro normaliza el correo y rechaza uno ya registrado
-[22m[39m[400] El correo electrónico ya está registrado.
-
-[90mstderr[2m | tests/regression/REG-ADM.ts[2m > [22m[2mREG-ADM-05  El alta rechaza precios o stock negativos antes de llegar al repositorio
-[22m[39m[400] Validación fallida: stockQuantity: El stock no puede ser negativo.
-
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-01  Maneja AppError devolviendo el statusCode y el mensaje
-[22m[39m[404] Recurso no disponible
-
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-02  Maneja Prisma P2002 como 409 conflicto con campos duplicados
-[22m[39m[409] El registro ya existe. Campo duplicado: email
-
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-03  Maneja Prisma P2025 como 404 no encontrado
-[22m[39m[404] El recurso solicitado no fue encontrado o no tienes permisos para acceder a él.
-
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-04  Maneja Prisma P2003 como 400 error de integridad
-[22m[39m[400] Error de integridad de datos. La entidad referenciada no existe.
-
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-05  Maneja PrismaClientValidationError como 400
-[22m[39m[400] Los datos proporcionados no coinciden con la estructura requerida.
-
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-06  Maneja TokenExpiredError como 401
-[22m[39m[401] Token expirado. Por favor, inicia sesión nuevamente.
-
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-07  Maneja JsonWebTokenError como 401
-[22m[39m[401] Token inválido o malformado.
-
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-08  Maneja error inesperado como 500
-[22m[39m❌ Error: Fallo imprevisto
+stderr | tests/unit-error-handler.ts > UNIT-ERR-08  Maneja error inesperado como 500
+❌ Error: Fallo imprevisto
 Error: Fallo imprevisto
-    at C:\Users\jdmg2\WebstormProjects\Homara\HomaraBackend\tests\unit-error-handler.ts:137:22
-    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
-    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
-    at file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
+    at /home/user/HomaraBackend/tests/unit-error-handler.ts:137:22
+    at file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11
+    at file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26
+    at file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20
     at new Promise (<anonymous>)
-    at runWithTimeout (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
-    at runTest (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
-    at processTicksAndRejections (node:internal/process/task_queues:104:5)
-    at runSuite (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
-    at runFiles (file:///C:/Users/jdmg2/WebstormProjects/Homara/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3)
+    at runWithTimeout (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)
+    at runTest (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at runSuite (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)
+    at runFiles (file:///home/user/HomaraBackend/node_modules/@vitest/runner/dist/chunk-hooks.js:1787:3)
 
-[90mstderr[2m | tests/unit-error-handler.ts[2m > [22m[2mUNIT-ERR-09  Maneja código Prisma desconocido como 400 genérico
-[22m[39m[400] Error en base de datos (P9999): Generic DB error
+stderr | tests/unit-error-handler.ts > UNIT-ERR-09  Maneja código Prisma desconocido como 400 genérico
+[400] Error en base de datos (P9999): Generic DB error
 
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-04  El login con clave incorrecta responde 401 con mensaje genérico
-[22m[39m[401] Credenciales incorrectas. Verifique correo y contraseña.
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-01  Maneja AppError devolviendo el statusCode y el mensaje 3ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-02  Maneja Prisma P2002 como 409 conflicto con campos duplicados 1ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-03  Maneja Prisma P2025 como 404 no encontrado 0ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-04  Maneja Prisma P2003 como 400 error de integridad 1ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-05  Maneja PrismaClientValidationError como 400 0ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-06  Maneja TokenExpiredError como 401 0ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-07  Maneja JsonWebTokenError como 401 1ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-08  Maneja error inesperado como 500 7ms
+ ✓ tests/unit-error-handler.ts > UNIT-ERR-09  Maneja código Prisma desconocido como 400 genérico 3ms
+ ✓ tests/F-ADM-03.ts > CP-F-ADM-03-01  Clasifica productos con existencias menores a cero como stock_negativo 5ms
+ ✓ tests/F-ADM-03.ts > CP-F-ADM-03-02  Clasifica productos con existencias en 0 como sin_stock 2ms
+ ✓ tests/F-ADM-03.ts > CP-F-ADM-03-03  Marca 49 unidades como límite superior de alerta stock_bajo 6ms
+ ✓ tests/F-ADM-03.ts > CP-F-ADM-03-04  Marca 50 unidades como límite inferior de inventario normal 2ms
+ ✓ tests/F-ADM-03.ts > CP-F-ADM-03-05  Procesa múltiples productos combinando estados en el reporte 1ms
+ ✓ tests/F-CAT-03.ts > CP-F-CAT-03-01  Rechaza calificación fuera del rango 1-5 o con decimales en validación de esquema 10ms
+ ✓ tests/F-CAT-03.ts > CP-F-CAT-03-02  Retorna 404 si el producto a calificar no existe 4ms
+ ✓ tests/F-CAT-03.ts > CP-F-CAT-03-03  Rechaza si el usuario ya había publicado una reseña previa para el producto 4ms
+ ✓ tests/F-CAT-03.ts > CP-F-CAT-03-04  Guarda la reseña y actualiza el promedio de calificación del producto 2ms
+ ✓ tests/F-CAT-03.ts > CP-F-CAT-03-04b  Valida límites de calificación (1 y 5) y longitud máxima de comentario (500) 4ms
+ ✓ tests/F-CAT-03.ts > CP-F-CAT-03-04c  Rechaza calificación fuera de rango directamente en el caso de uso 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-01  Aplica 5% de desperdicio por defecto para proyectos de pintura 6ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-02  Prioriza porcentaje explícito de desperdicio sobre patrón de colocación 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-02b  Respeta cota mínima de 0.1 m² cuando los descuentos superan el área 0ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-03  Asigna 15% de desperdicio para colocación en diagonal 0ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-04  Asigna 12% de desperdicio para colocación en trabadura 0ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-05  Asigna 10% de desperdicio para colocación directa o por defecto 0ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-06  Mantiene pintura genérica si el producto vinculado es material de construcción 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-07  Cotiza producto del catálogo por m² con desperdicio aplicado 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-08  Asigna baldosa genérica y calcula pegante vinculado por rendimiento de peso 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-09  Excluye insumos de baldosa (pegante, boquilla, crucetas) en proyectos de madera 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-10  Cotiza boquilla real vinculada y omite pegante si se desactiva includeAdhesive 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-11  Asigna pegante genérico de 25kg cuando el producto vinculado no es adhesivo 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-12  Mantiene crucetas cuando se omiten pegante y boquilla 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-13  Calcula boquilla genérica a rendimiento de 8 m² por kilo 0ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-14  Excluye insumos de baldosa pero preserva herramientas correspondientes 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-15  Calcula primer para vinilo y excluye cinta underlayment 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-16  Omite cinta underlayment para madera cuando includeAdhesive es false 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-17  Omite insumos específicos ante materialType desconocido cotizando producto galón 2ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-18  Omite primer para vinilo si includeAdhesive está desactivado 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-19  Cotiza paredes en proyecto integral aunque includeTools sea false 0ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-20  Incluye kit de herramientas de baldosa (nivel, llana y mazo) 1ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-21  Incluye solo nivel en herramientas para proyectos sin baldosa 0ms
+ ✓ tests/F-PROY-02.ts > CP-F-PROY-02-22  Omite estimación de paredes para pintura o cuando el tipo no es integral 1ms
+ ✓ tests/unit-auth-middleware.ts > UNIT-AUTH-01  optionalAuth pasa de largo si no hay cabecera Authorization 2ms
+ ✓ tests/unit-auth-middleware.ts > UNIT-AUTH-02  optionalAuth ignora cabeceras que no comienzan con Bearer 1ms
+ ✓ tests/unit-auth-middleware.ts > UNIT-AUTH-03  optionalAuth autentica al usuario cuando el token es válido y existe 5ms
+ ✓ tests/unit-auth-middleware.ts > UNIT-AUTH-04  optionalAuth traga silenciosamente errores de JWT inválido o expirado 2ms
+ ✓ tests/unit-auth-middleware.ts > UNIT-AUTH-05  optionalAuth no asigna usuario si findById devuelve null 1ms
+ ✓ tests/unit-auth-middleware.ts > UNIT-AUTH-06  forwardAuthError mapea errores inesperados a 500 3ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-01  Rechaza materialType no soportado 6ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-02  Retorna 404 si el proyecto no existe 1ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-03  Retorna 403 si el proyecto pertenece a otro usuario 1ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-04  Rechaza vincular producto incompatible con el tipo de proyecto 1ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-05  Guarda lista manual de materiales enviada por el cliente y recalcula presupuesto 1ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-06  Actualiza únicamente campos descriptivos sin alterar materiales 1ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-07  Recalcula materiales genéricos al cambiar área 1ms
+ ✓ tests/F-PROY-03.ts > CP-F-PROY-03-08  Vincula producto compatible y recalcula materiales y presupuesto 3ms
+ ✓ tests/F-CHK-01.ts > CP-F-CHK-01-01  Retorna 401 sin sesión autenticada antes de modificar el carrito 3ms
+ ✓ tests/F-CHK-01.ts > CP-F-CHK-01-02  Valida esquema para cantidades (1..9999, enteros) y formato cuid de ID 3ms
+ ✓ tests/F-CHK-01.ts > CP-F-CHK-01-03  Crea carrito si no existía y acumula cantidad si la línea ya existía 1ms
+ ✓ tests/F-CHK-01.ts > CP-F-CHK-01-04  Acumula cantidades de producto existente en el carrito respetando tope 1ms
+ ✓ tests/F-CHK-01.ts > CP-F-CHK-01-05  Agrega una nueva línea de producto cuando no estaba en el carrito 0ms
+ ✓ tests/F-CHK-01.ts > CP-F-CHK-01-06  Enviar materiales carrito (RF24): Permite iterar la adici�n para trasladar una lista de materiales al carrito 0ms
+ ✓ tests/regression/REG-MAT.ts > REG-MAT-01  Pegante vinculado sin peso en el nombre usa 25kg → 1 bulto cada 4m² 3ms
+ ✓ tests/regression/REG-MAT.ts > REG-MAT-02  Boquilla vinculada sin peso en el nombre usa 1kg → 1 unidad cada 8m² 1ms
+ ✓ tests/regression/REG-MAT.ts > REG-MAT-03  El materialType se compara sin distinguir mayúsculas 2ms
+ ✓ tests/regression/REG-MAT.ts > REG-MAT-04  Los nombres y notas fijos que traduce el frontend no cambian de texto 2ms
+ ✓ tests/regression/REG-MAT.ts > REG-MAT-05  Las notas con % de desperdicio conservan el patrón que el frontend reconoce 1ms
+ ✓ tests/unit-validators.ts > UNIT-VAL-01  Valida cuidParamSchema y itemIdParamSchema con CUID válido e inválido 3ms
+ ✓ tests/unit-validators.ts > UNIT-VAL-02  Valida listOrdersQuerySchema y transformación de admin boolean 1ms
+ ✓ tests/unit-validators.ts > UNIT-VAL-03  Valida createOrderSchema y updateOrderStatusSchema 2ms
+ ✓ tests/unit-validators.ts > UNIT-VAL-04  Valida createProjectSchema y updateProjectSchema 3ms
+ ✓ tests/F-CAT-02.ts > CP-F-CAT-02-01  Retorna 404 si el producto no existe 3ms
+ ✓ tests/F-CAT-02.ts > CP-F-CAT-02-02  Excluye la reserva propia del usuario autenticado al calcular stock disponible 2ms
+ ✓ tests/F-CAT-02.ts > CP-F-CAT-02-03  Descuenta todas las reservas activas para usuario anónimo 1ms
+ ✓ tests/F-CAT-02.ts > CP-F-CAT-02-03b  Marca producto como agotado si las reservas consumen todo el stock 1ms
+ ✓ tests/F-CAT-02.ts > CP-F-CAT-02-03c  Mantiene stock físico intacto cuando no hay reservas activas 1ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-01  Filtra por categoría, término de búsqueda y etiqueta simultáneamente 4ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-02  Filtra por texto y etiqueta sin categoría 2ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-03  Filtra únicamente por etiqueta 0ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-04  Lista catálogo sin filtros aplicados 0ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-05  Excluye reservas del propio carrito para usuario autenticado 4ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-06  Descuenta todas las reservas activas para visitante anónimo 1ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-05b  Evita stock negativo cuando las reservas superan el inventario físico 1ms
+ ✓ tests/F-CAT-01.ts > CP-F-CAT-01-06c  Trata filtros con cadenas vacías como filtros ausentes 0ms
+ ✓ tests/unit-validate-zod.ts > UNIT-ZOD-01  Valida body correcto y llama a next 5ms
+ ✓ tests/unit-validate-zod.ts > UNIT-ZOD-02  Lanza AppError 400 cuando el body no cumple el esquema 2ms
+ ✓ tests/unit-validate-zod.ts > UNIT-ZOD-03  Mutan in-place req.query preservando conversión de tipos de Zod 1ms
+ ✓ tests/unit-validate-zod.ts > UNIT-ZOD-04  Mutan in-place req.params con tipos validados 2ms
+ ✓ tests/F-CHK-03.ts > CP-F-CHK-03-01  Rechaza creación de orden cuando el carrito está vacío 3ms
+ ✓ tests/F-CHK-03.ts > CP-F-CHK-03-02  Genera pedido con envío gratuito e ítems congelados cuando subtotal supera 500000 2ms
+ ✓ tests/F-CHK-03.ts > CP-F-CHK-03-03  Evalúa umbral de envío gratuito con subtotal de 500000 exactos 1ms
+ ✓ tests/F-CHK-02.ts > CP-F-CHK-02-01  Crea un carrito vacío cuando el usuario no tenía uno previo 4ms
+ ✓ tests/F-CHK-02.ts > CP-F-CHK-02-02  Retorna estructura de carrito existente sin productos 1ms
+ ✓ tests/F-CHK-02.ts > CP-F-CHK-02-03  Calcula backorder y aplica envío gratuito cuando subtotal supera 500000 2ms
+ ✓ tests/F-CHK-02.ts > CP-F-CHK-02-04  Muestra disponibilidad total sin backorder con stock suficiente 1ms
+ ✓ tests/F-CHK-02.ts > CP-F-CHK-02-05  Itera múltiples líneas combinando disponibles y pedidos pendientes 1ms
+ ✓ tests/F-CHK-02.ts > CP-F-CHK-02-06  No cobra envío a un carrito vacío y evalúa umbral de 500000 1ms
+ ✓ tests/unit-entities.ts > UNIT-ENT-01  Instancia Category, Review y User correctamente 2ms
+ ✓ tests/unit-entities.ts > UNIT-ENT-02  Instancia Order, OrderItem, Project y ProjectMaterial 1ms
+ ✓ tests/unit-entities.ts > UNIT-ENT-03  Evalúa función helper getStockStatus para diferentes rangos de inventario 0ms
 
-[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-05  El perfil exige token y nunca expone la contraseña
-[22m[39m[401] Token no provisto.
-
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[90mstderr[2m | tests/regression/REG-AUTH.ts[2m > [22m[2mREG-AUTH-06  Un token de un usuario dado de baja deja de servir
-[22m[39m[401] Usuario no encontrado o dado de baja.
-
-[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m[33m[39m[32m·[39m
-
-[2m Test Files [22m [1m[32m33 passed[39m[22m[90m (33)[39m
-[2m      Tests [22m [1m[32m258 passed[39m[22m[90m (258)[39m
-[2m   Start at [22m 15:55:11
-[2m   Duration [22m 5.87s[2m (transform 4.63s, setup 0ms, collect 39.87s, tests 9.92s, environment 14ms, prepare 10.00s)[22m
+ Test Files  34 passed (34)
+      Tests  268 passed (268)
+   Start at  16:56:09
+   Duration  7.49s (transform 1.59s, setup 0ms, collect 9.65s, tests 3.60s, environment 6ms, prepare 2.87s)
 

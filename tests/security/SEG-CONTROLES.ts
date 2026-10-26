@@ -16,6 +16,7 @@ import {
   iniciarSesion,
   registrarUsuario,
   firmarTokenConSecretoPorDefecto,
+  secretoDelServidor,
   SEMILLA,
   claveDePrueba,
   claveCorta,
@@ -56,10 +57,11 @@ describe("Seguridad · Autenticación de rutas protegidas", () => {
   });
 
   test("CP-SEG-AUT-08", "RN-008 — token expirado se rechaza (401)", async () => {
-    // Arrange: firmado con el secreto por defecto pero ya expirado
+    // Arrange: firmado con el secreto real del servidor pero ya expirado
     const expirado = await firmarTokenConSecretoPorDefecto(
       { id: SEMILLA.juan.id, email: SEMILLA.juan.email, role: "CUSTOMER" },
       -10,
+      secretoDelServidor(),
     );
 
     // Act
@@ -71,19 +73,19 @@ describe("Seguridad · Autenticación de rutas protegidas", () => {
   });
 
   test("CP-SEG-AUT-09", "RN-008 — token de usuario inexistente se rechaza (401)", async () => {
-    // Arrange: firma válida pero el id no existe en la base
-    const noUsuario = await firmarTokenConSecretoPorDefecto({
-      id: "cxxxxxxxxxxxxxxxxxxxxxxxx",
-      email: "fantasma@test.local",
-      role: "ADMIN",
-    });
+    // Arrange: firma válida (secreto real del servidor) pero el id no existe en la base
+    const noUsuario = await firmarTokenConSecretoPorDefecto(
+      { id: "cxxxxxxxxxxxxxxxxxxxxxxxx", email: "fantasma@test.local", role: "ADMIN" },
+      undefined,
+      secretoDelServidor(),
+    );
 
     // Act
     const res = await pedir("/admin/metrics", { token: noUsuario });
 
     // Assert
     expect(res.status).toBe(401);
-    expect(res.body.success).toBe(false);
+    expect(res.body.error).toBe("Usuario no encontrado o dado de baja.");
   });
 
   test("CP-SEG-AUT-10", "ESC06/RN-010 — un CUSTOMER no entra a las rutas de administrador (403)", async () => {

@@ -30,7 +30,11 @@ function formatUserProfile(user: any, projectCount: number, orderCount: number) 
   };
 }
 
-const DEMO_USER_ID = "demo-user-001";
+function assertOwnerOrAdmin(req: Request, userId: string, message: string) {
+  if (userId !== req.user!.id && req.user!.role !== "ADMIN") {
+    throw new AppError(message, 403);
+  }
+}
 
 export class AuthController {
   private static async getUserWithMetrics(userId: string) {
@@ -74,10 +78,8 @@ export class AuthController {
 
   static async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      let userId = req.params.id as string;
-      if (userId === "me") {
-        userId = req.user ? req.user.id : DEMO_USER_ID;
-      }
+      const userId = req.params.id === "me" ? req.user!.id : (req.params.id as string);
+      assertOwnerOrAdmin(req, userId, "No tienes permiso para ver este perfil.");
 
       const data = await AuthController.getUserWithMetrics(userId);
       res.json({ success: true, data });
@@ -88,14 +90,8 @@ export class AuthController {
 
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
-      let userId = req.params.id as string;
-      if (userId === "me") {
-        userId = req.user!.id;
-      }
-
-      if (userId !== req.user!.id && req.user!.role !== "ADMIN") {
-        throw new AppError("No tienes permiso para modificar este perfil.", 403);
-      }
+      const userId = req.params.id === "me" ? req.user!.id : (req.params.id as string);
+      assertOwnerOrAdmin(req, userId, "No tienes permiso para modificar este perfil.");
 
       // Whitelist de campos permitidos — previene privilege escalation
       const { email, firstName, lastName, phone, address, city, state, zipCode, password } = req.body;
@@ -106,8 +102,10 @@ export class AuthController {
         updateData.password = await hashPassword(password);
       }
 
-      const updated = await userRepository.update(userId, updateData);
-      res.json({ success: true, data: updated });
+      await userRepository.update(userId, updateData);
+      // Misma proyección que GET /users/me: nunca se devuelve el hash de la contraseña.
+      const data = await AuthController.getUserWithMetrics(userId);
+      res.json({ success: true, data });
     } catch (error) {
       next(error);
     }

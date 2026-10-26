@@ -127,8 +127,8 @@ test("CP-F-CHK-01-03", "Crea carrito si no existía y acumula cantidad si la lí
   expect(item.productId).toBe(ID_PRODUCTO);
 });
 
-// Defecto abierto #9 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-CHK-01-04", "Acumula cantidades de producto existente en el carrito respetando tope", async () => {
+// Defecto #9 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-CHK-01-04", "Acumula cantidades de producto existente en el carrito respetando tope", async () => {
   // Arrange
   const { db, caso } = montar();
   db.cart.findUnique.mockResolvedValue(filaCarrito());
@@ -141,8 +141,11 @@ test.fails("CP-F-CHK-01-04", "Acumula cantidades de producto existente en el car
   const actualizacion = db.cartItem.update.mock.calls[0][0];
 
   db.cartItem.findUnique.mockResolvedValue(filaLinea({ quantity: 9999 }));
-  db.cartItem.update.mockResolvedValue(filaLinea({ quantity: 19998, product: filaProducto() }));
-  const excedido = await caso.execute(ID_USUARIO, ID_PRODUCTO, 9999);
+  db.cartItem.update.mockClear();
+  db.cartItem.update.mockResolvedValue(filaLinea({ quantity: 9999, product: filaProducto() }));
+  await caso.execute(ID_USUARIO, ID_PRODUCTO, 9999);
+  // El doble devuelve lo que se le programe: lo que prueba el tope es lo que se le PIDE guardar.
+  const excedido = db.cartItem.update.mock.calls[0][0].data;
 
   // Assert
   expect(db.cart.create).not.toHaveBeenCalled();
@@ -151,8 +154,8 @@ test.fails("CP-F-CHK-01-04", "Acumula cantidades de producto existente en el car
   });
   expect(actualizacion.data).toStrictEqual({ quantity: 9999 });
   expect(item.quantity).toBe(9999);
-  // DEFECTO: la acumulación supera el máximo de 9999 sin validación adicional
-  expect(excedido.quantity, `quantity=${excedido.quantity} supera el tope de 9999`).toBeLessThanOrEqual(9999);
+  // Corregido (#9): la acumulación se recorta al máximo de 9999
+  expect(excedido).toStrictEqual({ quantity: 9999 });
 });
 
 test("CP-F-CHK-01-05", "Agrega una nueva línea de producto cuando no estaba en el carrito", async () => {

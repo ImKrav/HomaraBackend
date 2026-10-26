@@ -73,15 +73,18 @@ test("REG-PROY-03", "El listado devuelve solo los proyectos del usuario autentic
   expect(res.body.data).toHaveLength(1);
 });
 
-test("REG-PROY-04", "Consultar exige un id CUID y responde 404 si no existe", async () => {
+test("REG-PROY-04", "Consultar exige sesión, un id CUID y responde 404 si no existe", async () => {
   // Arrange
+  const { token } = sesion();
   mockProyectos.findById.mockResolvedValue(null);
 
   // Act
-  const idInvalido = await pedir("GET", "/api/v1/projects/123");
-  const inexistente = await pedir("GET", `/api/v1/projects/${CUID.proyecto}`);
+  const sinSesion = await pedir("GET", `/api/v1/projects/${CUID.proyecto}`);
+  const idInvalido = await pedir("GET", "/api/v1/projects/123", { token });
+  const inexistente = await pedir("GET", `/api/v1/projects/${CUID.proyecto}`, { token });
 
   // Assert
+  expect(sinSesion.status).toBe(401);
   expect(idInvalido.status).toBe(400);
   expect(inexistente.status).toBe(404);
 });

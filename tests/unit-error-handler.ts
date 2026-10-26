@@ -87,7 +87,7 @@ test("UNIT-ERR-04", "Maneja Prisma P2003 como 400 error de integridad", () => {
   // Assert
   expect(res.statusCode).toBe(400);
   expect(res.payload.success).toBe(false);
-  expect(res.payload.error).toBe("Error de integridad de datos. La entidad referenciada no existe.");
+  expect(res.payload.error).toBe("Error de integridad de datos: el registro está en uso por otros datos (p. ej. pedidos) o la referencia no existe.");
 });
 
 test("UNIT-ERR-05", "Maneja PrismaClientValidationError como 400", () => {

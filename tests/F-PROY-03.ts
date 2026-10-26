@@ -115,8 +115,8 @@ test("CP-F-PROY-03-06", "Actualiza únicamente campos descriptivos sin alterar m
   expect(productos.findById).not.toHaveBeenCalled();
 });
 
-// Defecto abierto #7 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-PROY-03-07", "Recalcula materiales genéricos al cambiar área", async () => {
+// Defecto #7 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-PROY-03-07", "Recalcula materiales genéricos al cambiar área", async () => {
   // Arrange
   const { proyectos, productos, caso, actualizado } = montar();
   proyectos.findById.mockResolvedValue(proyecto({ area: 20, selectedProductId: null }));
@@ -152,7 +152,7 @@ test.fails("CP-F-PROY-03-07", "Recalcula materiales genéricos al cambiar área"
       ? "avisa del conflicto"
       : "descarta la lista manual en silencio";
 
-  // DEFECTO: la lista manual enviada junto a un campo de recálculo se descarta en silencio
+  // Corregido (defecto): la lista manual enviada junto a un campo de recálculo se descarta en silencio
   expect(comportamiento).not.toBe("descarta la lista manual en silencio");
 });
 

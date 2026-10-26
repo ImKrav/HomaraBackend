@@ -62,7 +62,7 @@ test("CP-F-ADM-02-02", "Rechaza campos inválidos (precio negativo, stock negati
 
   // Assert
   expect(precioNegativo.success).toBe(false);
-  if (!precioNegativo.success) expect(precioNegativo.error.issues[0].message).toBe("El precio no puede ser negativo.");
+  if (!precioNegativo.success) expect(precioNegativo.error.issues[0].message).toBe("El precio debe ser mayor a 0.");
   expect(stockNegativo.success).toBe(false);
   if (!stockNegativo.success) expect(stockNegativo.error.issues[0].message).toBe("El stock no puede ser negativo.");
   expect(sinNombre.success).toBe(false);
@@ -87,8 +87,8 @@ test("CP-F-ADM-02-03", "Retorna 404 al intentar actualizar un producto que no ex
   expect(repo.update).not.toHaveBeenCalled();
 });
 
-// Defecto abierto #12 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-ADM-02-04", "Crea producto nuevo con valores derivados y valida precio mayor a 0", async () => {
+// Defecto #12 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-ADM-02-04", "Crea producto nuevo con valores derivados y valida precio mayor a 0", async () => {
   // Arrange
   const { repo, crear } = montar();
   repo.create.mockImplementation(async (p: any) => producto({ ...p, id: "prd_nuevo" }));
@@ -118,12 +118,12 @@ test.fails("CP-F-ADM-02-04", "Crea producto nuevo con valores derivados y valida
   expect(validacionSinExistencias.success).toBe(true);
   expect(guardadoSinExistencias.stockQuantity).toBe(0);
   expect(guardadoSinExistencias.inStock).toBe(false);
-  // DEFECTO: el esquema del servidor acepta precio 0 cuando debería exigir precio > 0 (RF32)
+  // Corregido (defecto): el esquema del servidor acepta precio 0 cuando debería exigir precio > 0 (RF32)
   expect(precioCero.success).toBe(false);
 });
 
-// Defecto abierto #13 (ver la tabla en tests/README.md): se espera que falle.
-test.fails("CP-F-ADM-02-05", "Aplica parche parcial en actualización y actualiza inStock si stockQuantity llega a 0", async () => {
+// Defecto #13 corregido (ver "Defectos corregidos" en tests/README.md).
+test("CP-F-ADM-02-05", "Aplica parche parcial en actualización y actualiza inStock si stockQuantity llega a 0", async () => {
   // Arrange
   const { repo, actualizar } = montar();
   repo.findById.mockResolvedValue(producto());
@@ -146,6 +146,6 @@ test.fails("CP-F-ADM-02-05", "Aplica parche parcial en actualización y actualiz
   expect(parche).not.toHaveProperty("categoryId");
   expect(salida.price).toBe(45000);
   expect(salida.name).toBe("Piso Ceramico Beige 60x60");
-  // DEFECTO: reducir existencias a 0 en PUT debería marcar inStock = false
+  // Corregido (defecto): reducir existencias a 0 en PUT debería marcar inStock = false
   expect(parcheSinExistencias).toMatchObject({ stockQuantity: 0, inStock: false });
 });

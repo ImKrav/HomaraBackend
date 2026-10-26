@@ -54,24 +54,24 @@ test("REG-VAL-03", "Cada esquema conserva su mensaje de error propio", () => {
   // Act
   const param = cuidParamSchema.safeParse({ id: invalido });
   const item = itemIdParamSchema.safeParse({ itemId: invalido });
-  const pedidos = listOrdersQuerySchema.safeParse({ userId: invalido });
+  const pedidos = listOrdersQuerySchema.safeParse({ admin: invalido });
   const carrito = addItemSchema.safeParse({ productId: invalido, quantity: 1 });
 
   // Assert
   expect(param.error?.issues[0].message).toBe("El ID proporcionado debe ser un formato CUID válido.");
   expect(item.error?.issues[0].message).toBe("El ID de ítem proporcionado debe ser un formato CUID válido.");
-  expect(pedidos.error?.issues[0].message).toBe("El ID de usuario de consulta debe ser un formato CUID válido.");
+  expect(pedidos.error?.issues[0].message).toBe("El parámetro admin debe ser 'true' o 'false'");
   expect(carrito.error?.issues[0].message).toBe("ID de producto inválido");
 });
 
-test("REG-VAL-04", "El userId de los listados sigue siendo opcional", () => {
+test("REG-VAL-04", "Los listados descartan un userId de la query (el usuario sale del token)", () => {
   // Arrange
-  const sinFiltro = {};
+  const conUserIdAjeno = { userId: "cusr0000000000000000000a1" };
 
   // Act
-  const resultado = listOrdersQuerySchema.safeParse(sinFiltro);
+  const resultado = listOrdersQuerySchema.safeParse(conUserIdAjeno);
 
   // Assert
   expect(resultado.success).toBe(true);
-  expect(resultado.data?.userId).toBeUndefined();
+  expect(resultado.data).not.toHaveProperty("userId");
 });
