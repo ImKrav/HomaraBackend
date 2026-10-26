@@ -84,6 +84,13 @@ const MUTACIONES = [
     poner: "res.json({ success: true, data: await userRepository.findById(userId) });\n    } catch (error) {\n      next(error);\n    }\n  }\n}",
   },
   {
+    modulo: "Seguridad",
+    cambio: "La cookie de sesión vuelve a ser legible por JavaScript",
+    archivo: "src/infrastructure/http/session-cookie.ts",
+    buscar: "httpOnly: true,",
+    poner: "httpOnly: false,",
+  },
+  {
     modulo: "Proyectos",
     cambio: "Cualquiera puede borrar un proyecto ajeno",
     archivo: "src/application/use-cases/project.use-cases.ts",

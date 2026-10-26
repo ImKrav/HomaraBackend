@@ -106,3 +106,19 @@ test("UNIT-AUTH-06", "forwardAuthError mapea errores inesperados a 500", async (
   expect(error.statusCode).toBe(500);
   expect(error.message).toBe("Error durante la autenticación.");
 });
+
+test("UNIT-AUTH-07", "requireAuth acepta el token de la cookie HttpOnly de sesión (DEF-SEG-FE-02)", async () => {
+  // Arrange
+  const u = usuario({ id: "usr_cookie", role: "CUSTOMER" });
+  mockUsuarios.findById.mockResolvedValue(u);
+  const token = tokenDe({ id: "usr_cookie", email: u.email, role: u.role });
+  const { req, res, next } = contextoExpress();
+  req.headers.cookie = `homara_theme=dark; homara_session=${token}`;
+
+  // Act
+  await requireAuth(req, res, next);
+
+  // Assert
+  expect(errorDeNext(next)).toBe(undefined);
+  expect(req.user?.id).toBe("usr_cookie");
+});

@@ -8,7 +8,7 @@ import rateLimit from "express-rate-limit";
 import { AuthController } from "../controllers/auth.controller.js";
 import { validateZod } from "../middlewares/validateZod.js";
 import { registerSchema, loginSchema, updateProfileSchema } from "../validators/auth.validator.js";
-import { requireAuth } from "../middlewares/auth.js";
+import { requireAuth, optionalAuth } from "../middlewares/auth.js";
 import { AppError } from "../../../shared/errors/AppError.js";
 
 const router = Router();
@@ -111,6 +111,34 @@ router.post(
   validateZod(loginSchema),
   AuthController.login
 );
+
+/**
+ * @openapi
+ * /users/logout:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Cerrar sesión
+ *     description: Borra la cookie HttpOnly de sesión del navegador.
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada (idempotente).
+ */
+router.post("/logout", AuthController.logout);
+
+/**
+ * @openapi
+ * /users/session:
+ *   get:
+ *     tags:
+ *       - Authentication
+ *     summary: Sesión actual del navegador
+ *     description: Devuelve el perfil del usuario de la cookie de sesión (o del Bearer), o `data null` si no hay sesión válida.
+ *     responses:
+ *       200:
+ *         description: Perfil del usuario o null.
+ */
+router.get("/session", optionalAuth, AuthController.getSession);
 
 /**
  * @openapi

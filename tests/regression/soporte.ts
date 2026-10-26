@@ -21,7 +21,7 @@ export interface Respuesta {
 export async function pedir(
   metodo: "GET" | "POST" | "PUT" | "DELETE",
   ruta: string,
-  { token, body }: { token?: string; body?: unknown } = {},
+  { token, body, cookie }: { token?: string; body?: unknown; cookie?: string } = {},
 ): Promise<Respuesta> {
   const server = createServer(app);
   await new Promise<void>((resolve) => server.listen(0, resolve));
@@ -29,6 +29,7 @@ export async function pedir(
   try {
     const headers: Record<string, string> = {};
     if (token) headers.Authorization = `Bearer ${token}`;
+    if (cookie) headers.Cookie = cookie;
     if (body !== undefined) headers["Content-Type"] = "application/json";
     const res = await fetch(`http://127.0.0.1:${port}${ruta}`, {
       method: metodo,

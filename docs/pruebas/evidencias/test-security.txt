@@ -1,42 +1,42 @@
 
  RUN  v3.2.7 /home/user/HomaraBackend
 
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-01  ESC35 (Alta) — un token de ADMIN forjado con el secreto por defecto NO debe ser aceptado 33ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-02  ESC36 (Alta) — ?admin=true NO debe listar todos los pedidos a un CUSTOMER 118ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-03  ESC36 (Alta) — GET /orders?userId=<ajeno> sin token NO debe filtrar pedidos de otro usuario 143ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-04  ESC36 (Alta) — GET /projects?userId=<ajeno> sin token NO debe filtrar proyectos de otro usuario 173ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-05  ESC36 (Media) — GET /cart?userId=<ajeno> sin token NO debe exponer el carrito de otro usuario 112ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-06  ESC36 (Alta) — GET /orders/:id sin token NO debe exponer el detalle ni el PII del cliente 147ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-07  ESC36 (Alta) — GET /projects/:id sin token NO debe exponer el proyecto de otro usuario 143ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-08  ESC36 (Alta) — GET /users/:id NO debe exponer el PII (teléfono/dirección) de otro usuario 172ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-09  ESC35 (Alta) — PUT /users/:id NO debe devolver la entidad con el hash de la contraseña 123ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-10  ESC35 (Media) — deberían existir cabeceras de seguridad (p. ej. X-Content-Type-Options) 4ms
- ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-11  ESC35 (Media) — el login debería limitar intentos (rate limiting) tras muchos fallos 987ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-01  ESC36/RN-008 — GET /users/me sin token responde 401 25ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-02  ESC36/RN-008 — POST /cart/items sin token responde 401 7ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-01  ESC35 (Alta) — un token de ADMIN forjado con el secreto por defecto NO debe ser aceptado 21ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-02  ESC36 (Alta) — ?admin=true NO debe listar todos los pedidos a un CUSTOMER 112ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-03  ESC36 (Alta) — GET /orders?userId=<ajeno> sin token NO debe filtrar pedidos de otro usuario 161ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-04  ESC36 (Alta) — GET /projects?userId=<ajeno> sin token NO debe filtrar proyectos de otro usuario 152ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-05  ESC36 (Media) — GET /cart?userId=<ajeno> sin token NO debe exponer el carrito de otro usuario 109ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-06  ESC36 (Alta) — GET /orders/:id sin token NO debe exponer el detalle ni el PII del cliente 158ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-07  ESC36 (Alta) — GET /projects/:id sin token NO debe exponer el proyecto de otro usuario 142ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-08  ESC36 (Alta) — GET /users/:id NO debe exponer el PII (teléfono/dirección) de otro usuario 178ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-09  ESC35 (Alta) — PUT /users/:id NO debe devolver la entidad con el hash de la contraseña 98ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-10  ESC35 (Media) — deberían existir cabeceras de seguridad (p. ej. X-Content-Type-Options) 3ms
+ ✓ tests/security/SEG-DEFECTOS.ts > Seguridad · Defectos corregidos (afirman el comportamiento seguro) > CP-SEG-DEF-11  ESC35 (Media) — el login debería limitar intentos (rate limiting) tras muchos fallos 1036ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-01  ESC36/RN-008 — GET /users/me sin token responde 401 27ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-02  ESC36/RN-008 — POST /cart/items sin token responde 401 8ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-03  ESC36/RN-008 — POST /orders sin token responde 401 8ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-04  ESC36/RN-008 — POST /projects sin token responde 401 5ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-05  ESC36/RN-008 — GET /admin/metrics sin token responde 401 5ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-05  ESC36/RN-008 — GET /admin/metrics sin token responde 401 6ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-06  ESC36/RN-008 — GET /admin/inventory sin token responde 401 3ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-07  RN-008 — token malformado se rechaza (401) 3ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-08  RN-008 — token expirado se rechaza (401) 3ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-09  RN-008 — token de usuario inexistente se rechaza (401) 6ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-10  ESC06/RN-010 — un CUSTOMER no entra a las rutas de administrador (403) 102ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-01  ESC35/RN-005 — login no devuelve la contraseña ni su hash 89ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-02  ESC35/RN-006 — el error de login es genérico (no revela si el correo existe) 93ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-03  ESC35/RN-005 — GET /users/me nunca incluye la contraseña 90ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-04  RN-012 — PUT /users/:id no permite escalar el rol a ADMIN 106ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-05  ESC36/RN-011 — un usuario no puede editar el perfil de otro (403) 197ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-ERR-01  ESC41/RN-062 — los errores usan el sobre {success:false,error} 5ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Autenticación de rutas protegidas > CP-SEG-AUT-10  ESC06/RN-010 — un CUSTOMER no entra a las rutas de administrador (403) 103ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-01  ESC35/RN-005 — login no devuelve la contraseña ni su hash 81ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-02  ESC35/RN-006 — el error de login es genérico (no revela si el correo existe) 88ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-03  ESC35/RN-005 — GET /users/me nunca incluye la contraseña 87ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-04  RN-012 — PUT /users/:id no permite escalar el rol a ADMIN 101ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Credenciales y datos sensibles > CP-SEG-CRED-05  ESC36/RN-011 — un usuario no puede editar el perfil de otro (403) 182ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-ERR-01  ESC41/RN-062 — los errores usan el sobre {success:false,error} 4ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-ERR-02  ESC41 — en producción las respuestas de error NO filtran el stack trace 3ms
  ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-ERR-03  ESC41/RN-063 — JSON malformado se maneja con el sobre uniforme (400) 3ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CFG-01  Config — no se expone la cabecera X-Powered-By 3ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CFG-02  Config — existe un límite de tamaño de cuerpo (payload grande = 413) 14ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CORS-01  ESC36 — CORS refleja exactamente el origen permitido, nunca el comodín * 3ms
- ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CORS-02  ESC36 — CORS no refleja un origen ajeno a la lista blanca 2ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CFG-01  Config — no se expone la cabecera X-Powered-By 4ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CFG-02  Config — existe un límite de tamaño de cuerpo (payload grande = 413) 16ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CORS-01  ESC36 — CORS refleja exactamente el origen permitido, nunca el comodín * 4ms
+ ✓ tests/security/SEG-CONTROLES.ts > Seguridad · Manejo uniforme de errores y configuración > CP-SEG-CORS-02  ESC36 — CORS no refleja un origen ajeno a la lista blanca 3ms
 
  Test Files  2 passed (2)
       Tests  33 passed (33)
-   Start at  16:56:05
-   Duration  3.44s (transform 78ms, setup 0ms, collect 110ms, tests 2.94s, environment 0ms, prepare 125ms)
+   Start at  22:19:16
+   Duration  3.47s (transform 106ms, setup 0ms, collect 137ms, tests 2.92s, environment 0ms, prepare 128ms)
 

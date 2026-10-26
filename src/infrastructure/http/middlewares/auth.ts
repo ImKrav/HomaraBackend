@@ -3,6 +3,7 @@ import { verifyToken } from "../../../shared/utils/authHelper.js";
 import { PrismaUserRepository } from "../../database/repositories/prisma-user.repository.js";
 import { IUserRepository } from "../../../domain/repositories/user-repository.interface.js";
 import { AppError } from "../../../shared/errors/AppError.js";
+import { readSessionCookie } from "../session-cookie.js";
 import jwt from "jsonwebtoken";
 
 const { TokenExpiredError, JsonWebTokenError } = jwt;
@@ -40,11 +41,19 @@ function toRequestUser(user: {
   };
 }
 
-function extractToken(authHeader: string | undefined): string {
-  if (!authHeader?.startsWith("Bearer ")) {
+// Clientes de API usan `Authorization: Bearer`; el navegador, la cookie HttpOnly de sesión.
+function findToken(req: Request): string | undefined {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) return authHeader.split(" ")[1];
+  return readSessionCookie(req);
+}
+
+function extractToken(req: Request): string {
+  const token = findToken(req);
+  if (!token) {
     throw new AppError("Token no provisto.", 401);
   }
-  return authHeader.split(" ")[1];
+  return token;
 }
 
 function forwardAuthError(error: unknown, next: NextFunction) {
@@ -67,7 +76,7 @@ async function authenticateUser(req: Request, token: string) {
 
 export async function requireAuth(_req: Request, _res: Response, next: NextFunction) {
   try {
-    const token = extractToken(_req.headers.authorization);
+    const token = extractToken(_req);
     await authenticateUser(_req, token);
     next();
   } catch (error) {
@@ -77,7 +86,7 @@ export async function requireAuth(_req: Request, _res: Response, next: NextFunct
 
 export async function requireAdmin(req: Request, _res: Response, next: NextFunction) {
   try {
-    const token = extractToken(req.headers.authorization);
+    const token = extractToken(req);
     await authenticateUser(req, token);
 
     if (req.user?.role !== "ADMIN") {
@@ -91,9 +100,8 @@ export async function requireAdmin(req: Request, _res: Response, next: NextFunct
 }
 
 export async function optionalAuth(req: Request, _res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-  if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.split(" ")[1];
+  const token = findToken(req);
+  if (token) {
     try {
       const decoded = verifyToken(token);
       const user = await userRepository.findById(decoded.id);
