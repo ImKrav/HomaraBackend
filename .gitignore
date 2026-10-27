@@ -48,3 +48,6 @@ next-env.d.ts
 .agents
 .claude
 skills-lock.json
+
+# Evidencias de Postman/Newman: se entregan aparte, no se versionan.
+/postman/evidencias/
